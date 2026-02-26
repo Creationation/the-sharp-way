@@ -7,7 +7,7 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "1.5rem",
+      padding: "1rem",
       screens: {
         "2xl": "1400px",
       },
@@ -15,7 +15,7 @@ export default {
     extend: {
       fontFamily: {
         heading: ['"Bebas Neue"', 'sans-serif'],
-        body: ['"Open Sans"', 'sans-serif'],
+        body: ['"Inter"', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -55,6 +55,9 @@ export default {
           DEFAULT: "hsl(var(--copper))",
           light: "hsl(var(--copper-light))",
           dark: "hsl(var(--copper-dark))",
+        },
+        mint: {
+          DEFAULT: "hsl(var(--mint))",
         },
         surface: {
           DEFAULT: "hsl(var(--surface))",
