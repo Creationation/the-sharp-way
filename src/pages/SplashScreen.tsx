@@ -46,7 +46,7 @@ const SplashScreen = () => {
               <span className="text-gradient-copper">YOUR LOOK INSTANTLY.</span>
             </h1>
             <p className="text-muted-foreground text-base max-w-sm opacity-0 animate-fade-up animation-delay-200" style={{ animationFillMode: "forwards" }}>
-              Vienna's premium barbershop — walk in or book ahead
+              Vienna's premium barbershop. Walk in or book ahead.
             </p>
             <div className="opacity-0 animate-fade-up animation-delay-400" style={{ animationFillMode: "forwards" }}>
               <button
