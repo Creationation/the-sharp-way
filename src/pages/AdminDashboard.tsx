@@ -120,7 +120,7 @@ const AdminDashboard = () => {
               filter === f ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
             }`}
           >
-            {f === "all" ? "Tous" : f === "confirmed" ? "Confirmés" : "Annulés"}
+            {f === "all" ? "All" : f === "confirmed" ? "Confirmed" : "Cancelled"}
           </button>
         ))}
       </div>
