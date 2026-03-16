@@ -1,13 +1,14 @@
 import { Star, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import barber1 from "@/assets/barber-1.jpg";
 import barber2 from "@/assets/barber-2.jpg";
 
 const reviews = [
-  { name: "Alex M.", barber: "Marco", barberImg: barber1, service: "Fade & Taper", stars: 5, text: "Best barbershop in Vienna. Marco nailed the fade — absolutely clean.", date: "2 days ago" },
-  { name: "Thomas R.", barber: "Lukas", barberImg: barber2, service: "Haircut + Beard Combo", stars: 5, text: "These guys know their craft. I walked in scruffy and walked out looking like a different person.", date: "1 week ago" },
-  { name: "Stefan K.", barber: "Marco", barberImg: barber1, service: "Hot Towel Shave", stars: 5, text: "The hot towel shave is an experience. Smooth, relaxing, and flawless.", date: "2 weeks ago" },
-  { name: "Michael B.", barber: "Lukas", barberImg: barber2, service: "Classic Haircut", stars: 4, text: "Lukas took his time to get the cut exactly right. Professional and friendly.", date: "3 weeks ago" },
+  { name: "Alex M.", barber: "Marco", barberImg: barber1, service: "Haarschnitt", stars: 5, text: { en: "Best barbershop in Vienna. Marco nailed the fade — absolutely clean.", de: "Der beste Barbershop in Wien. Marco hat den Schnitt perfekt getroffen — absolut sauber." }, date: { en: "2 days ago", de: "Vor 2 Tagen" } },
+  { name: "Thomas R.", barber: "Lukas", barberImg: barber2, service: "Haarschnitt + Komplett Service", stars: 5, text: { en: "These guys know their craft. I walked in scruffy and walked out looking like a different person.", de: "Die wissen was sie tun. Ich kam ungepflegt rein und sah aus wie ein anderer Mensch." }, date: { en: "1 week ago", de: "Vor 1 Woche" } },
+  { name: "Stefan K.", barber: "Marco", barberImg: barber1, service: "Moderne Bartrasur", stars: 5, text: { en: "The hot towel shave is an experience. Smooth, relaxing, and flawless.", de: "Die Bartrasur ist ein Erlebnis. Glatt, entspannend und makellos." }, date: { en: "2 weeks ago", de: "Vor 2 Wochen" } },
+  { name: "Michael B.", barber: "Lukas", barberImg: barber2, service: "Haarschnitt", stars: 4, text: { en: "Lukas took his time to get the cut exactly right. Professional and friendly.", de: "Lukas hat sich Zeit genommen, um den Schnitt genau richtig hinzubekommen. Professionell und freundlich." }, date: { en: "3 weeks ago", de: "Vor 3 Wochen" } },
 ];
 
 const ratingBars = [
@@ -20,6 +21,7 @@ const ratingBars = [
 
 const ReviewsScreen = () => {
   const navigate = useNavigate();
+  const { t, lang } = useLanguage();
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -28,7 +30,7 @@ const ReviewsScreen = () => {
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
           <ArrowLeft size={18} className="text-foreground" />
         </button>
-        <h1 className="font-heading text-2xl text-foreground">Reviews</h1>
+        <h1 className="font-heading text-2xl text-foreground">{t.reviews.title}</h1>
       </div>
 
       {/* Overall rating */}
@@ -39,7 +41,7 @@ const ReviewsScreen = () => {
             <div className="flex items-center gap-0.5 mt-1 justify-center">
               {[1,2,3,4,5].map(i => <Star key={i} size={14} className="text-copper fill-copper" />)}
             </div>
-            <p className="text-muted-foreground text-xs mt-1">312 reviews</p>
+            <p className="text-muted-foreground text-xs mt-1">{t.reviews.count}</p>
           </div>
           <div className="flex-1 space-y-1.5">
             {ratingBars.map(r => (
@@ -63,7 +65,7 @@ const ReviewsScreen = () => {
               <img src={r.barberImg} alt={r.barber} className="w-9 h-9 rounded-full object-cover" />
               <div className="flex-1">
                 <p className="text-foreground text-sm font-medium">{r.name}</p>
-                <p className="text-muted-foreground text-[11px]">{r.date}</p>
+                <p className="text-muted-foreground text-[11px]">{r.date[lang]}</p>
               </div>
               <div className="flex gap-0.5">
                 {Array.from({ length: r.stars }).map((_, j) => (
@@ -74,7 +76,7 @@ const ReviewsScreen = () => {
             <span className="inline-block bg-surface text-copper text-[10px] font-medium px-2.5 py-1 rounded-full mb-2">
               {r.service}
             </span>
-            <p className="text-muted-foreground text-sm leading-relaxed">"{r.text}"</p>
+            <p className="text-muted-foreground text-sm leading-relaxed">"{r.text[lang]}"</p>
           </div>
         ))}
       </div>

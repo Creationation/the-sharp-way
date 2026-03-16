@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowLeft, Bookmark, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import gallery1 from "@/assets/gallery-1.jpg";
 import gallery2 from "@/assets/gallery-2.jpg";
 import gallery3 from "@/assets/gallery-3.jpg";
@@ -8,21 +9,26 @@ import barber1 from "@/assets/barber-1.jpg";
 import barber2 from "@/assets/barber-2.jpg";
 import barber3 from "@/assets/barber-3.jpg";
 
-const filters = ["All", "Fades", "Beards", "Classic", "Color"];
-
 const galleryImages = [
-  { src: gallery1, tag: "Fade", saved: false },
-  { src: gallery2, tag: "Beard", saved: true },
-  { src: gallery3, tag: "Classic", saved: false },
-  { src: barber1, tag: "Fade", saved: false },
-  { src: barber2, tag: "Classic", saved: true },
-  { src: barber3, tag: "Beard", saved: false },
+  { src: gallery1, tagIndex: 1, saved: false },
+  { src: gallery2, tagIndex: 2, saved: true },
+  { src: gallery3, tagIndex: 3, saved: false },
+  { src: barber1, tagIndex: 1, saved: false },
+  { src: barber2, tagIndex: 3, saved: true },
+  { src: barber3, tagIndex: 2, saved: false },
 ];
 
 const GalleryScreen = () => {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState("All");
+  const { t } = useLanguage();
+  const [activeFilter, setActiveFilter] = useState(0);
   const [lightbox, setLightbox] = useState<string | null>(null);
+
+  const filters = t.gallery.filters;
+
+  const filtered = activeFilter === 0
+    ? galleryImages
+    : galleryImages.filter(img => img.tagIndex === activeFilter);
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -31,18 +37,18 @@ const GalleryScreen = () => {
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
           <ArrowLeft size={18} className="text-foreground" />
         </button>
-        <h1 className="font-heading text-2xl text-foreground">The Art of the Cut</h1>
+        <h1 className="font-heading text-2xl text-foreground">{t.gallery.title}</h1>
       </div>
 
       {/* Filters */}
       <div className="px-5 mb-5">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-          {filters.map(f => (
+          {filters.map((f, i) => (
             <button
               key={f}
-              onClick={() => setActiveFilter(f)}
+              onClick={() => setActiveFilter(i)}
               className={`px-4 py-2 rounded-full text-sm font-medium flex-shrink-0 transition-all ${
-                activeFilter === f
+                activeFilter === i
                   ? "gradient-copper text-primary-foreground"
                   : "bg-surface border border-border text-muted-foreground"
               }`}
@@ -55,7 +61,7 @@ const GalleryScreen = () => {
 
       {/* Masonry grid */}
       <div className="px-5 columns-2 gap-3 space-y-3">
-        {galleryImages.map((img, i) => (
+        {filtered.map((img, i) => (
           <div
             key={i}
             className="relative rounded-2xl overflow-hidden cursor-pointer break-inside-avoid group"
@@ -72,7 +78,7 @@ const GalleryScreen = () => {
             </div>
             <div className="absolute bottom-2.5 left-2.5">
               <span className="bg-background/70 backdrop-blur-sm text-foreground text-[10px] font-medium px-2 py-1 rounded-full">
-                {img.tag}
+                {filters[img.tagIndex]}
               </span>
             </div>
           </div>

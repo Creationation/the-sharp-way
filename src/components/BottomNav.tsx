@@ -1,20 +1,21 @@
 import { Home, Search, Scissors, Image, User } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-
-const tabs = [
-  { icon: Home, label: "Home", path: "/home" },
-  { icon: Search, label: "Explore", path: "/services" },
-  { icon: Scissors, label: "Book", path: "/book", isCenter: true },
-  { icon: Image, label: "Gallery", path: "/gallery" },
-  { icon: User, label: "Profile", path: "/profile" },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
-  // Hide on splash
   if (location.pathname === "/") return null;
+
+  const tabs = [
+    { icon: Home, label: t.nav.home, path: "/home" },
+    { icon: Search, label: t.nav.explore, path: "/services" },
+    { icon: Scissors, label: t.nav.book, path: "/book", isCenter: true },
+    { icon: Image, label: t.nav.gallery, path: "/gallery" },
+    { icon: User, label: t.nav.profile, path: "/profile" },
+  ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border pb-safe">

@@ -1,5 +1,6 @@
-import { Bell, Search, MapPin, Star, ChevronRight, Scissors } from "lucide-react";
+import { Bell, Search, MapPin, Star, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import barber1 from "@/assets/barber-1.jpg";
 import barber2 from "@/assets/barber-2.jpg";
 import barber3 from "@/assets/barber-3.jpg";
@@ -13,13 +14,15 @@ const barbers = [
 
 const HomeDashboard = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Announcement strip */}
       <div className="bg-surface border-b border-border px-4 py-2.5 text-center">
         <p className="text-xs text-muted-foreground">
-          ✂️ <span className="text-copper font-medium">New:</span> Hot Towel Shave now available — <span className="text-copper cursor-pointer" onClick={() => navigate("/book")}>Book Today</span>
+          ✂️ <span className="text-copper font-medium">New:</span> {t.home.announcement}{" "}
+          <span className="text-copper cursor-pointer" onClick={() => navigate("/book")}>{t.home.announcementLink}</span>
         </p>
       </div>
 
@@ -30,10 +33,10 @@ const HomeDashboard = () => {
             S
           </div>
           <div>
-            <p className="text-foreground font-semibold text-sm">Hi, Sharp Client</p>
+            <p className="text-foreground font-semibold text-sm">{t.home.greeting}</p>
             <div className="flex items-center gap-1 text-muted-foreground text-xs">
               <MapPin size={10} />
-              <span>Vienna, AT</span>
+              <span>{t.home.location}</span>
             </div>
           </div>
         </div>
@@ -48,7 +51,7 @@ const HomeDashboard = () => {
       <div className="px-5 mb-5">
         <div className="bg-surface rounded-xl px-4 py-3 flex items-center gap-3 border border-border">
           <Search size={18} className="text-muted-foreground" />
-          <span className="text-muted-foreground text-sm">Search barbers, styles, services...</span>
+          <span className="text-muted-foreground text-sm">{t.home.searchPlaceholder}</span>
         </div>
       </div>
 
@@ -58,13 +61,13 @@ const HomeDashboard = () => {
           <div className="absolute inset-0 gradient-copper opacity-10" />
           <div className="relative flex items-center p-5">
             <div className="flex-1">
-              <p className="text-copper font-heading text-2xl mb-1">Upgrade Your Style ✂️</p>
-              <p className="text-muted-foreground text-xs mb-3">First visit? Get 20% OFF — code: SHARP20</p>
+              <p className="text-copper font-heading text-2xl mb-1">{t.home.promoTitle}</p>
+              <p className="text-muted-foreground text-xs mb-3">{t.home.promoSub}</p>
               <button
                 onClick={() => navigate("/book")}
                 className="gradient-copper text-primary-foreground text-xs font-semibold px-4 py-2 rounded-full"
               >
-                Book Now
+                {t.home.bookNow}
               </button>
             </div>
             <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 ml-3">
@@ -77,19 +80,19 @@ const HomeDashboard = () => {
       {/* Last Appointment */}
       <div className="px-5 mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-heading text-lg text-foreground">Your Last Appointment</h3>
+          <h3 className="font-heading text-lg text-foreground">{t.home.lastAppointment}</h3>
         </div>
         <div className="card-app p-4 flex items-center gap-4">
           <img src={barber1} alt="Marco" className="w-12 h-12 rounded-full object-cover" />
           <div className="flex-1">
-            <p className="text-foreground font-semibold text-sm">Fade & Taper with Marco</p>
+            <p className="text-foreground font-semibold text-sm">{t.home.lastService}</p>
             <p className="text-muted-foreground text-xs">Feb 15, 2026 · 11:00 AM</p>
           </div>
           <button
             onClick={() => navigate("/book")}
             className="text-copper text-xs font-semibold border border-copper rounded-full px-3 py-1.5"
           >
-            Rebook
+            {t.home.rebook}
           </button>
         </div>
       </div>
@@ -97,9 +100,9 @@ const HomeDashboard = () => {
       {/* Our Barbers */}
       <div className="mb-6">
         <div className="flex items-center justify-between px-5 mb-3">
-          <h3 className="font-heading text-lg text-foreground">Our Barbers</h3>
+          <h3 className="font-heading text-lg text-foreground">{t.home.ourBarbers}</h3>
           <button className="text-copper text-xs font-medium flex items-center gap-1">
-            See all <ChevronRight size={14} />
+            {t.home.seeAll} <ChevronRight size={14} />
           </button>
         </div>
         <div className="overflow-x-auto scrollbar-hide">
@@ -113,10 +116,9 @@ const HomeDashboard = () => {
                 <div className="relative h-36">
                   <img src={b.image} alt={b.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
-                  {/* Availability dot */}
                   <div className="absolute top-3 right-3 flex items-center gap-1 bg-background/70 backdrop-blur-sm rounded-full px-2 py-0.5">
                     <div className={`w-2 h-2 rounded-full ${b.available ? "bg-mint animate-pulse-dot" : "bg-muted-foreground"}`} />
-                    <span className="text-[9px] text-foreground font-medium">{b.available ? "Available" : "Busy"}</span>
+                    <span className="text-[9px] text-foreground font-medium">{b.available ? t.home.available : t.home.busy}</span>
                   </div>
                 </div>
                 <div className="p-3">
@@ -127,7 +129,7 @@ const HomeDashboard = () => {
                     <span className="text-foreground text-xs font-medium">{b.rating}</span>
                   </div>
                   <button className="w-full gradient-copper text-primary-foreground text-[11px] font-semibold py-1.5 rounded-full">
-                    Book Now →
+                    {t.home.bookNow} →
                   </button>
                 </div>
               </div>
@@ -139,9 +141,9 @@ const HomeDashboard = () => {
       {/* Quick Services */}
       <div className="px-5">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-heading text-lg text-foreground">Quick Book</h3>
+          <h3 className="font-heading text-lg text-foreground">{t.home.quickBook}</h3>
           <button onClick={() => navigate("/services")} className="text-copper text-xs font-medium flex items-center gap-1">
-            All services <ChevronRight size={14} />
+            {t.home.allServices} <ChevronRight size={14} />
           </button>
         </div>
         <div className="grid grid-cols-2 gap-3">

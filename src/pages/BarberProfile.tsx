@@ -1,5 +1,6 @@
-import { ArrowLeft, Star, MapPin, Clock, Share2 } from "lucide-react";
+import { ArrowLeft, Star, MapPin, Share2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import barber1 from "@/assets/barber-1.jpg";
 import barber2 from "@/assets/barber-2.jpg";
 import barber3 from "@/assets/barber-3.jpg";
@@ -24,6 +25,7 @@ const services = [
 const BarberProfile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { t } = useLanguage();
   const barber = barbersData.find(b => b.id === Number(id)) || barbersData[0];
   const recentWork = [gallery1, gallery2, gallery3];
 
@@ -52,7 +54,7 @@ const BarberProfile = () => {
             <div className="flex items-center gap-1">
               <Star size={14} className="text-copper fill-copper" />
               <span className="text-foreground font-medium">{barber.rating}</span>
-              <span className="text-muted-foreground">· {barber.reviews} reviews</span>
+              <span className="text-muted-foreground">· {barber.reviews} {t.barber.reviews}</span>
             </div>
             <div className="flex items-center gap-1 text-muted-foreground">
               <MapPin size={12} />
@@ -66,9 +68,9 @@ const BarberProfile = () => {
       <div className="px-5 py-5">
         <div className="grid grid-cols-3 gap-3">
           {[
-            { value: `${barber.cuts}`, label: "Cuts" },
-            { value: `${barber.years} yrs`, label: "Experience" },
-            { value: "Top Rated", label: "Status" },
+            { value: `${barber.cuts}`, label: t.barber.cuts },
+            { value: `${barber.years} ${t.barber.yrs}`, label: t.barber.experience },
+            { value: t.barber.topRated, label: t.barber.status },
           ].map(s => (
             <div key={s.label} className="card-app p-3 text-center">
               <p className="text-copper font-heading text-xl">{s.value}</p>
@@ -80,7 +82,7 @@ const BarberProfile = () => {
 
       {/* Services */}
       <div className="px-5 mb-6">
-        <h3 className="font-heading text-lg text-foreground mb-3">Services</h3>
+        <h3 className="font-heading text-lg text-foreground mb-3">{t.barber.services}</h3>
         <div className="overflow-x-auto scrollbar-hide">
           <div className="flex gap-2" style={{ width: "max-content" }}>
             {services.map(s => (
@@ -95,7 +97,7 @@ const BarberProfile = () => {
 
       {/* Recent Work */}
       <div className="px-5 mb-6">
-        <h3 className="font-heading text-lg text-foreground mb-3">Recent Work</h3>
+        <h3 className="font-heading text-lg text-foreground mb-3">{t.barber.recentWork}</h3>
         <div className="grid grid-cols-3 gap-2">
           {recentWork.map((img, i) => (
             <div key={i} className="aspect-square rounded-xl overflow-hidden">
@@ -111,7 +113,7 @@ const BarberProfile = () => {
           onClick={() => navigate("/book")}
           className="w-full gradient-copper text-primary-foreground font-semibold text-base py-3.5 rounded-full shadow-copper"
         >
-          Book with {barber.name} →
+          {t.barber.bookWith(barber.name)}
         </button>
       </div>
     </div>

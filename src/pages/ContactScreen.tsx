@@ -1,19 +1,27 @@
-import { ArrowLeft, MapPin, Phone, Mail, Clock, MessageCircle, Navigation, Instagram } from "lucide-react";
+import { ArrowLeft, MapPin, Phone, Clock, MessageCircle, Navigation, Instagram } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-const hours = [
-  { day: "Monday", time: "Closed" },
-  { day: "Tuesday", time: "10:00 AM – 8:00 PM" },
-  { day: "Wednesday", time: "10:00 AM – 8:00 PM" },
-  { day: "Thursday", time: "10:00 AM – 8:00 PM" },
-  { day: "Friday", time: "10:00 AM – 8:00 PM" },
-  { day: "Saturday", time: "10:00 AM – 8:00 PM" },
-  { day: "Sunday", time: "Closed" },
+const hoursData = [
+  { time: "Closed" },
+  { time: "10:00 – 20:00" },
+  { time: "10:00 – 20:00" },
+  { time: "10:00 – 20:00" },
+  { time: "10:00 – 20:00" },
+  { time: "10:00 – 20:00" },
+  { time: "Closed" },
 ];
 
 const ContactScreen = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const whatsappUrl = `https://wa.me/436644686073?text=${encodeURIComponent("Hallo, ich möchte einen Termin bei Sitdown Barber vereinbaren.")}`;
+
+  const hours = hoursData.map((h, i) => ({
+    day: t.contact.days[i],
+    time: h.time === "Closed" ? t.contact.closed : h.time,
+    isClosed: h.time === "Closed",
+  }));
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -22,7 +30,7 @@ const ContactScreen = () => {
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
           <ArrowLeft size={18} className="text-foreground" />
         </button>
-        <h1 className="font-heading text-2xl text-foreground">Find Us</h1>
+        <h1 className="font-heading text-2xl text-foreground">{t.contact.title}</h1>
       </div>
 
       {/* Map placeholder */}
@@ -42,12 +50,14 @@ const ContactScreen = () => {
       <div className="px-5 space-y-2 mb-5">
         {[
           { icon: MapPin, label: "Lavaterstrasse 2, 1220 Wien", sub: "Austria", href: "https://maps.google.com/?q=Lavaterstrasse+2,+1220+Wien" },
-          { icon: Phone, label: "+43 664 4686073", sub: "Anrufen", href: "tel:+436644686073" },
-          { icon: MessageCircle, label: "WhatsApp", sub: "Schreib uns", href: whatsappUrl },
+          { icon: Phone, label: "+43 664 4686073", sub: t.contact.callUs, href: "tel:+436644686073" },
+          { icon: MessageCircle, label: "WhatsApp", sub: t.contact.chatUs, href: whatsappUrl },
         ].map((item, i) => (
           <a
             key={i}
-            href={item.href || "#"}
+            href={item.href}
+            target={item.href.startsWith("http") ? "_blank" : undefined}
+            rel="noreferrer"
             className="card-app p-4 flex items-center gap-4 block"
           >
             <div className="w-10 h-10 rounded-xl bg-surface flex items-center justify-center">
@@ -66,14 +76,14 @@ const ContactScreen = () => {
         <div className="card-app p-4">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-2 h-2 rounded-full bg-mint animate-pulse-dot" />
-            <span className="text-mint text-xs font-medium">Open Now</span>
-            <span className="text-muted-foreground text-xs">· Closes at 8PM</span>
+            <span className="text-mint text-xs font-medium">{t.contact.openNow}</span>
+            <span className="text-muted-foreground text-xs">{t.contact.closesAt}</span>
           </div>
           <div className="space-y-2">
             {hours.map(h => (
               <div key={h.day} className="flex items-center justify-between">
                 <span className="text-muted-foreground text-sm">{h.day}</span>
-                <span className={`text-sm ${h.time === "Closed" ? "text-muted-foreground/50" : "text-foreground"}`}>
+                <span className={`text-sm ${h.isClosed ? "text-muted-foreground/50" : "text-foreground"}`}>
                   {h.time}
                 </span>
               </div>
@@ -91,7 +101,7 @@ const ContactScreen = () => {
           className="w-full gradient-copper text-primary-foreground font-semibold py-3.5 rounded-full shadow-copper flex items-center justify-center gap-2"
         >
           <Navigation size={18} />
-          Get Directions
+          {t.contact.directions}
         </a>
       </div>
 
@@ -115,7 +125,7 @@ const ContactScreen = () => {
         <p className="font-heading text-lg text-foreground tracking-widest">
           THE SHARP <span className="text-copper">CUT</span>
         </p>
-        <p className="text-muted-foreground text-xs mt-1">© 2026 The Sharp Cut. All rights reserved.</p>
+        <p className="text-muted-foreground text-xs mt-1">{t.contact.copyright}</p>
       </div>
     </div>
   );

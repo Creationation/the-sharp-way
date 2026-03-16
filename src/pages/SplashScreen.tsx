@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const SplashScreen = () => {
   const navigate = useNavigate();
+  const { t, lang, setLang } = useLanguage();
   const [phase, setPhase] = useState<"logo" | "content">("logo");
 
   useEffect(() => {
-    const t = setTimeout(() => setPhase("content"), 1200);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setPhase("content"), 1200);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -41,19 +43,47 @@ const SplashScreen = () => {
         ) : (
           <div className="space-y-6">
             <h1 className="font-heading text-5xl sm:text-6xl md:text-8xl leading-[0.95] opacity-0 animate-fade-up" style={{ animationFillMode: "forwards" }}>
-              DISCOVER TOP<br />
-              BARBERS & BOOK<br />
-              <span className="text-gradient-copper">YOUR LOOK INSTANTLY.</span>
+              {t.splash.line1}<br />
+              {t.splash.line2}<br />
+              <span className="text-gradient-copper">{t.splash.line3}</span>
             </h1>
             <p className="text-muted-foreground text-base max-w-sm opacity-0 animate-fade-up animation-delay-200" style={{ animationFillMode: "forwards" }}>
-              Vienna's premium barbershop. Walk in or book ahead.
+              {t.splash.sub}
             </p>
+
+            {/* Language picker */}
+            <div className="opacity-0 animate-fade-up animation-delay-300" style={{ animationFillMode: "forwards" }}>
+              <p className="text-muted-foreground text-xs mb-2">{t.splash.pickLanguage}</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setLang("de")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border transition-all ${
+                    lang === "de"
+                      ? "gradient-copper text-primary-foreground border-transparent shadow-copper"
+                      : "bg-surface border-border text-muted-foreground"
+                  }`}
+                >
+                  🇩🇪 Deutsch
+                </button>
+                <button
+                  onClick={() => setLang("en")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border transition-all ${
+                    lang === "en"
+                      ? "gradient-copper text-primary-foreground border-transparent shadow-copper"
+                      : "bg-surface border-border text-muted-foreground"
+                  }`}
+                >
+                  🇬🇧 English
+                </button>
+              </div>
+            </div>
+
             <div className="opacity-0 animate-fade-up animation-delay-400" style={{ animationFillMode: "forwards" }}>
               <button
                 onClick={() => navigate("/home")}
                 className="gradient-copper text-primary-foreground font-body font-semibold text-base px-8 py-3.5 rounded-full shadow-copper hover:opacity-90 transition-all flex items-center gap-2"
               >
-                Get Started
+                {t.splash.cta}
                 <span>→</span>
               </button>
             </div>
@@ -64,7 +94,7 @@ const SplashScreen = () => {
       {/* Bottom text */}
       <div className="relative z-10 text-center pb-10 opacity-0 animate-fade-in animation-delay-600" style={{ animationFillMode: "forwards" }}>
         <p className="text-muted-foreground text-xs">
-          Or walk in anytime · Tue–Sat 10:00–20:00
+          {t.splash.walkin}
         </p>
       </div>
     </div>

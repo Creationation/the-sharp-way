@@ -3,6 +3,7 @@ import { ArrowLeft, Trophy, Gift, ChevronRight, Calendar, Clock, LogOut, Shield 
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { format } from "date-fns";
 
 interface Booking {
@@ -20,6 +21,7 @@ const stamps = 4;
 const ProfileScreen = () => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
+  const { t, lang, setLang } = useLanguage();
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +60,7 @@ const ProfileScreen = () => {
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
           <ArrowLeft size={18} className="text-foreground" />
         </button>
-        <h1 className="font-heading text-2xl text-foreground flex-1">Profile</h1>
+        <h1 className="font-heading text-2xl text-foreground flex-1">{t.profile.title}</h1>
         <button onClick={handleSignOut} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
           <LogOut size={18} className="text-muted-foreground" />
         </button>
@@ -83,8 +85,8 @@ const ProfileScreen = () => {
           <div className="absolute inset-0 gradient-copper opacity-20" />
           <div className="relative border border-copper/30 rounded-2xl p-5">
             <div className="flex items-center justify-between mb-4">
-              <p className="font-heading text-lg text-copper tracking-widest">THE SHARP CUT MEMBER</p>
-              <span className="text-foreground text-[10px] bg-surface px-2 py-1 rounded-full">Gold</span>
+              <p className="font-heading text-lg text-copper tracking-widest">{t.profile.member}</p>
+              <span className="text-foreground text-[10px] bg-surface px-2 py-1 rounded-full">{t.profile.gold}</span>
             </div>
             <div className="grid grid-cols-5 gap-2 mb-4">
               {Array.from({ length: 10 }).map((_, i) => (
@@ -103,7 +105,7 @@ const ProfileScreen = () => {
               ))}
             </div>
             <p className="text-muted-foreground text-xs text-center">
-              {stamps}/10 — Every 10th cut is <span className="text-copper font-semibold">FREE</span> ✂️
+              {t.profile.stampsLabel(stamps)}
             </p>
           </div>
         </div>
@@ -114,16 +116,16 @@ const ProfileScreen = () => {
         <div className="card-app p-4 flex items-center gap-4">
           <Trophy size={24} className="text-copper" />
           <div className="flex-1">
-            <p className="text-foreground font-semibold text-sm">450 Sharp Points</p>
-            <p className="text-muted-foreground text-xs">Earn 50 pts per visit</p>
+            <p className="text-foreground font-semibold text-sm">{t.profile.points}</p>
+            <p className="text-muted-foreground text-xs">{t.profile.earnPoints}</p>
           </div>
-          <button className="text-copper text-xs font-semibold">Redeem →</button>
+          <button className="text-copper text-xs font-semibold">{t.profile.redeem}</button>
         </div>
       </div>
 
       {/* My Bookings */}
       <div className="px-5 mb-5">
-        <h3 className="font-heading text-lg text-foreground mb-3">My Bookings</h3>
+        <h3 className="font-heading text-lg text-foreground mb-3">{t.profile.myBookings}</h3>
         <div className="flex gap-2 mb-3">
           {(["upcoming", "past"] as const).map(tab => (
             <button
@@ -135,7 +137,7 @@ const ProfileScreen = () => {
                   : "bg-surface border border-border text-muted-foreground"
               }`}
             >
-              {tab === "upcoming" ? "Upcoming" : "Past"}
+              {tab === "upcoming" ? t.profile.upcoming : t.profile.past}
             </button>
           ))}
         </div>
@@ -147,11 +149,11 @@ const ProfileScreen = () => {
         ) : (activeTab === "upcoming" ? upcoming : past).length === 0 ? (
           <div className="card-app p-8 text-center">
             <p className="text-muted-foreground text-sm">
-              {activeTab === "upcoming" ? "No upcoming appointments" : "No past appointments"}
+              {activeTab === "upcoming" ? t.profile.noUpcoming : t.profile.noPast}
             </p>
             {activeTab === "upcoming" && (
               <button onClick={() => navigate("/book")} className="text-copper text-sm font-semibold mt-2">
-                Book now →
+                {t.profile.bookNow}
               </button>
             )}
           </div>
@@ -161,7 +163,9 @@ const ProfileScreen = () => {
               <div key={b.id} className="card-app p-4">
                 <div className="flex items-center gap-3 mb-2">
                   <Calendar size={16} className="text-copper" />
-                  <span className="text-foreground text-sm font-medium">{b.service_name} with {b.barber_name}</span>
+                  <span className="text-foreground text-sm font-medium">
+                    {b.service_name} {t.profile.with} {b.barber_name}
+                  </span>
                 </div>
                 <div className="flex items-center gap-3 text-muted-foreground text-xs">
                   <Clock size={12} />
@@ -178,11 +182,40 @@ const ProfileScreen = () => {
       <div className="px-5 mb-5">
         <div className="card-app p-5 border-copper/30">
           <Gift size={24} className="text-copper mb-3" />
-          <h3 className="text-foreground font-semibold text-sm mb-1">Refer a Friend</h3>
-          <p className="text-muted-foreground text-xs mb-3">Give €10, Get €10. Share your code</p>
+          <h3 className="text-foreground font-semibold text-sm mb-1">{t.profile.referTitle}</h3>
+          <p className="text-muted-foreground text-xs mb-3">{t.profile.referSub}</p>
           <div className="bg-surface rounded-xl px-4 py-2.5 flex items-center justify-between">
             <span className="text-copper font-mono font-semibold text-sm">SHARP-FR1END</span>
-            <button className="text-foreground text-xs">Copy</button>
+            <button className="text-foreground text-xs">{t.profile.copy}</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Language selector */}
+      <div className="px-5 mb-5">
+        <div className="card-app p-4">
+          <p className="text-foreground text-sm font-medium mb-3">{t.profile.language}</p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setLang("de")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border transition-all ${
+                lang === "de"
+                  ? "gradient-copper text-primary-foreground border-transparent shadow-copper"
+                  : "bg-surface border-border text-muted-foreground"
+              }`}
+            >
+              🇩🇪 Deutsch
+            </button>
+            <button
+              onClick={() => setLang("en")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border transition-all ${
+                lang === "en"
+                  ? "gradient-copper text-primary-foreground border-transparent shadow-copper"
+                  : "bg-surface border-border text-muted-foreground"
+              }`}
+            >
+              🇬🇧 English
+            </button>
           </div>
         </div>
       </div>
@@ -195,15 +228,15 @@ const ProfileScreen = () => {
             className="w-full card-app p-4 flex items-center justify-between border-copper/30"
           >
             <span className="text-copper text-sm font-semibold flex items-center gap-2">
-              <Shield size={16} /> Admin Dashboard
+              <Shield size={16} /> {t.profile.adminDashboard}
             </span>
             <ChevronRight size={16} className="text-copper" />
           </button>
         )}
         {[
-          { label: "Reviews", action: () => navigate("/reviews") },
-          { label: "Contact Us", action: () => navigate("/contact") },
-          { label: "About The Sharp Cut", action: () => {} },
+          { label: t.profile.reviews, action: () => navigate("/reviews") },
+          { label: t.profile.contact, action: () => navigate("/contact") },
+          { label: t.profile.about, action: () => {} },
         ].map(item => (
           <button
             key={item.label}

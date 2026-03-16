@@ -3,6 +3,7 @@ import { ArrowLeft, Star, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 import barber1 from "@/assets/barber-1.jpg";
 import barber2 from "@/assets/barber-2.jpg";
@@ -39,6 +40,7 @@ const takenSlots = ["10:00", "11:30", "14:00", "15:30", "17:00"];
 const BookingFlow = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [selectedBarber, setSelectedBarber] = useState(barbers[0]);
   const [selectedService, setSelectedService] = useState(services[0]);
   const [selectedDay, setSelectedDay] = useState(3);
@@ -86,22 +88,22 @@ const BookingFlow = () => {
           <div className="w-20 h-20 rounded-full gradient-copper mx-auto mb-6 flex items-center justify-center animate-fade-up">
             <Check size={36} className="text-primary-foreground" />
           </div>
-          <h2 className="font-heading text-4xl text-copper mb-2 animate-fade-up" style={{ animationDelay: "100ms", animationFillMode: "forwards", opacity: 0 }}>You're Booked!</h2>
+          <h2 className="font-heading text-4xl text-copper mb-2 animate-fade-up" style={{ animationDelay: "100ms", animationFillMode: "forwards", opacity: 0 }}>{t.booking.booked}</h2>
           <p className="text-muted-foreground mb-2 animate-fade-up" style={{ animationDelay: "200ms", animationFillMode: "forwards", opacity: 0 }}>
-            {selectedService.name} with {selectedBarber.name}
+            {selectedService.name} {t.booking.bookedWith} {selectedBarber.name}
           </p>
           <p className="text-foreground font-medium mb-1 animate-fade-up" style={{ animationDelay: "300ms", animationFillMode: "forwards", opacity: 0 }}>
-            {days[selectedDay]}, {dates[selectedDay]} Feb · {selectedTime}
+            {days[selectedDay]}, {dates[selectedDay]} {t.booking.feb} · {selectedTime}
           </p>
           <p className="text-muted-foreground text-xs mb-8 animate-fade-up" style={{ animationDelay: "400ms", animationFillMode: "forwards", opacity: 0 }}>
-            Free cancellation up to 2 hours before
+            {t.booking.cancellation}
           </p>
           <button
             onClick={() => navigate("/home")}
             className="gradient-copper text-primary-foreground font-semibold px-8 py-3 rounded-full shadow-copper animate-fade-up"
             style={{ animationDelay: "500ms", animationFillMode: "forwards", opacity: 0 }}
           >
-            Back to Home
+            {t.booking.backHome}
           </button>
         </div>
       </div>
@@ -114,13 +116,13 @@ const BookingFlow = () => {
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
           <ArrowLeft size={18} className="text-foreground" />
         </button>
-        <h1 className="font-heading text-2xl text-foreground flex-1">Book Now</h1>
+        <h1 className="font-heading text-2xl text-foreground flex-1">{t.booking.title}</h1>
         <img src={selectedBarber.image} alt="" className="w-8 h-8 rounded-full object-cover border-2 border-copper" />
       </div>
 
       {/* Select Barber */}
       <div className="px-5 mb-5">
-        <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">SELECT BARBER</h3>
+        <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">{t.booking.selectBarber}</h3>
         <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
           {barbers.map(b => (
             <button
@@ -143,7 +145,7 @@ const BookingFlow = () => {
 
       {/* Day strip */}
       <div className="px-5 mb-5">
-        <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">AVAILABLE SLOTS</h3>
+        <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">{t.booking.availableSlots}</h3>
         <div className="flex gap-2 mb-4">
           {days.map((d, i) => (
             <button
@@ -155,7 +157,7 @@ const BookingFlow = () => {
             >
               <p className={`text-[10px] font-medium ${selectedDay === i ? "text-primary-foreground" : "text-muted-foreground"}`}>{d}</p>
               <p className={`text-lg font-semibold ${selectedDay === i ? "text-primary-foreground" : "text-foreground"}`}>{dates[i]}</p>
-              <p className={`text-[10px] ${selectedDay === i ? "text-primary-foreground/70" : "text-muted-foreground"}`}>FEB</p>
+              <p className={`text-[10px] ${selectedDay === i ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{t.booking.feb}</p>
             </button>
           ))}
         </div>
@@ -163,7 +165,7 @@ const BookingFlow = () => {
 
       {/* Time slots */}
       <div className="px-5 mb-5">
-        <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">SELECT TIME</h3>
+        <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">{t.booking.selectTime}</h3>
         <div className="grid grid-cols-4 gap-2">
           {timeSlots.map(t => {
             const taken = takenSlots.includes(t);
@@ -193,7 +195,7 @@ const BookingFlow = () => {
 
       {/* Service selection */}
       <div className="px-5 mb-5">
-        <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">SELECT SERVICE</h3>
+        <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">{t.booking.selectService}</h3>
         <div className="space-y-2">
           {services.map(s => (
             <button
@@ -224,24 +226,24 @@ const BookingFlow = () => {
       <div className="px-5 mb-6">
         <div className="card-app p-4 border-copper/30">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-muted-foreground text-xs">Service</span>
+            <span className="text-muted-foreground text-xs">{t.booking.service}</span>
             <span className="text-foreground text-sm font-medium">{selectedService.name}</span>
           </div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-muted-foreground text-xs">Duration</span>
+            <span className="text-muted-foreground text-xs">{t.booking.duration}</span>
             <span className="text-foreground text-sm">{selectedService.duration}</span>
           </div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-muted-foreground text-xs">Barber</span>
+            <span className="text-muted-foreground text-xs">{t.booking.barber}</span>
             <span className="text-foreground text-sm">{selectedBarber.name}</span>
           </div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-muted-foreground text-xs">Date & Time</span>
+            <span className="text-muted-foreground text-xs">{t.booking.dateTime}</span>
             <span className="text-foreground text-sm">{days[selectedDay]} {dates[selectedDay]} · {selectedTime}</span>
           </div>
           <div className="border-t border-border my-3" />
           <div className="flex items-center justify-between">
-            <span className="text-foreground font-semibold">Total</span>
+            <span className="text-foreground font-semibold">{t.booking.total}</span>
             <span className="text-copper font-heading text-2xl">{selectedService.price}</span>
           </div>
         </div>
@@ -254,9 +256,9 @@ const BookingFlow = () => {
           disabled={saving}
           className="w-full gradient-copper text-primary-foreground font-semibold text-base py-3.5 rounded-full shadow-copper disabled:opacity-50"
         >
-          {saving ? "Booking..." : "Confirm Booking →"}
+          {saving ? t.booking.saving : t.booking.confirm}
         </button>
-        <p className="text-center text-muted-foreground text-[10px] mt-2">Free cancellation up to 2 hours before</p>
+        <p className="text-center text-muted-foreground text-[10px] mt-2">{t.booking.cancellation}</p>
       </div>
     </div>
   );
