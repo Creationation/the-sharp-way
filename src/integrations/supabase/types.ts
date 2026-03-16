@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      barber_availability: {
+        Row: {
+          barber_name: string
+          blocked_slots: string[]
+          created_at: string
+          date: string
+          day_off: boolean
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          barber_name: string
+          blocked_slots?: string[]
+          created_at?: string
+          date: string
+          day_off?: boolean
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          barber_name?: string
+          blocked_slots?: string[]
+          created_at?: string
+          date?: string
+          day_off?: boolean
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           barber_name: string

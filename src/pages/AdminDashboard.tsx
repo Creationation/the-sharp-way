@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
-import { ArrowLeft, Calendar, Clock, User, Trash2, XCircle, CheckCircle } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import {
+  ArrowLeft, Calendar, Clock, User, Trash2, XCircle,
+  CheckCircle, ChevronLeft, ChevronRight, ToggleLeft, ToggleRight, Save,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { format, addDays, subDays } from "date-fns";
 
 interface Booking {
   id: string;
@@ -27,13 +30,35 @@ interface Profile {
   phone: string | null;
 }
 
+const BARBERS = ["Marco", "Lukas", "Daniel"];
+
+const ALL_SLOTS: string[] = [];
+for (let h = 10; h <= 19; h++) {
+  ALL_SLOTS.push(`${h.toString().padStart(2, "0")}:00`);
+  ALL_SLOTS.push(`${h.toString().padStart(2, "0")}:30`);
+}
+
+type SlotState = "available" | "booked" | "blocked";
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { isAdmin, loading: authLoading } = useAuth();
+
+  const [tab, setTab] = useState<"bookings" | "availability">("bookings");
+
+  // — Bookings tab state —
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [profiles, setProfiles] = useState<Map<string, Profile>>(new Map());
-  const [loading, setLoading] = useState(true);
+  const [loadingBookings, setLoadingBookings] = useState(true);
   const [filter, setFilter] = useState<"all" | "confirmed" | "cancelled">("all");
+
+  // — Availability tab state —
+  const [avBarber, setAvBarber] = useState(BARBERS[0]);
+  const [avDate, setAvDate] = useState<Date>(new Date());
+  const [dayOff, setDayOff] = useState(false);
+  const [slotStates, setSlotStates] = useState<Record<string, SlotState>>({});
+  const [loadingAv, setLoadingAv] = useState(false);
+  const [savingAv, setSavingAv] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !isAdmin) {
@@ -52,14 +77,13 @@ const AdminDashboard = () => {
 
     if (error) {
       toast.error("Failed to load bookings");
-      setLoading(false);
+      setLoadingBookings(false);
       return;
     }
 
     const bookingsData = (data as Booking[]) || [];
     setBookings(bookingsData);
 
-    // Fetch profiles for all unique user_ids
     const userIds = [...new Set(bookingsData.map(b => b.user_id))];
     if (userIds.length > 0) {
       const { data: profilesData } = await supabase
@@ -73,43 +97,105 @@ const AdminDashboard = () => {
         setProfiles(profileMap);
       }
     }
+    setLoadingBookings(false);
+  };
 
-    setLoading(false);
+  const fetchAvailability = useCallback(async () => {
+    setLoadingAv(true);
+    const dateStr = avDate.toISOString().split("T")[0];
+
+    const [bookingsRes, availRes] = await Promise.all([
+      supabase
+        .from("bookings")
+        .select("booking_time")
+        .eq("barber_name", avBarber)
+        .eq("booking_date", dateStr)
+        .eq("status", "confirmed"),
+      supabase
+        .from("barber_availability")
+        .select("blocked_slots, day_off")
+        .eq("barber_name", avBarber)
+        .eq("date", dateStr)
+        .maybeSingle(),
+    ]);
+
+    const bookedTimes = new Set(
+      (bookingsRes.data ?? []).map((r: { booking_time: string }) => r.booking_time)
+    );
+    const blocked = new Set<string>(availRes.data?.blocked_slots ?? []);
+    const isOff = availRes.data?.day_off ?? false;
+
+    setDayOff(isOff);
+
+    const states: Record<string, SlotState> = {};
+    for (const slot of ALL_SLOTS) {
+      if (bookedTimes.has(slot)) states[slot] = "booked";
+      else if (blocked.has(slot)) states[slot] = "blocked";
+      else states[slot] = "available";
+    }
+    setSlotStates(states);
+    setLoadingAv(false);
+  }, [avBarber, avDate]);
+
+  useEffect(() => {
+    if (isAdmin && tab === "availability") fetchAvailability();
+  }, [isAdmin, tab, avBarber, avDate, fetchAvailability]);
+
+  const toggleSlot = (slot: string) => {
+    setSlotStates(prev => {
+      if (prev[slot] === "booked") return prev; // client-booked, readonly
+      return {
+        ...prev,
+        [slot]: prev[slot] === "blocked" ? "available" : "blocked",
+      };
+    });
+  };
+
+  const saveAvailability = async () => {
+    setSavingAv(true);
+    const dateStr = avDate.toISOString().split("T")[0];
+    const blockedSlots = Object.entries(slotStates)
+      .filter(([, state]) => state === "blocked")
+      .map(([slot]) => slot);
+
+    const { error } = await supabase
+      .from("barber_availability")
+      .upsert(
+        { barber_name: avBarber, date: dateStr, blocked_slots: blockedSlots, day_off: dayOff },
+        { onConflict: "barber_name,date" }
+      );
+
+    setSavingAv(false);
+    if (error) {
+      toast.error("Failed to save availability");
+    } else {
+      toast.success("Availability saved");
+    }
   };
 
   const updateStatus = async (id: string, status: string) => {
-    const { error } = await supabase
-      .from("bookings")
-      .update({ status })
-      .eq("id", id);
-
-    if (error) {
-      toast.error("Error updating booking");
-      return;
-    }
+    const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
+    if (error) { toast.error("Error updating booking"); return; }
     toast.success(status === "cancelled" ? "Booking cancelled" : "Status updated");
     fetchBookings();
   };
 
   const deleteBooking = async (id: string) => {
     const { error } = await supabase.from("bookings").delete().eq("id", id);
-    if (error) {
-      toast.error("Error deleting booking");
-      return;
-    }
+    if (error) { toast.error("Error deleting booking"); return; }
     toast.success("Booking deleted");
     fetchBookings();
   };
 
-  const filtered = bookings.filter(b => filter === "all" || b.status === filter);
-
-  if (authLoading || loading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-copper border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
+
+  const filtered = bookings.filter(b => filter === "all" || b.status === filter);
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -120,105 +206,240 @@ const AdminDashboard = () => {
         <h1 className="font-heading text-2xl text-foreground">Admin Dashboard</h1>
       </div>
 
-      {/* Stats */}
-      <div className="px-5 mb-5 grid grid-cols-3 gap-3">
-        <div className="card-app p-3 text-center">
-          <p className="text-copper font-heading text-2xl">{bookings.length}</p>
-          <p className="text-muted-foreground text-[10px]">Total</p>
-        </div>
-        <div className="card-app p-3 text-center">
-          <p className="text-mint font-heading text-2xl">{bookings.filter(b => b.status === "confirmed").length}</p>
-          <p className="text-muted-foreground text-[10px]">Confirmed</p>
-        </div>
-        <div className="card-app p-3 text-center">
-          <p className="text-destructive font-heading text-2xl">{bookings.filter(b => b.status === "cancelled").length}</p>
-          <p className="text-muted-foreground text-[10px]">Cancelled</p>
-        </div>
+      {/* Tab switcher */}
+      <div className="px-5 mb-5 flex gap-2">
+        <button
+          onClick={() => setTab("bookings")}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+            tab === "bookings" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+          }`}
+        >
+          Bookings
+        </button>
+        <button
+          onClick={() => setTab("availability")}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+            tab === "availability" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+          }`}
+        >
+          Availability
+        </button>
       </div>
 
-      {/* Filters */}
-      <div className="px-5 mb-4 flex gap-2">
-        {(["all", "confirmed", "cancelled"] as const).map(f => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
-              filter === f ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
-            }`}
-          >
-            {f === "all" ? "All" : f === "confirmed" ? "Confirmed" : "Cancelled"}
-          </button>
-        ))}
-      </div>
-
-      {/* Bookings list */}
-      <div className="px-5 space-y-3">
-        {filtered.length === 0 ? (
-          <div className="card-app p-8 text-center">
-            <p className="text-muted-foreground">No bookings</p>
+      {/* ═══════════════════ BOOKINGS TAB ═══════════════════ */}
+      {tab === "bookings" && (
+        <>
+          <div className="px-5 mb-5 grid grid-cols-3 gap-3">
+            <div className="card-app p-3 text-center">
+              <p className="text-copper font-heading text-2xl">{bookings.length}</p>
+              <p className="text-muted-foreground text-[10px]">Total</p>
+            </div>
+            <div className="card-app p-3 text-center">
+              <p className="text-mint font-heading text-2xl">{bookings.filter(b => b.status === "confirmed").length}</p>
+              <p className="text-muted-foreground text-[10px]">Confirmed</p>
+            </div>
+            <div className="card-app p-3 text-center">
+              <p className="text-destructive font-heading text-2xl">{bookings.filter(b => b.status === "cancelled").length}</p>
+              <p className="text-muted-foreground text-[10px]">Cancelled</p>
+            </div>
           </div>
-        ) : (
-          filtered.map(b => {
-            const profile = profiles.get(b.user_id);
-            return (
-              <div key={b.id} className={`card-app p-4 ${b.status === "cancelled" ? "opacity-60" : ""}`}>
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <p className="text-foreground font-medium text-sm">{b.service_name}</p>
-                    <p className="text-muted-foreground text-xs">with {b.barber_name}</p>
-                  </div>
-                  <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${
-                    b.status === "confirmed" ? "bg-mint/20 text-mint" : "bg-destructive/20 text-destructive"
-                  }`}>
-                    {b.status === "confirmed" ? "Confirmed" : "Cancelled"}
-                  </span>
+
+          <div className="px-5 mb-4 flex gap-2">
+            {(["all", "confirmed", "cancelled"] as const).map(f => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
+                  filter === f ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+                }`}
+              >
+                {f === "all" ? "All" : f === "confirmed" ? "Confirmed" : "Cancelled"}
+              </button>
+            ))}
+          </div>
+
+          {loadingBookings ? (
+            <div className="flex justify-center py-8">
+              <div className="w-6 h-6 border-2 border-copper border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <div className="px-5 space-y-3">
+              {filtered.length === 0 ? (
+                <div className="card-app p-8 text-center">
+                  <p className="text-muted-foreground">No bookings</p>
                 </div>
+              ) : (
+                filtered.map(b => {
+                  const profile = profiles.get(b.user_id);
+                  return (
+                    <div key={b.id} className={`card-app p-4 ${b.status === "cancelled" ? "opacity-60" : ""}`}>
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="text-foreground font-medium text-sm">{b.service_name}</p>
+                          <p className="text-muted-foreground text-xs">with {b.barber_name}</p>
+                        </div>
+                        <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${
+                          b.status === "confirmed" ? "bg-mint/20 text-mint" : "bg-destructive/20 text-destructive"
+                        }`}>
+                          {b.status === "confirmed" ? "Confirmed" : "Cancelled"}
+                        </span>
+                      </div>
 
-                <div className="flex items-center gap-4 mb-2 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1"><Calendar size={12} /> {format(new Date(b.booking_date), "dd/MM/yyyy")}</span>
-                  <span className="flex items-center gap-1"><Clock size={12} /> {b.booking_time}</span>
-                  <span className="text-copper font-semibold">{b.service_price}</span>
-                </div>
+                      <div className="flex items-center gap-4 mb-2 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><Calendar size={12} /> {format(new Date(b.booking_date), "dd/MM/yyyy")}</span>
+                        <span className="flex items-center gap-1"><Clock size={12} /> {b.booking_time}</span>
+                        <span className="text-copper font-semibold">{b.service_price}</span>
+                      </div>
 
-                {profile && (
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
-                    <User size={12} />
-                    <span>{profile.full_name || profile.email}</span>
-                    {profile.phone && <span>· {profile.phone}</span>}
-                  </div>
-                )}
+                      {profile && (
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
+                          <User size={12} />
+                          <span>{profile.full_name || profile.email}</span>
+                          {profile.phone && <span>· {profile.phone}</span>}
+                        </div>
+                      )}
 
-                {b.notes && <p className="text-muted-foreground text-xs italic mb-3">"{b.notes}"</p>}
+                      {b.notes && <p className="text-muted-foreground text-xs italic mb-3">"{b.notes}"</p>}
 
-                <div className="flex gap-2">
-                  {b.status === "confirmed" && (
-                    <button
-                      onClick={() => updateStatus(b.id, "cancelled")}
-                      className="flex items-center gap-1 text-xs text-destructive bg-destructive/10 px-3 py-1.5 rounded-full"
-                    >
-                      <XCircle size={12} /> Cancel
-                    </button>
-                  )}
-                  {b.status === "cancelled" && (
-                    <button
-                      onClick={() => updateStatus(b.id, "confirmed")}
-                      className="flex items-center gap-1 text-xs text-mint bg-mint/10 px-3 py-1.5 rounded-full"
-                    >
-                      <CheckCircle size={12} /> Confirm
-                    </button>
-                  )}
+                      <div className="flex gap-2">
+                        {b.status === "confirmed" && (
+                          <button
+                            onClick={() => updateStatus(b.id, "cancelled")}
+                            className="flex items-center gap-1 text-xs text-destructive bg-destructive/10 px-3 py-1.5 rounded-full"
+                          >
+                            <XCircle size={12} /> Cancel
+                          </button>
+                        )}
+                        {b.status === "cancelled" && (
+                          <button
+                            onClick={() => updateStatus(b.id, "confirmed")}
+                            className="flex items-center gap-1 text-xs text-mint bg-mint/10 px-3 py-1.5 rounded-full"
+                          >
+                            <CheckCircle size={12} /> Confirm
+                          </button>
+                        )}
+                        <button
+                          onClick={() => deleteBooking(b.id)}
+                          className="flex items-center gap-1 text-xs text-muted-foreground bg-surface px-3 py-1.5 rounded-full"
+                        >
+                          <Trash2 size={12} /> Delete
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ═══════════════════ AVAILABILITY TAB ═══════════════════ */}
+      {tab === "availability" && (
+        <div className="px-5">
+          {/* Barber selector */}
+          <div className="flex gap-2 mb-5">
+            {BARBERS.map(b => (
+              <button
+                key={b}
+                onClick={() => setAvBarber(b)}
+                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  avBarber === b ? "gradient-copper text-primary-foreground shadow-copper" : "bg-surface border border-border text-muted-foreground"
+                }`}
+              >
+                {b}
+              </button>
+            ))}
+          </div>
+
+          {/* Date navigation */}
+          <div className="flex items-center justify-between mb-5 card-app px-4 py-3">
+            <button
+              onClick={() => setAvDate(d => subDays(d, 1))}
+              className="w-8 h-8 rounded-full bg-surface flex items-center justify-center"
+            >
+              <ChevronLeft size={16} className="text-foreground" />
+            </button>
+            <div className="text-center">
+              <p className="text-foreground font-semibold text-sm">{format(avDate, "EEEE")}</p>
+              <p className="text-muted-foreground text-xs">{format(avDate, "dd MMMM yyyy")}</p>
+            </div>
+            <button
+              onClick={() => setAvDate(d => addDays(d, 1))}
+              className="w-8 h-8 rounded-full bg-surface flex items-center justify-center"
+            >
+              <ChevronRight size={16} className="text-foreground" />
+            </button>
+          </div>
+
+          {/* Day Off toggle */}
+          <div className="card-app px-4 py-3 flex items-center justify-between mb-5">
+            <div>
+              <p className="text-foreground text-sm font-medium">Day Off</p>
+              <p className="text-muted-foreground text-xs">Close entire day for {avBarber}</p>
+            </div>
+            <button onClick={() => setDayOff(v => !v)}>
+              {dayOff
+                ? <ToggleRight size={32} className="text-copper" />
+                : <ToggleLeft size={32} className="text-muted-foreground" />
+              }
+            </button>
+          </div>
+
+          {/* Legend */}
+          <div className="flex gap-4 mb-3 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-mint inline-block" /> Available</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-copper inline-block" /> Client booked</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-destructive inline-block" /> Blocked</span>
+          </div>
+
+          {/* Slot grid */}
+          {loadingAv ? (
+            <div className="flex justify-center py-8">
+              <div className="w-6 h-6 border-2 border-copper border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <div className={`grid grid-cols-4 gap-2 mb-5 ${dayOff ? "opacity-40 pointer-events-none" : ""}`}>
+              {ALL_SLOTS.map(slot => {
+                const state = slotStates[slot] ?? "available";
+                return (
                   <button
-                    onClick={() => deleteBooking(b.id)}
-                    className="flex items-center gap-1 text-xs text-muted-foreground bg-surface px-3 py-1.5 rounded-full"
+                    key={slot}
+                    onClick={() => toggleSlot(slot)}
+                    disabled={state === "booked"}
+                    className={`py-2.5 rounded-xl text-xs font-medium transition-all relative ${
+                      state === "booked"
+                        ? "bg-copper/20 text-copper border border-copper/40 cursor-default"
+                        : state === "blocked"
+                        ? "bg-destructive/20 text-destructive border border-destructive/40"
+                        : "bg-surface border border-border text-foreground hover:border-copper/30"
+                    }`}
                   >
-                    <Trash2 size={12} /> Delete
+                    {slot}
+                    {state === "available" && (
+                      <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-mint" />
+                    )}
                   </button>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Save button */}
+          <button
+            onClick={saveAvailability}
+            disabled={savingAv || loadingAv}
+            className="w-full gradient-copper text-primary-foreground font-semibold py-3.5 rounded-full shadow-copper flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            <Save size={16} />
+            {savingAv ? "Saving..." : "Save Availability"}
+          </button>
+
+          <p className="text-center text-muted-foreground text-[10px] mt-3">
+            Click a slot to block/unblock it. Client bookings (amber) cannot be modified here.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
