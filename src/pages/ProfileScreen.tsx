@@ -161,7 +161,7 @@ const ProfileScreen = () => {
               <div key={b.id} className="card-app p-4">
                 <div className="flex items-center gap-3 mb-2">
                   <Calendar size={16} className="text-copper" />
-                  <span className="text-foreground text-sm font-medium">{b.service_name} avec {b.barber_name}</span>
+                  <span className="text-foreground text-sm font-medium">{b.service_name} with {b.barber_name}</span>
                 </div>
                 <div className="flex items-center gap-3 text-muted-foreground text-xs">
                   <Clock size={12} />
