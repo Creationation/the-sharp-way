@@ -5,17 +5,18 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import gallery1 from "@/assets/gallery-1.jpg";
 import gallery2 from "@/assets/gallery-2.jpg";
 import gallery3 from "@/assets/gallery-3.jpg";
-import barber1 from "@/assets/barber-1.jpg";
-import barber2 from "@/assets/barber-2.jpg";
-import barber3 from "@/assets/barber-3.jpg";
+import gallery4 from "@/assets/gallery-4.jpg";
+import gallery5 from "@/assets/gallery-5.jpg";
+import gallery6 from "@/assets/gallery-6.jpg";
 
+// tagIndex maps to filters array: 1=Fades, 2=Beards, 3=Classic
 const galleryImages = [
-  { src: gallery1, tagIndex: 1, saved: false },
-  { src: gallery2, tagIndex: 2, saved: true },
-  { src: gallery3, tagIndex: 3, saved: false },
-  { src: barber1, tagIndex: 1, saved: false },
-  { src: barber2, tagIndex: 3, saved: true },
-  { src: barber3, tagIndex: 2, saved: false },
+  { src: gallery1, tagIndex: 1, saved: false },  // Fades — tattooed barber doing a fade
+  { src: gallery2, tagIndex: 1, saved: true },   // Fades — curly fade in progress
+  { src: gallery3, tagIndex: 2, saved: false },  // Beards — styled man with trimmed beard
+  { src: gallery4, tagIndex: 2, saved: true },   // Beards — scissor beard trim, moody
+  { src: gallery5, tagIndex: 3, saved: false },  // Classic — suited man, clean cut
+  { src: gallery6, tagIndex: 3, saved: false },  // Classic — full service blow-dry
 ];
 
 const GalleryScreen = () => {
@@ -24,7 +25,7 @@ const GalleryScreen = () => {
   const [activeFilter, setActiveFilter] = useState(0);
   const [lightbox, setLightbox] = useState<string | null>(null);
 
-  const filters = t.gallery.filters;
+  const filters = t.gallery.filters; // ["All/Alle", "Fades", "Beards/Bärte", "Classic/Klassisch"]
 
   const filtered = activeFilter === 0
     ? galleryImages
@@ -40,10 +41,10 @@ const GalleryScreen = () => {
         <h1 className="font-heading text-2xl text-foreground">{t.gallery.title}</h1>
       </div>
 
-      {/* Filters */}
+      {/* Filters — only show categories we have photos for */}
       <div className="px-5 mb-5">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-          {filters.map((f, i) => (
+          {filters.slice(0, 4).map((f, i) => (
             <button
               key={f}
               onClick={() => setActiveFilter(i)}
@@ -63,13 +64,13 @@ const GalleryScreen = () => {
       <div className="px-5 columns-2 gap-3 space-y-3">
         {filtered.map((img, i) => (
           <div
-            key={i}
+            key={img.src}
             className="relative rounded-2xl overflow-hidden cursor-pointer break-inside-avoid group"
             onClick={() => setLightbox(img.src)}
           >
             <img
               src={img.src}
-              alt="Haircut"
+              alt={filters[img.tagIndex]}
               className={`w-full object-cover ${i % 3 === 0 ? "h-56" : "h-44"}`}
               loading="lazy"
             />
@@ -87,7 +88,10 @@ const GalleryScreen = () => {
 
       {/* Lightbox */}
       {lightbox && (
-        <div className="fixed inset-0 z-[100] bg-background/95 flex items-center justify-center animate-fade-in" onClick={() => setLightbox(null)}>
+        <div
+          className="fixed inset-0 z-[100] bg-background/95 flex items-center justify-center animate-fade-in"
+          onClick={() => setLightbox(null)}
+        >
           <button className="absolute top-12 right-5 w-10 h-10 rounded-full bg-surface flex items-center justify-center">
             <X size={20} className="text-foreground" />
           </button>

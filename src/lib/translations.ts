@@ -178,7 +178,7 @@ const en: Translations = {
   },
   gallery: {
     title: "The Art of the Cut",
-    filters: ["All", "Fades", "Beards", "Classic", "Color"],
+    filters: ["All", "Fades", "Beards", "Classic"],
   },
   reviews: {
     title: "Reviews",
@@ -294,7 +294,7 @@ const de: Translations = {
   },
   gallery: {
     title: "Die Kunst des Schnitts",
-    filters: ["Alle", "Fades", "Bärte", "Klassisch", "Farbe"],
+    filters: ["Alle", "Fades", "Bärte", "Klassisch"],
   },
   reviews: {
     title: "Bewertungen",
