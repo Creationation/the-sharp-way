@@ -18,13 +18,20 @@ interface Booking {
   status: string;
   notes: string | null;
   created_at: string;
-  profiles?: { full_name: string | null; email: string | null; phone: string | null } | null;
+}
+
+interface Profile {
+  user_id: string;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
 }
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { isAdmin, loading: authLoading } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [profiles, setProfiles] = useState<Map<string, Profile>>(new Map());
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "confirmed" | "cancelled">("all");
 
@@ -39,15 +46,34 @@ const AdminDashboard = () => {
   const fetchBookings = async () => {
     const { data, error } = await supabase
       .from("bookings")
-      .select("*, profiles(full_name, email, phone)")
-      .order("booking_date", { ascending: true })
+      .select("*")
+      .order("booking_date", { ascending: false })
       .order("booking_time", { ascending: true });
 
     if (error) {
       toast.error("Failed to load bookings");
+      setLoading(false);
       return;
     }
-    setBookings((data as any) || []);
+
+    const bookingsData = (data as Booking[]) || [];
+    setBookings(bookingsData);
+
+    // Fetch profiles for all unique user_ids
+    const userIds = [...new Set(bookingsData.map(b => b.user_id))];
+    if (userIds.length > 0) {
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, email, phone")
+        .in("user_id", userIds);
+
+      if (profilesData) {
+        const profileMap = new Map<string, Profile>();
+        (profilesData as Profile[]).forEach(p => profileMap.set(p.user_id, p));
+        setProfiles(profileMap);
+      }
+    }
+
     setLoading(false);
   };
 
@@ -132,62 +158,65 @@ const AdminDashboard = () => {
             <p className="text-muted-foreground">No bookings</p>
           </div>
         ) : (
-          filtered.map(b => (
-            <div key={b.id} className={`card-app p-4 ${b.status === "cancelled" ? "opacity-60" : ""}`}>
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <p className="text-foreground font-medium text-sm">{b.service_name}</p>
-                  <p className="text-muted-foreground text-xs">with {b.barber_name}</p>
+          filtered.map(b => {
+            const profile = profiles.get(b.user_id);
+            return (
+              <div key={b.id} className={`card-app p-4 ${b.status === "cancelled" ? "opacity-60" : ""}`}>
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <p className="text-foreground font-medium text-sm">{b.service_name}</p>
+                    <p className="text-muted-foreground text-xs">with {b.barber_name}</p>
+                  </div>
+                  <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${
+                    b.status === "confirmed" ? "bg-mint/20 text-mint" : "bg-destructive/20 text-destructive"
+                  }`}>
+                    {b.status === "confirmed" ? "Confirmed" : "Cancelled"}
+                  </span>
                 </div>
-                <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${
-                  b.status === "confirmed" ? "bg-mint/20 text-mint" : "bg-destructive/20 text-destructive"
-                }`}>
-                  {b.status === "confirmed" ? "Confirmed" : "Cancelled"}
-                </span>
-              </div>
 
-              <div className="flex items-center gap-4 mb-2 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1"><Calendar size={12} /> {format(new Date(b.booking_date), "dd/MM/yyyy")}</span>
-                <span className="flex items-center gap-1"><Clock size={12} /> {b.booking_time}</span>
-                <span className="text-copper font-semibold">{b.service_price}</span>
-              </div>
-
-              {b.profiles && (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
-                  <User size={12} />
-                  <span>{b.profiles.full_name || b.profiles.email}</span>
-                  {b.profiles.phone && <span>· {b.profiles.phone}</span>}
+                <div className="flex items-center gap-4 mb-2 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1"><Calendar size={12} /> {format(new Date(b.booking_date), "dd/MM/yyyy")}</span>
+                  <span className="flex items-center gap-1"><Clock size={12} /> {b.booking_time}</span>
+                  <span className="text-copper font-semibold">{b.service_price}</span>
                 </div>
-              )}
 
-              {b.notes && <p className="text-muted-foreground text-xs italic mb-3">"{b.notes}"</p>}
+                {profile && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
+                    <User size={12} />
+                    <span>{profile.full_name || profile.email}</span>
+                    {profile.phone && <span>· {profile.phone}</span>}
+                  </div>
+                )}
 
-              <div className="flex gap-2">
-                {b.status === "confirmed" && (
+                {b.notes && <p className="text-muted-foreground text-xs italic mb-3">"{b.notes}"</p>}
+
+                <div className="flex gap-2">
+                  {b.status === "confirmed" && (
+                    <button
+                      onClick={() => updateStatus(b.id, "cancelled")}
+                      className="flex items-center gap-1 text-xs text-destructive bg-destructive/10 px-3 py-1.5 rounded-full"
+                    >
+                      <XCircle size={12} /> Cancel
+                    </button>
+                  )}
+                  {b.status === "cancelled" && (
+                    <button
+                      onClick={() => updateStatus(b.id, "confirmed")}
+                      className="flex items-center gap-1 text-xs text-mint bg-mint/10 px-3 py-1.5 rounded-full"
+                    >
+                      <CheckCircle size={12} /> Confirm
+                    </button>
+                  )}
                   <button
-                    onClick={() => updateStatus(b.id, "cancelled")}
-                    className="flex items-center gap-1 text-xs text-destructive bg-destructive/10 px-3 py-1.5 rounded-full"
+                    onClick={() => deleteBooking(b.id)}
+                    className="flex items-center gap-1 text-xs text-muted-foreground bg-surface px-3 py-1.5 rounded-full"
                   >
-                    <XCircle size={12} /> Cancel
+                    <Trash2 size={12} /> Delete
                   </button>
-                )}
-                {b.status === "cancelled" && (
-                  <button
-                    onClick={() => updateStatus(b.id, "confirmed")}
-                    className="flex items-center gap-1 text-xs text-mint bg-mint/10 px-3 py-1.5 rounded-full"
-                  >
-                    <CheckCircle size={12} /> Confirm
-                  </button>
-                )}
-                <button
-                  onClick={() => deleteBooking(b.id)}
-                  className="flex items-center gap-1 text-xs text-muted-foreground bg-surface px-3 py-1.5 rounded-full"
-                >
-                  <Trash2 size={12} /> Delete
-                </button>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
