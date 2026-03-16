@@ -71,7 +71,7 @@ const ProfileScreen = () => {
             {user.user_metadata?.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
           </div>
           <div>
-            <p className="text-foreground font-medium text-sm">{user.user_metadata?.full_name || "Utilisateur"}</p>
+            <p className="text-foreground font-medium text-sm">{user.user_metadata?.full_name || "User"}</p>
             <p className="text-muted-foreground text-xs">{user.email}</p>
           </div>
         </div>
