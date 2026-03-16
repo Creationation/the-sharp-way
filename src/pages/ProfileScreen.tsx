@@ -147,11 +147,11 @@ const ProfileScreen = () => {
         ) : (activeTab === "upcoming" ? upcoming : past).length === 0 ? (
           <div className="card-app p-8 text-center">
             <p className="text-muted-foreground text-sm">
-              {activeTab === "upcoming" ? "Aucun rendez-vous à venir" : "Aucun rendez-vous passé"}
+              {activeTab === "upcoming" ? "No upcoming appointments" : "No past appointments"}
             </p>
             {activeTab === "upcoming" && (
               <button onClick={() => navigate("/book")} className="text-copper text-sm font-semibold mt-2">
-                Réserver maintenant →
+                Book now →
               </button>
             )}
           </div>
