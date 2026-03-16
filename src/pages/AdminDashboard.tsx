@@ -168,7 +168,7 @@ const AdminDashboard = () => {
                     onClick={() => updateStatus(b.id, "cancelled")}
                     className="flex items-center gap-1 text-xs text-destructive bg-destructive/10 px-3 py-1.5 rounded-full"
                   >
-                    <XCircle size={12} /> Annuler
+                    <XCircle size={12} /> Cancel
                   </button>
                 )}
                 {b.status === "cancelled" && (
