@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { ArrowLeft, Star, MapPin, Check } from "lucide-react";
+import { ArrowLeft, Star, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 import barber1 from "@/assets/barber-1.jpg";
 import barber2 from "@/assets/barber-2.jpg";
 import barber3 from "@/assets/barber-3.jpg";
@@ -24,21 +27,55 @@ const days = ["MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const dates = [9, 10, 11, 12, 13, 14];
 
 const timeSlots: string[] = [];
-for (let h = 9; h <= 19; h++) {
+for (let h = 10; h <= 19; h++) {
   timeSlots.push(`${h.toString().padStart(2, "0")}:00`);
   timeSlots.push(`${h.toString().padStart(2, "0")}:30`);
 }
 
-// Simulate taken slots
 const takenSlots = ["10:00", "11:30", "14:00", "15:30", "17:00"];
 
 const BookingFlow = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [selectedBarber, setSelectedBarber] = useState(barbers[0]);
   const [selectedService, setSelectedService] = useState(services[0]);
-  const [selectedDay, setSelectedDay] = useState(3); // THU
+  const [selectedDay, setSelectedDay] = useState(3);
   const [selectedTime, setSelectedTime] = useState("12:00");
   const [confirmed, setConfirmed] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const handleConfirm = async () => {
+    if (!user) {
+      toast.error("Connecte-toi pour réserver");
+      navigate("/auth");
+      return;
+    }
+
+    setSaving(true);
+    const now = new Date();
+    const bookingDate = new Date(now.getFullYear(), now.getMonth(), dates[selectedDay]);
+    if (bookingDate < now) bookingDate.setMonth(bookingDate.getMonth() + 1);
+
+    const { error } = await supabase.from("bookings").insert({
+      user_id: user.id,
+      barber_name: selectedBarber.name,
+      service_name: selectedService.name,
+      service_price: selectedService.price,
+      service_duration: selectedService.duration,
+      booking_date: bookingDate.toISOString().split("T")[0],
+      booking_time: selectedTime,
+      status: "confirmed",
+    });
+
+    setSaving(false);
+
+    if (error) {
+      toast.error("Erreur lors de la réservation");
+      return;
+    }
+
+    setConfirmed(true);
+  };
 
   if (confirmed) {
     return (
@@ -47,20 +84,20 @@ const BookingFlow = () => {
           <div className="w-20 h-20 rounded-full gradient-copper mx-auto mb-6 flex items-center justify-center animate-fade-up">
             <Check size={36} className="text-primary-foreground" />
           </div>
-          <h2 className="font-heading text-4xl text-copper mb-2 animate-fade-up animation-delay-100" style={{ animationFillMode: "forwards", opacity: 0 }}>You're Booked!</h2>
-          <p className="text-muted-foreground mb-2 animate-fade-up animation-delay-200" style={{ animationFillMode: "forwards", opacity: 0 }}>
+          <h2 className="font-heading text-4xl text-copper mb-2 animate-fade-up" style={{ animationDelay: "100ms", animationFillMode: "forwards", opacity: 0 }}>You're Booked!</h2>
+          <p className="text-muted-foreground mb-2 animate-fade-up" style={{ animationDelay: "200ms", animationFillMode: "forwards", opacity: 0 }}>
             {selectedService.name} with {selectedBarber.name}
           </p>
-          <p className="text-foreground font-medium mb-1 animate-fade-up animation-delay-300" style={{ animationFillMode: "forwards", opacity: 0 }}>
+          <p className="text-foreground font-medium mb-1 animate-fade-up" style={{ animationDelay: "300ms", animationFillMode: "forwards", opacity: 0 }}>
             {days[selectedDay]}, {dates[selectedDay]} Feb · {selectedTime}
           </p>
-          <p className="text-muted-foreground text-xs mb-8 animate-fade-up animation-delay-400" style={{ animationFillMode: "forwards", opacity: 0 }}>
+          <p className="text-muted-foreground text-xs mb-8 animate-fade-up" style={{ animationDelay: "400ms", animationFillMode: "forwards", opacity: 0 }}>
             Free cancellation up to 2 hours before
           </p>
           <button
             onClick={() => navigate("/home")}
-            className="gradient-copper text-primary-foreground font-semibold px-8 py-3 rounded-full shadow-copper animate-fade-up animation-delay-500"
-            style={{ animationFillMode: "forwards", opacity: 0 }}
+            className="gradient-copper text-primary-foreground font-semibold px-8 py-3 rounded-full shadow-copper animate-fade-up"
+            style={{ animationDelay: "500ms", animationFillMode: "forwards", opacity: 0 }}
           >
             Back to Home
           </button>
@@ -71,7 +108,6 @@ const BookingFlow = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      {/* Header */}
       <div className="px-5 pt-12 pb-4 flex items-center gap-4">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
           <ArrowLeft size={18} className="text-foreground" />
@@ -103,7 +139,7 @@ const BookingFlow = () => {
         </div>
       </div>
 
-      {/* Available Slots - Day strip */}
+      {/* Day strip */}
       <div className="px-5 mb-5">
         <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">AVAILABLE SLOTS</h3>
         <div className="flex gap-2 mb-4">
@@ -112,9 +148,7 @@ const BookingFlow = () => {
               key={d}
               onClick={() => setSelectedDay(i)}
               className={`flex-1 py-3 rounded-xl text-center transition-all ${
-                selectedDay === i
-                  ? "gradient-copper shadow-copper"
-                  : "bg-surface border border-border"
+                selectedDay === i ? "gradient-copper shadow-copper" : "bg-surface border border-border"
               }`}
             >
               <p className={`text-[10px] font-medium ${selectedDay === i ? "text-primary-foreground" : "text-muted-foreground"}`}>{d}</p>
@@ -214,10 +248,11 @@ const BookingFlow = () => {
       {/* CTA */}
       <div className="fixed bottom-16 left-0 right-0 z-40 px-5 py-3 bg-background/90 backdrop-blur-md border-t border-border">
         <button
-          onClick={() => setConfirmed(true)}
-          className="w-full gradient-copper text-primary-foreground font-semibold text-base py-3.5 rounded-full shadow-copper"
+          onClick={handleConfirm}
+          disabled={saving}
+          className="w-full gradient-copper text-primary-foreground font-semibold text-base py-3.5 rounded-full shadow-copper disabled:opacity-50"
         >
-          Confirm Booking →
+          {saving ? "Réservation en cours..." : "Confirm Booking →"}
         </button>
         <p className="text-center text-muted-foreground text-[10px] mt-2">Free cancellation up to 2 hours before</p>
       </div>

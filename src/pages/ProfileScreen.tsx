@@ -1,23 +1,80 @@
-import { useState } from "react";
-import { ArrowLeft, Trophy, Gift, ChevronRight, Calendar, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Trophy, Gift, ChevronRight, Calendar, Clock, LogOut, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { format } from "date-fns";
+
+interface Booking {
+  id: string;
+  barber_name: string;
+  service_name: string;
+  service_price: string;
+  booking_date: string;
+  booking_time: string;
+  status: string;
+}
 
 const stamps = 4;
 
 const ProfileScreen = () => {
   const navigate = useNavigate();
+  const { user, isAdmin, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
-  const [email, setEmail] = useState("");
-  const [referred, setReferred] = useState(false);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    fetchBookings();
+  }, [user]);
+
+  const fetchBookings = async () => {
+    const { data } = await supabase
+      .from("bookings")
+      .select("*")
+      .order("booking_date", { ascending: true });
+    setBookings((data as Booking[]) || []);
+    setLoading(false);
+  };
+
+  const today = new Date().toISOString().split("T")[0];
+  const upcoming = bookings.filter(b => b.booking_date >= today && b.status === "confirmed");
+  const past = bookings.filter(b => b.booking_date < today || b.status === "cancelled");
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/home");
+  };
+
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
       <div className="px-5 pt-12 pb-4 flex items-center gap-4">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
           <ArrowLeft size={18} className="text-foreground" />
         </button>
-        <h1 className="font-heading text-2xl text-foreground">Profile</h1>
+        <h1 className="font-heading text-2xl text-foreground flex-1">Profile</h1>
+        <button onClick={handleSignOut} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
+          <LogOut size={18} className="text-muted-foreground" />
+        </button>
+      </div>
+
+      {/* User info */}
+      <div className="px-5 mb-5">
+        <div className="card-app p-4 flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full gradient-copper flex items-center justify-center text-primary-foreground font-heading text-xl">
+            {user.user_metadata?.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
+          </div>
+          <div>
+            <p className="text-foreground font-medium text-sm">{user.user_metadata?.full_name || "Utilisateur"}</p>
+            <p className="text-muted-foreground text-xs">{user.email}</p>
+          </div>
+        </div>
       </div>
 
       {/* Loyalty Card */}
@@ -78,25 +135,41 @@ const ProfileScreen = () => {
                   : "bg-surface border border-border text-muted-foreground"
               }`}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tab === "upcoming" ? "À venir" : "Passés"}
             </button>
           ))}
         </div>
-        {activeTab === "upcoming" ? (
-          <div className="card-app p-4">
-            <div className="flex items-center gap-3 mb-2">
-              <Calendar size={16} className="text-copper" />
-              <span className="text-foreground text-sm font-medium">Fade & Taper with Marco</span>
-            </div>
-            <div className="flex items-center gap-3 text-muted-foreground text-xs">
-              <Clock size={12} />
-              <span>Thu, Feb 27 · 14:00 — 14:45</span>
-            </div>
+
+        {loading ? (
+          <div className="card-app p-8 text-center">
+            <div className="w-6 h-6 border-2 border-copper border-t-transparent rounded-full animate-spin mx-auto" />
+          </div>
+        ) : (activeTab === "upcoming" ? upcoming : past).length === 0 ? (
+          <div className="card-app p-8 text-center">
+            <p className="text-muted-foreground text-sm">
+              {activeTab === "upcoming" ? "Aucun rendez-vous à venir" : "Aucun rendez-vous passé"}
+            </p>
+            {activeTab === "upcoming" && (
+              <button onClick={() => navigate("/book")} className="text-copper text-sm font-semibold mt-2">
+                Réserver maintenant →
+              </button>
+            )}
           </div>
         ) : (
-          <div className="card-app p-4">
-            <p className="text-muted-foreground text-sm">Classic Haircut with Lukas</p>
-            <p className="text-muted-foreground text-xs">Feb 10, 2026</p>
+          <div className="space-y-2">
+            {(activeTab === "upcoming" ? upcoming : past).map(b => (
+              <div key={b.id} className="card-app p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <Calendar size={16} className="text-copper" />
+                  <span className="text-foreground text-sm font-medium">{b.service_name} avec {b.barber_name}</span>
+                </div>
+                <div className="flex items-center gap-3 text-muted-foreground text-xs">
+                  <Clock size={12} />
+                  <span>{format(new Date(b.booking_date), "dd/MM/yyyy")} · {b.booking_time}</span>
+                  <span className="text-copper font-semibold">{b.service_price}</span>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -116,6 +189,17 @@ const ProfileScreen = () => {
 
       {/* Quick links */}
       <div className="px-5 space-y-2">
+        {isAdmin && (
+          <button
+            onClick={() => navigate("/admin")}
+            className="w-full card-app p-4 flex items-center justify-between border-copper/30"
+          >
+            <span className="text-copper text-sm font-semibold flex items-center gap-2">
+              <Shield size={16} /> Admin Dashboard
+            </span>
+            <ChevronRight size={16} className="text-copper" />
+          </button>
+        )}
         {[
           { label: "Reviews", action: () => navigate("/reviews") },
           { label: "Contact Us", action: () => navigate("/contact") },
