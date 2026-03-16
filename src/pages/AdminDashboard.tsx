@@ -44,7 +44,7 @@ const AdminDashboard = () => {
       .order("booking_time", { ascending: true });
 
     if (error) {
-      toast.error("Erreur de chargement");
+      toast.error("Failed to load bookings");
       return;
     }
     setBookings((data as any) || []);
@@ -58,20 +58,20 @@ const AdminDashboard = () => {
       .eq("id", id);
 
     if (error) {
-      toast.error("Erreur");
+      toast.error("Error updating booking");
       return;
     }
-    toast.success(status === "cancelled" ? "Rendez-vous annulé" : "Statut mis à jour");
+    toast.success(status === "cancelled" ? "Booking cancelled" : "Status updated");
     fetchBookings();
   };
 
   const deleteBooking = async (id: string) => {
     const { error } = await supabase.from("bookings").delete().eq("id", id);
     if (error) {
-      toast.error("Erreur");
+      toast.error("Error deleting booking");
       return;
     }
-    toast.success("Rendez-vous supprimé");
+    toast.success("Booking deleted");
     fetchBookings();
   };
 
@@ -102,11 +102,11 @@ const AdminDashboard = () => {
         </div>
         <div className="card-app p-3 text-center">
           <p className="text-mint font-heading text-2xl">{bookings.filter(b => b.status === "confirmed").length}</p>
-          <p className="text-muted-foreground text-[10px]">Confirmés</p>
+          <p className="text-muted-foreground text-[10px]">Confirmed</p>
         </div>
         <div className="card-app p-3 text-center">
           <p className="text-destructive font-heading text-2xl">{bookings.filter(b => b.status === "cancelled").length}</p>
-          <p className="text-muted-foreground text-[10px]">Annulés</p>
+          <p className="text-muted-foreground text-[10px]">Cancelled</p>
         </div>
       </div>
 
@@ -120,7 +120,7 @@ const AdminDashboard = () => {
               filter === f ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
             }`}
           >
-            {f === "all" ? "Tous" : f === "confirmed" ? "Confirmés" : "Annulés"}
+            {f === "all" ? "All" : f === "confirmed" ? "Confirmed" : "Cancelled"}
           </button>
         ))}
       </div>
@@ -129,7 +129,7 @@ const AdminDashboard = () => {
       <div className="px-5 space-y-3">
         {filtered.length === 0 ? (
           <div className="card-app p-8 text-center">
-            <p className="text-muted-foreground">Aucun rendez-vous</p>
+            <p className="text-muted-foreground">No bookings</p>
           </div>
         ) : (
           filtered.map(b => (
@@ -137,12 +137,12 @@ const AdminDashboard = () => {
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <p className="text-foreground font-medium text-sm">{b.service_name}</p>
-                  <p className="text-muted-foreground text-xs">avec {b.barber_name}</p>
+                  <p className="text-muted-foreground text-xs">with {b.barber_name}</p>
                 </div>
                 <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${
                   b.status === "confirmed" ? "bg-mint/20 text-mint" : "bg-destructive/20 text-destructive"
                 }`}>
-                  {b.status === "confirmed" ? "Confirmé" : "Annulé"}
+                  {b.status === "confirmed" ? "Confirmed" : "Cancelled"}
                 </span>
               </div>
 
@@ -168,7 +168,7 @@ const AdminDashboard = () => {
                     onClick={() => updateStatus(b.id, "cancelled")}
                     className="flex items-center gap-1 text-xs text-destructive bg-destructive/10 px-3 py-1.5 rounded-full"
                   >
-                    <XCircle size={12} /> Annuler
+                    <XCircle size={12} /> Cancel
                   </button>
                 )}
                 {b.status === "cancelled" && (
@@ -176,14 +176,14 @@ const AdminDashboard = () => {
                     onClick={() => updateStatus(b.id, "confirmed")}
                     className="flex items-center gap-1 text-xs text-mint bg-mint/10 px-3 py-1.5 rounded-full"
                   >
-                    <CheckCircle size={12} /> Confirmer
+                    <CheckCircle size={12} /> Confirm
                   </button>
                 )}
                 <button
                   onClick={() => deleteBooking(b.id)}
                   className="flex items-center gap-1 text-xs text-muted-foreground bg-surface px-3 py-1.5 rounded-full"
                 >
-                  <Trash2 size={12} /> Supprimer
+                  <Trash2 size={12} /> Delete
                 </button>
               </div>
             </div>

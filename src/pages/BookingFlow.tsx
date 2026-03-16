@@ -46,7 +46,7 @@ const BookingFlow = () => {
 
   const handleConfirm = async () => {
     if (!user) {
-      toast.error("Connecte-toi pour réserver");
+      toast.error("Sign in to book an appointment");
       navigate("/auth");
       return;
     }
@@ -70,7 +70,7 @@ const BookingFlow = () => {
     setSaving(false);
 
     if (error) {
-      toast.error("Erreur lors de la réservation");
+      toast.error("Booking failed. Please try again.");
       return;
     }
 
@@ -252,7 +252,7 @@ const BookingFlow = () => {
           disabled={saving}
           className="w-full gradient-copper text-primary-foreground font-semibold text-base py-3.5 rounded-full shadow-copper disabled:opacity-50"
         >
-          {saving ? "Réservation en cours..." : "Confirm Booking →"}
+          {saving ? "Booking..." : "Confirm Booking →"}
         </button>
         <p className="text-center text-muted-foreground text-[10px] mt-2">Free cancellation up to 2 hours before</p>
       </div>

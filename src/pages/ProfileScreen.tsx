@@ -71,7 +71,7 @@ const ProfileScreen = () => {
             {user.user_metadata?.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
           </div>
           <div>
-            <p className="text-foreground font-medium text-sm">{user.user_metadata?.full_name || "Utilisateur"}</p>
+            <p className="text-foreground font-medium text-sm">{user.user_metadata?.full_name || "User"}</p>
             <p className="text-muted-foreground text-xs">{user.email}</p>
           </div>
         </div>
@@ -135,7 +135,7 @@ const ProfileScreen = () => {
                   : "bg-surface border border-border text-muted-foreground"
               }`}
             >
-              {tab === "upcoming" ? "À venir" : "Passés"}
+              {tab === "upcoming" ? "Upcoming" : "Past"}
             </button>
           ))}
         </div>
@@ -147,11 +147,11 @@ const ProfileScreen = () => {
         ) : (activeTab === "upcoming" ? upcoming : past).length === 0 ? (
           <div className="card-app p-8 text-center">
             <p className="text-muted-foreground text-sm">
-              {activeTab === "upcoming" ? "Aucun rendez-vous à venir" : "Aucun rendez-vous passé"}
+              {activeTab === "upcoming" ? "No upcoming appointments" : "No past appointments"}
             </p>
             {activeTab === "upcoming" && (
               <button onClick={() => navigate("/book")} className="text-copper text-sm font-semibold mt-2">
-                Réserver maintenant →
+                Book now →
               </button>
             )}
           </div>
@@ -161,7 +161,7 @@ const ProfileScreen = () => {
               <div key={b.id} className="card-app p-4">
                 <div className="flex items-center gap-3 mb-2">
                   <Calendar size={16} className="text-copper" />
-                  <span className="text-foreground text-sm font-medium">{b.service_name} avec {b.barber_name}</span>
+                  <span className="text-foreground text-sm font-medium">{b.service_name} with {b.barber_name}</span>
                 </div>
                 <div className="flex items-center gap-3 text-muted-foreground text-xs">
                   <Clock size={12} />
@@ -179,7 +179,7 @@ const ProfileScreen = () => {
         <div className="card-app p-5 border-copper/30">
           <Gift size={24} className="text-copper mb-3" />
           <h3 className="text-foreground font-semibold text-sm mb-1">Refer a Friend</h3>
-          <p className="text-muted-foreground text-xs mb-3">Give €10, Get €10 — Share your code</p>
+          <p className="text-muted-foreground text-xs mb-3">Give €10, Get €10. Share your code</p>
           <div className="bg-surface rounded-xl px-4 py-2.5 flex items-center justify-between">
             <span className="text-copper font-mono font-semibold text-sm">SHARP-FR1END</span>
             <button className="text-foreground text-xs">Copy</button>
