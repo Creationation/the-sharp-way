@@ -135,7 +135,7 @@ const ProfileScreen = () => {
                   : "bg-surface border border-border text-muted-foreground"
               }`}
             >
-              {tab === "upcoming" ? "À venir" : "Passés"}
+              {tab === "upcoming" ? "Upcoming" : "Past"}
             </button>
           ))}
         </div>
