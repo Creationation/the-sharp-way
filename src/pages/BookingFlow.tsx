@@ -252,7 +252,7 @@ const BookingFlow = () => {
           disabled={saving}
           className="w-full gradient-copper text-primary-foreground font-semibold text-base py-3.5 rounded-full shadow-copper disabled:opacity-50"
         >
-          {saving ? "Réservation en cours..." : "Confirm Booking →"}
+          {saving ? "Booking..." : "Confirm Booking →"}
         </button>
         <p className="text-center text-muted-foreground text-[10px] mt-2">Free cancellation up to 2 hours before</p>
       </div>

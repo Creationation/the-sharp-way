@@ -179,7 +179,7 @@ const ProfileScreen = () => {
         <div className="card-app p-5 border-copper/30">
           <Gift size={24} className="text-copper mb-3" />
           <h3 className="text-foreground font-semibold text-sm mb-1">Refer a Friend</h3>
-          <p className="text-muted-foreground text-xs mb-3">Give €10, Get €10 — Share your code</p>
+          <p className="text-muted-foreground text-xs mb-3">Give €10, Get €10. Share your code</p>
           <div className="bg-surface rounded-xl px-4 py-2.5 flex items-center justify-between">
             <span className="text-copper font-mono font-semibold text-sm">SHARP-FR1END</span>
             <button className="text-foreground text-xs">Copy</button>
