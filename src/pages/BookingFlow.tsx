@@ -70,7 +70,7 @@ const BookingFlow = () => {
     setSaving(false);
 
     if (error) {
-      toast.error("Erreur lors de la réservation");
+      toast.error("Booking failed. Please try again.");
       return;
     }
 
