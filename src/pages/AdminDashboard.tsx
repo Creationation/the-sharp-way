@@ -58,10 +58,10 @@ const AdminDashboard = () => {
       .eq("id", id);
 
     if (error) {
-      toast.error("Erreur");
+      toast.error("Error updating booking");
       return;
     }
-    toast.success(status === "cancelled" ? "Rendez-vous annulé" : "Statut mis à jour");
+    toast.success(status === "cancelled" ? "Booking cancelled" : "Status updated");
     fetchBookings();
   };
 
