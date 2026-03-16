@@ -46,7 +46,7 @@ const BookingFlow = () => {
 
   const handleConfirm = async () => {
     if (!user) {
-      toast.error("Connecte-toi pour réserver");
+      toast.error("Sign in to book an appointment");
       navigate("/auth");
       return;
     }
