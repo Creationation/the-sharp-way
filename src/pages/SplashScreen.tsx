@@ -64,7 +64,7 @@ const SplashScreen = () => {
       {/* Bottom text */}
       <div className="relative z-10 text-center pb-10 opacity-0 animate-fade-in animation-delay-600" style={{ animationFillMode: "forwards" }}>
         <p className="text-muted-foreground text-xs">
-          Or walk in anytime · Tue–Sat 10AM–8PM
+          Or walk in anytime · Tue–Sat 10:00–20:00
         </p>
       </div>
     </div>
