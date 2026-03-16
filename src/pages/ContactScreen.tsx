@@ -13,7 +13,7 @@ const hours = [
 
 const ContactScreen = () => {
   const navigate = useNavigate();
-  const whatsappUrl = `https://wa.me/4312345678?text=${encodeURIComponent("Hi, I'd like to book an appointment at The Sharp Cut")}`;
+  const whatsappUrl = `https://wa.me/436644686073?text=${encodeURIComponent("Hallo, ich möchte einen Termin bei Sitdown Barber vereinbaren.")}`;
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -31,8 +31,8 @@ const ContactScreen = () => {
           <div className="h-48 bg-surface flex items-center justify-center">
             <div className="text-center">
               <MapPin size={32} className="text-copper mx-auto mb-2" />
-              <p className="text-muted-foreground text-sm">Mariahilfer Straße 45</p>
-              <p className="text-muted-foreground text-xs">1060 Vienna, Austria</p>
+              <p className="text-muted-foreground text-sm">Lavaterstrasse 2</p>
+              <p className="text-muted-foreground text-xs">1220 Wien, Austria</p>
             </div>
           </div>
         </div>
@@ -41,10 +41,9 @@ const ContactScreen = () => {
       {/* Contact info */}
       <div className="px-5 space-y-2 mb-5">
         {[
-          { icon: MapPin, label: "Mariahilfer Straße 45, 1060 Vienna", sub: "Austria" },
-          { icon: Phone, label: "+43 1 234 5678", sub: "Call us" },
-          { icon: MessageCircle, label: "WhatsApp", sub: "Chat with us", href: whatsappUrl },
-          { icon: Mail, label: "hello@thesharpcut.at", sub: "Email us" },
+          { icon: MapPin, label: "Lavaterstrasse 2, 1220 Wien", sub: "Austria", href: "https://maps.google.com/?q=Lavaterstrasse+2,+1220+Wien" },
+          { icon: Phone, label: "+43 664 4686073", sub: "Anrufen", href: "tel:+436644686073" },
+          { icon: MessageCircle, label: "WhatsApp", sub: "Schreib uns", href: whatsappUrl },
         ].map((item, i) => (
           <a
             key={i}
@@ -85,16 +84,21 @@ const ContactScreen = () => {
 
       {/* Get Directions */}
       <div className="px-5 mb-5">
-        <button className="w-full gradient-copper text-primary-foreground font-semibold py-3.5 rounded-full shadow-copper flex items-center justify-center gap-2">
+        <a
+          href="https://maps.google.com/?q=Lavaterstrasse+2,+1220+Wien"
+          target="_blank"
+          rel="noreferrer"
+          className="w-full gradient-copper text-primary-foreground font-semibold py-3.5 rounded-full shadow-copper flex items-center justify-center gap-2"
+        >
           <Navigation size={18} />
           Get Directions
-        </button>
+        </a>
       </div>
 
       {/* Social */}
       <div className="px-5 mb-5">
         <div className="flex items-center justify-center gap-4">
-          <a href="#" className="w-12 h-12 rounded-full bg-surface flex items-center justify-center text-muted-foreground hover:text-copper transition-colors" aria-label="Instagram">
+          <a href="https://instagram.com/sitdownvienna" target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-surface flex items-center justify-center text-muted-foreground hover:text-copper transition-colors" aria-label="Instagram">
             <Instagram size={20} />
           </a>
           <a href="#" className="w-12 h-12 rounded-full bg-surface flex items-center justify-center text-muted-foreground hover:text-copper transition-colors" aria-label="TikTok">

@@ -146,10 +146,10 @@ const HomeDashboard = () => {
         </div>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { name: "Classic Haircut", price: "€25", icon: "✂️" },
-            { name: "Fade & Taper", price: "€30", icon: "💈" },
-            { name: "Beard Trim", price: "€15", icon: "🪒" },
-            { name: "Combo", price: "€40", icon: "⭐" },
+            { name: "Haarschnitt", price: "€20", icon: "✂️" },
+            { name: "Maschinenschnitt", price: "€15", icon: "⚡" },
+            { name: "Moderne Bartrasur", price: "€15", icon: "🪒" },
+            { name: "Komplett Service", price: "€38", icon: "⭐" },
           ].map((s) => (
             <button
               key={s.name}

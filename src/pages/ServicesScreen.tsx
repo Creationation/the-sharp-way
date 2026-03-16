@@ -2,17 +2,46 @@ import { useState } from "react";
 import { ArrowLeft, Clock, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const categories = ["All", "Hair", "Beard", "Combo", "Special"];
+const categories = ["All", "Herren", "Damen", "Bart", "Kinder"];
 
 const allServices = [
-  { name: "Classic Haircut", price: "€25", duration: "30min", desc: "Timeless precision cut tailored to your style.", cat: "Hair", icon: "✂️" },
-  { name: "Fade & Taper", price: "€30", duration: "45min", desc: "Seamless blends and razor-sharp lines.", cat: "Hair", icon: "💈" },
-  { name: "Beard Trim", price: "€15", duration: "20min", desc: "Sculpted and shaped to perfection.", cat: "Beard", icon: "🪒" },
-  { name: "Haircut + Beard Combo", price: "€40", duration: "60min", desc: "The full experience — cut, trim, and styled.", cat: "Combo", icon: "⭐" },
-  { name: "Hot Towel Shave", price: "€35", duration: "45min", desc: "Old-school luxury with a straight razor finish.", cat: "Special", icon: "🔥" },
-  { name: "Kids Cut", price: "€18", duration: "25min", desc: "Patient, fun, and stylish cuts for the little ones.", cat: "Hair", icon: "👦" },
-  { name: "Hair Color", price: "€45", duration: "75min", desc: "Professional coloring with premium products.", cat: "Special", icon: "🎨" },
-  { name: "Buzz Cut", price: "€18", duration: "20min", desc: "Clean and sharp all-over buzz.", cat: "Hair", icon: "⚡" },
+  // Herren
+  { name: "Haarschnitt", price: "€20", duration: "30min", desc: "Klassischer Herrenschnitt, präzise und sauber.", cat: "Herren", icon: "✂️" },
+  { name: "Maschinenschnitt", price: "€15", duration: "20min", desc: "Kurz und clean mit der Maschine.", cat: "Herren", icon: "⚡" },
+  { name: "Pensionisten Schnitt", price: "€18", duration: "25min", desc: "Spezialtarif für Senioren.", cat: "Herren", icon: "💈" },
+  { name: "Haarschnitt + Waschen/Föhnen", price: "€25", duration: "45min", desc: "Schnitt inkl. Waschen und Föhnen.", cat: "Herren", icon: "💧" },
+  { name: "Haarschnitt + Komplett Service", price: "€38", duration: "60min", desc: "Vollservice: Schnitt, Waschen, Föhnen & Styling.", cat: "Herren", icon: "⭐" },
+  { name: "Haare färben", price: "€35", duration: "60min", desc: "Professionelle Haarfarbe für Herren.", cat: "Herren", icon: "🎨" },
+  { name: "Waschen/Föhnen", price: "€10", duration: "15min", desc: "Waschen und Föhnen ohne Schnitt.", cat: "Herren", icon: "🚿" },
+  { name: "Augenbrauen zupfen", price: "€7", duration: "10min", desc: "Präzises Zupfen für einen gepflegten Look.", cat: "Herren", icon: "👁️" },
+  { name: "Waxing", price: "€7", duration: "10min", desc: "Haarentfernung per Waxing.", cat: "Herren", icon: "🌿" },
+  { name: "Maske", price: "€7", duration: "15min", desc: "Pflegende Gesichtsmaske.", cat: "Herren", icon: "✨" },
+  // Bart
+  { name: "Moderne Bartrasur", price: "€15", duration: "20min", desc: "Modernes Bartshaping und Pflege.", cat: "Bart", icon: "🪒" },
+  { name: "Bart Rasur", price: "€10", duration: "15min", desc: "Klassische Rasur, glatt und sauber.", cat: "Bart", icon: "🔥" },
+  { name: "Bart färben", price: "€20", duration: "30min", desc: "Professionelles Bartfärben.", cat: "Bart", icon: "🎨" },
+  // Damen
+  { name: "Trockenschnitt (K/L)", price: "€23 / €28", duration: "30min", desc: "Schnitt ohne Waschen, kurze oder lange Haare.", cat: "Damen", icon: "✂️" },
+  { name: "Waschen + Schnitt (K/L)", price: "€28 / €33", duration: "45min", desc: "Waschen und Schnitt für kurze oder lange Haare.", cat: "Damen", icon: "💧" },
+  { name: "Waschen + Schnitt + Föhnen (K/L)", price: "€40 / €50", duration: "60min", desc: "Komplett-Service inkl. Föhnen.", cat: "Damen", icon: "⭐" },
+  { name: "Waschen + Föhnen (K/L)", price: "€25 / €35", duration: "30min", desc: "Waschen und Föhnen ohne Schnitt.", cat: "Damen", icon: "🚿" },
+  { name: "Föhnen (K/L)", price: "€20 / €30", duration: "20min", desc: "Nur Föhnen.", cat: "Damen", icon: "💨" },
+  { name: "Färben + Waschen + Föhnen (K/L)", price: "€50 / €60", duration: "75min", desc: "Färben mit Waschen und Föhnen.", cat: "Damen", icon: "🎨" },
+  { name: "Ansatz + Waschen + Föhnen (K/L)", price: "€40 / €60", duration: "60min", desc: "Ansatzfarbe mit Waschen und Föhnen.", cat: "Damen", icon: "🌈" },
+  { name: "Strähnen (K/L)", price: "€60 / €80", duration: "90min", desc: "Highlights und Strähnen.", cat: "Damen", icon: "✨" },
+  { name: "Blondierung (K/L)", price: "€45 / €60", duration: "75min", desc: "Professionelle Blondierung.", cat: "Damen", icon: "⭐" },
+  { name: "Ombre", price: "€80 – €180", duration: "120min", desc: "Ombre-Färbung für einen fließenden Farbverlauf.", cat: "Damen", icon: "🌅" },
+  { name: "Balayage", price: "€180", duration: "150min", desc: "Handgemalt für natürliche Highlights.", cat: "Damen", icon: "🖌️" },
+  { name: "Dauerwelle (K/L)", price: "€60 / €80", duration: "90min", desc: "Klassische oder moderne Dauerwelle.", cat: "Damen", icon: "🌀" },
+  { name: "Locken (K/L)", price: "€40 / €55", duration: "60min", desc: "Lockiges Styling für jeden Typ.", cat: "Damen", icon: "💫" },
+  { name: "Faden (Gesicht)", price: "€25", duration: "20min", desc: "Fadenepilation für das Gesicht.", cat: "Damen", icon: "🧵" },
+  { name: "Augenbrauen zupfen", price: "€8", duration: "10min", desc: "Präzises Brauen-Zupfen.", cat: "Damen", icon: "👁️" },
+  { name: "Augenbrauen färben", price: "€8", duration: "15min", desc: "Augenbrauen färben für mehr Ausdruck.", cat: "Damen", icon: "🎨" },
+  { name: "Wimpern färben", price: "€10", duration: "15min", desc: "Wimpernfarbe für intensiveren Blick.", cat: "Damen", icon: "👁️" },
+  { name: "Oberlippe zupfen", price: "€7", duration: "10min", desc: "Sanfte Haarentfernung der Oberlippe.", cat: "Damen", icon: "🌿" },
+  // Kinder
+  { name: "Kinder Haarschnitt (bis 10 Jahre)", price: "€16", duration: "20min", desc: "Liebevoller Schnitt für die Kleinen bis 10 Jahre.", cat: "Kinder", icon: "👦" },
+  { name: "Kinder Waschen/Föhnen + Schnitt", price: "€20", duration: "30min", desc: "Komplett-Service für Kinder.", cat: "Kinder", icon: "🧒" },
 ];
 
 const ServicesScreen = () => {
