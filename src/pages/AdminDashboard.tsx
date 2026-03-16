@@ -68,10 +68,10 @@ const AdminDashboard = () => {
   const deleteBooking = async (id: string) => {
     const { error } = await supabase.from("bookings").delete().eq("id", id);
     if (error) {
-      toast.error("Erreur");
+      toast.error("Error deleting booking");
       return;
     }
-    toast.success("Rendez-vous supprimé");
+    toast.success("Booking deleted");
     fetchBookings();
   };
 
