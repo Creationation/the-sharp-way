@@ -30,18 +30,19 @@ const AuthScreen = () => {
           },
         });
         if (error) throw error;
-        toast.success("Compte créé ! Vérifie ton email pour confirmer.");
+        toast.success("Account created!");
+        navigate("/home");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: form.email,
           password: form.password,
         });
         if (error) throw error;
-        toast.success("Connexion réussie !");
+        toast.success("Welcome back!");
         navigate("/home");
       }
     } catch (error: any) {
-      toast.error(error.message || "Une erreur est survenue");
+      toast.error(error.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -54,7 +55,7 @@ const AuthScreen = () => {
           <ArrowLeft size={18} className="text-foreground" />
         </button>
         <h1 className="font-heading text-2xl text-foreground">
-          {mode === "login" ? "Connexion" : "Créer un compte"}
+          {mode === "login" ? "Sign In" : "Create Account"}
         </h1>
       </div>
 
@@ -62,7 +63,7 @@ const AuthScreen = () => {
         <div className="text-center mb-8">
           <h2 className="font-heading text-3xl text-copper mb-2">The Sharp Cut</h2>
           <p className="text-muted-foreground text-sm">
-            {mode === "login" ? "Content de te revoir." : "Rejoins la communauté."}
+            {mode === "login" ? "Welcome back." : "Join the community."}
           </p>
         </div>
 
@@ -75,7 +76,7 @@ const AuthScreen = () => {
                 value={form.fullName}
                 onChange={handleChange}
                 required
-                placeholder="Nom complet"
+                placeholder="Full Name"
                 className="w-full bg-surface border border-border rounded-xl pl-12 pr-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper transition-colors"
               />
             </div>
@@ -103,7 +104,7 @@ const AuthScreen = () => {
               onChange={handleChange}
               required
               minLength={6}
-              placeholder="Mot de passe"
+              placeholder="Password"
               className="w-full bg-surface border border-border rounded-xl pl-12 pr-12 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper transition-colors"
             />
             <button
@@ -120,17 +121,17 @@ const AuthScreen = () => {
             disabled={loading}
             className="w-full gradient-copper text-primary-foreground font-semibold text-base py-3.5 rounded-full shadow-copper disabled:opacity-50"
           >
-            {loading ? "Chargement..." : mode === "login" ? "Se connecter" : "Créer mon compte"}
+            {loading ? "Loading..." : mode === "login" ? "Sign In" : "Create Account"}
           </button>
         </form>
 
         <p className="text-center text-muted-foreground text-sm mt-6">
-          {mode === "login" ? "Pas encore de compte ?" : "Déjà un compte ?"}
+          {mode === "login" ? "Don't have an account?" : "Already have an account?"}
           <button
             onClick={() => setMode(mode === "login" ? "signup" : "login")}
             className="text-copper font-semibold ml-1"
           >
-            {mode === "login" ? "S'inscrire" : "Se connecter"}
+            {mode === "login" ? "Sign Up" : "Sign In"}
           </button>
         </p>
       </div>
