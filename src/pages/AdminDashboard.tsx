@@ -102,7 +102,7 @@ const AdminDashboard = () => {
         </div>
         <div className="card-app p-3 text-center">
           <p className="text-mint font-heading text-2xl">{bookings.filter(b => b.status === "confirmed").length}</p>
-          <p className="text-muted-foreground text-[10px]">Confirmés</p>
+          <p className="text-muted-foreground text-[10px]">Confirmed</p>
         </div>
         <div className="card-app p-3 text-center">
           <p className="text-destructive font-heading text-2xl">{bookings.filter(b => b.status === "cancelled").length}</p>
