@@ -132,7 +132,7 @@ const BookingFlow = () => {
 
   const handleConfirm = async () => {
     if (!user) {
-      toast.error("Sign in to book an appointment");
+      toast.error(t.toasts.signInToBook);
       navigate("/auth");
       return;
     }
