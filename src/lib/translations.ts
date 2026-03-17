@@ -635,6 +635,8 @@ const de: Translations = {
       confirmDelete: "Möchtest du diesen Barbier wirklich löschen?",
     },
   },
+  barber: {
+    cuts: "Schnitte",
     experience: "Erfahrung",
     status: "Status",
     topRated: "Top bewertet",
