@@ -487,6 +487,9 @@ const AdminDashboard = () => {
 
       {/* ═══════════════════ PROMOTIONS TAB ═══════════════════ */}
       {tab === "promotions" && <PromotionsTab t={t.admin.promosTab} />}
+
+      {/* ═══════════════════ BARBERS TAB ═══════════════════ */}
+      {tab === "barbers" && <BarbersTab t={t.admin.barbersTab} />}
     </div>
   );
 };
