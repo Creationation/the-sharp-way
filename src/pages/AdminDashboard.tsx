@@ -279,7 +279,7 @@ const AdminDashboard = () => {
             <div className="px-5 space-y-3">
               {filtered.length === 0 ? (
                 <div className="card-app p-8 text-center">
-                  <p className="text-muted-foreground">No bookings</p>
+                  <p className="text-muted-foreground">{t.admin.noBookings}</p>
                 </div>
               ) : (
                 filtered.map(b => {
