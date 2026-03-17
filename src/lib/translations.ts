@@ -208,6 +208,31 @@ export interface Translations {
       loadError: string;
       confirmDelete: string;
     };
+    promoCodesTab: {
+      title: string;
+      code: string;
+      description: string;
+      discountType: string;
+      percentage: string;
+      fixed: string;
+      discountValue: string;
+      maxUses: string;
+      unlimited: string;
+      uses: string;
+      expiresAt: string;
+      noExpiry: string;
+      active: string;
+      inactive: string;
+      addCode: string;
+      save: string;
+      saved: string;
+      saveError: string;
+      deleted: string;
+      deleteError: string;
+      loadError: string;
+      confirmDelete: string;
+      stripeReady: string;
+    };
   };
   barber: {
     cuts: string;
