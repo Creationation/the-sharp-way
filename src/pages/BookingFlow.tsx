@@ -67,7 +67,7 @@ const BookingFlow = () => {
   const availableDates = getAvailableDates();
 
   const [selectedBarber, setSelectedBarber] = useState(barbers[0]);
-  const [selectedService, setSelectedService] = useState(services[0]);
+  const [selectedServices, setSelectedServices] = useState([services[0]]);
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
   const [selectedTime, setSelectedTime] = useState("12:00");
   const [confirmed, setConfirmed] = useState(false);
