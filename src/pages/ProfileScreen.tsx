@@ -77,10 +77,6 @@ const ProfileScreen = () => {
     }
   };
 
-  // Real loyalty stamps — total confirmed bookings ever
-  const totalConfirmed = bookings.filter(b => b.status === "confirmed").length;
-  const stamps = totalConfirmed % 10;
-  const totalPoints = totalConfirmed * 50;
 
   const handleSignOut = async () => {
     await signOut();
