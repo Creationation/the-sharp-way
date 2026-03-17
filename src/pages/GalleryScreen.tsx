@@ -60,7 +60,7 @@ const GalleryScreen = () => {
       {/* Filters — only show categories we have photos for */}
       <div className="px-5 mb-5">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-          {filters.slice(0, 4).map((f, i) => (
+          {filters.map((f, i) => (
             <button
               key={f}
               onClick={() => setActiveFilter(i)}
