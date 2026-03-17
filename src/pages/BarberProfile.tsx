@@ -1,18 +1,10 @@
 import { ArrowLeft, Star, MapPin, Share2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-import barber1 from "@/assets/barber-1.jpg";
-import barber2 from "@/assets/barber-2.jpg";
-import barber3 from "@/assets/barber-3.jpg";
+import { useBarbers } from "@/hooks/useBarbers";
 import gallery1 from "@/assets/gallery-1.jpg";
 import gallery2 from "@/assets/gallery-2.jpg";
 import gallery3 from "@/assets/gallery-3.jpg";
-
-const barbersData = [
-  { id: 1, name: "Marco", specialty: "Classic Cuts & Hot Towel Shaves", rating: 4.9, reviews: 243, cuts: 847, years: 12, image: barber1, available: true },
-  { id: 2, name: "Lukas", specialty: "Fades, Tapers & Modern Styles", rating: 4.8, reviews: 189, cuts: 623, years: 7, image: barber2, available: true },
-  { id: 3, name: "Daniel", specialty: "Beard Sculpting & Design", rating: 4.7, reviews: 156, cuts: 510, years: 9, image: barber3, available: false },
-];
 
 const services = [
   { name: "Classic Haircut", price: "€25" },
@@ -25,9 +17,20 @@ const services = [
 const BarberProfile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { t } = useLanguage();
-  const barber = barbersData.find(b => b.id === Number(id)) || barbersData[0];
+  const { t, lang } = useLanguage();
+  const { barbers, loading } = useBarbers();
   const recentWork = [gallery1, gallery2, gallery3];
+
+  if (loading || barbers.length === 0) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-copper border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const barber = barbers.find(b => b.id === id) || barbers[0];
+  const specialty = lang === "de" ? barber.specialty_de : barber.specialty_en;
 
   return (
     <div className="min-h-screen bg-background pb-28">
@@ -49,12 +52,11 @@ const BarberProfile = () => {
         {/* Barber info overlay */}
         <div className="absolute bottom-6 left-5 right-5">
           <h1 className="font-heading text-4xl text-foreground">{barber.name}</h1>
-          <p className="text-copper text-sm font-medium mb-2">{barber.specialty}</p>
+          <p className="text-copper text-sm font-medium mb-2">{specialty}</p>
           <div className="flex items-center gap-3 text-sm">
             <div className="flex items-center gap-1">
               <Star size={14} className="text-copper fill-copper" />
               <span className="text-foreground font-medium">{barber.rating}</span>
-              <span className="text-muted-foreground">· {barber.reviews} {t.barber.reviews}</span>
             </div>
             <div className="flex items-center gap-1 text-muted-foreground">
               <MapPin size={12} />
