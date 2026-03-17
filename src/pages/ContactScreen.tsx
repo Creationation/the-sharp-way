@@ -106,7 +106,7 @@ const ContactScreen = () => {
       {/* Get Directions */}
       <div className="px-5 mb-5">
         <a
-          href="https://maps.google.com/?q=Lavaterstrasse+2,+1220+Wien"
+          href="https://www.google.com/maps/dir/?api=1&destination=Lavaterstrasse+2,+1220+Wien,+Austria"
           target="_blank"
           rel="noreferrer"
           className="w-full gradient-copper text-primary-foreground font-semibold py-3.5 rounded-full shadow-copper flex items-center justify-center gap-2"
