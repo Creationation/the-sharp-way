@@ -33,23 +33,34 @@ const ContactScreen = () => {
         <h1 className="font-heading text-2xl text-foreground">{t.contact.title}</h1>
       </div>
 
-      {/* Map placeholder */}
+      {/* Interactive Map */}
       <div className="px-5 mb-5">
-        <div className="card-app overflow-hidden">
-          <div className="h-48 bg-surface flex items-center justify-center">
-            <div className="text-center">
-              <MapPin size={32} className="text-copper mx-auto mb-2" />
-              <p className="text-muted-foreground text-sm">Lavaterstrasse 2</p>
-              <p className="text-muted-foreground text-xs">1220 Wien, Austria</p>
-            </div>
+        <a
+          href="https://www.google.com/maps/dir/?api=1&destination=Lavaterstrasse+2,+1220+Wien,+Austria"
+          target="_blank"
+          rel="noreferrer"
+          className="card-app overflow-hidden block"
+        >
+          <div className="relative h-48 w-full">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2657.5!2d16.3976!3d48.2358!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476d07851f8daaab%3A0x0!2sLavaterstrasse%202%2C%201220%20Wien!5e0!3m2!1sde!2sat!4v1"
+              width="100%"
+              height="100%"
+              style={{ border: 0, pointerEvents: "none" }}
+              allowFullScreen={false}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Shop location"
+            />
+            <div className="absolute inset-0" />
           </div>
-        </div>
+        </a>
       </div>
 
       {/* Contact info */}
       <div className="px-5 space-y-2 mb-5">
         {[
-          { icon: MapPin, label: "Lavaterstrasse 2, 1220 Wien", sub: "Austria", href: "https://maps.google.com/?q=Lavaterstrasse+2,+1220+Wien" },
+          { icon: MapPin, label: "Lavaterstrasse 2, 1220 Wien", sub: "Austria", href: "https://www.google.com/maps/dir/?api=1&destination=Lavaterstrasse+2,+1220+Wien,+Austria" },
           { icon: Phone, label: "+43 664 4686073", sub: t.contact.callUs, href: "tel:+436644686073" },
           { icon: MessageCircle, label: "WhatsApp", sub: t.contact.chatUs, href: whatsappUrl },
         ].map((item, i) => (
@@ -95,7 +106,7 @@ const ContactScreen = () => {
       {/* Get Directions */}
       <div className="px-5 mb-5">
         <a
-          href="https://maps.google.com/?q=Lavaterstrasse+2,+1220+Wien"
+          href="https://www.google.com/maps/dir/?api=1&destination=Lavaterstrasse+2,+1220+Wien,+Austria"
           target="_blank"
           rel="noreferrer"
           className="w-full gradient-copper text-primary-foreground font-semibold py-3.5 rounded-full shadow-copper flex items-center justify-center gap-2"
