@@ -533,6 +533,9 @@ const AdminDashboard = () => {
       {/* ═══════════════════ LOYALTY TAB ═══════════════════ */}
       {tab === "loyalty" && <LoyaltyTab t={t.admin.loyaltyTab} />}
 
+      {/* ═══════════════════ REWARDS TAB ═══════════════════ */}
+      {tab === "rewards" && <RewardsTab t={t.admin.rewardsTab} />}
+
       {/* ═══════════════════ NOTIFICATIONS TAB ═══════════════════ */}
       {tab === "notifications" && (
         <div className="px-5">
