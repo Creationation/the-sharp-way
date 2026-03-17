@@ -335,7 +335,7 @@ const AdminDashboard = () => {
                           onClick={() => deleteBooking(b.id)}
                           className="flex items-center gap-1 text-xs text-muted-foreground bg-surface px-3 py-1.5 rounded-full"
                         >
-                          <Trash2 size={12} /> Delete
+                          <Trash2 size={12} /> {t.admin.delete}
                         </button>
                       </div>
                     </div>
