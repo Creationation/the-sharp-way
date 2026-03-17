@@ -228,6 +228,13 @@ const AdminDashboard = () => {
           }`}
         >
           Availability
+        <button
+          onClick={() => setTab("users")}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+            tab === "users" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+          }`}
+        >
+          {t.admin.users}
         </button>
       </div>
 
