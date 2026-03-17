@@ -197,7 +197,7 @@ const en: Translations = {
     profile: "Profile",
   },
   home: {
-    announcement: "New: Hot Towel Shave now available —",
+    announcement: "New: Hot Towel Shave now available",
     announcementLink: "Book Today",
     greeting: "Hi, Sharp Client",
     location: "Vienna, AT",
