@@ -119,6 +119,22 @@ export interface Translations {
     language: string;
     gold: string;
   };
+  admin: {
+    users: string;
+    usersTab: {
+      title: string;
+      search: string;
+      totalUsers: string;
+      name: string;
+      email: string;
+      phone: string;
+      joined: string;
+      noUsers: string;
+      noPhone: string;
+      noName: string;
+      loadError: string;
+    };
+  };
   barber: {
     cuts: string;
     experience: string;
