@@ -77,6 +77,7 @@ const AdminDashboard = () => {
     if (barberNames.length > 0 && !avBarber) setAvBarber(barberNames[0]);
   }, [barberNames]);
 
+  useEffect(() => {
     if (!authLoading && !isAdmin) {
       navigate("/home");
       return;
