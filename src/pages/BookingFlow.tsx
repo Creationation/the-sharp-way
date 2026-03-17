@@ -98,8 +98,8 @@ const BookingFlow = () => {
   const monthAbbr = MONTH_ABBR[lang] ?? MONTH_ABBR.en;
 
   useEffect(() => {
-    fetchAvailability();
-  }, [selectedBarber.name, selectedDayIdx]);
+    if (selectedBarber) fetchAvailability();
+  }, [selectedBarber?.name, selectedDayIdx]);
 
   const fetchAvailability = async () => {
     setLoadingSlots(true);
