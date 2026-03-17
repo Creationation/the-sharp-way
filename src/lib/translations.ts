@@ -415,6 +415,22 @@ const de: Translations = {
     language: "Sprache",
     gold: "Gold",
   },
+  admin: {
+    users: "Kunden",
+    usersTab: {
+      title: "Kunden",
+      search: "Nach Name, E-Mail, Telefon suchen...",
+      totalUsers: "Kunden gesamt",
+      name: "Name",
+      email: "E-Mail",
+      phone: "Telefon",
+      joined: "Beigetreten",
+      noUsers: "Keine Kunden gefunden",
+      noPhone: "Kein Telefon",
+      noName: "Kein Name",
+      loadError: "Fehler beim Laden der Kunden",
+    },
+  },
   barber: {
     cuts: "Schnitte",
     experience: "Erfahrung",
