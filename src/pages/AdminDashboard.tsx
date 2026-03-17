@@ -328,7 +328,7 @@ const AdminDashboard = () => {
                             onClick={() => updateStatus(b.id, "confirmed")}
                             className="flex items-center gap-1 text-xs text-mint bg-mint/10 px-3 py-1.5 rounded-full"
                           >
-                            <CheckCircle size={12} /> Confirm
+                            <CheckCircle size={12} /> {t.admin.confirm}
                           </button>
                         )}
                         <button
