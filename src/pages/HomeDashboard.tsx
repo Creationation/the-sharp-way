@@ -3,18 +3,12 @@ import { Bell, Search, MapPin, Star, ChevronRight, X, Calendar, Clock } from "lu
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useBarbers } from "@/hooks/useBarbers";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import barber1 from "@/assets/barber-1.jpg";
-import barber2 from "@/assets/barber-2.jpg";
-import barber3 from "@/assets/barber-3.jpg";
 import heroBg from "@/assets/hero-bg.jpg";
 
-const barbers = [
-  { id: 1, name: "Marco", specialty: "Classic Cuts & Shaves", rating: 4.9, cuts: 847, years: 12, image: barber1, available: true },
-  { id: 2, name: "Lukas", specialty: "Fades & Modern Styles", rating: 4.8, cuts: 623, years: 7, image: barber2, available: true },
-  { id: 3, name: "Daniel", specialty: "Beard Sculpting", rating: 4.7, cuts: 510, years: 9, image: barber3, available: false },
-];
 
 const quickServices = [
   { name: "Haarschnitt", price: "€20", icon: "✂️" },
