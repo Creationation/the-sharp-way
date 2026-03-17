@@ -75,6 +75,8 @@ export interface Translations {
     bookedWith: string;
     backHome: string;
     feb: string;
+    moreDates: string;
+    closedDay: string;
   };
   gallery: {
     title: string;
