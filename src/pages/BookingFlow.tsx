@@ -194,22 +194,32 @@ const BookingFlow = () => {
       <div className="px-5 mb-5">
         <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">{t.booking.selectBarber}</h3>
         <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
-          {barbers.map(b => (
-            <button
-              key={b.id}
-              onClick={() => setSelectedBarber(b)}
-              className={`flex items-center gap-3 card-app px-4 py-3 flex-shrink-0 transition-all ${selectedBarber.id === b.id ? "border-copper" : ""}`}
-            >
-              <img src={b.image} alt={b.name} className="w-10 h-10 rounded-full object-cover" />
-              <div className="text-left">
-                <p className="text-foreground text-sm font-medium">{b.name}</p>
-                <div className="flex items-center gap-1">
-                  <Star size={10} className="text-copper fill-copper" />
-                  <span className="text-muted-foreground text-[11px]">{b.rating}</span>
+          {barbers.map(b => {
+            const isSelected = selectedBarber.id === b.id;
+            return (
+              <button
+                key={b.id}
+                onClick={() => setSelectedBarber(b)}
+                className={`flex items-center gap-3 card-app px-4 py-3 flex-shrink-0 transition-all ${isSelected ? "border-copper ring-2 ring-copper/40 bg-copper/10" : "opacity-60"}`}
+              >
+                <div className="relative">
+                  <img src={b.image} alt={b.name} className={`w-10 h-10 rounded-full object-cover transition-all ${isSelected ? "ring-2 ring-copper" : ""}`} />
+                  {isSelected && (
+                    <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full gradient-copper flex items-center justify-center">
+                      <Check size={10} className="text-primary-foreground" />
+                    </div>
+                  )}
                 </div>
-              </div>
-            </button>
-          ))}
+                <div className="text-left">
+                  <p className="text-foreground text-sm font-medium">{b.name}</p>
+                  <div className="flex items-center gap-1">
+                    <Star size={10} className="text-copper fill-copper" />
+                    <span className="text-muted-foreground text-[11px]">{b.rating}</span>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
