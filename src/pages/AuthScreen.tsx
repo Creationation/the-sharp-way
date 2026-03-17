@@ -40,7 +40,7 @@ const AuthScreen = () => {
           password: form.password,
         });
         if (error) throw error;
-        toast.success("Welcome back!");
+        toast.success(t.toasts.welcomeBack);
         navigate("/home");
       }
     } catch (error: any) {
