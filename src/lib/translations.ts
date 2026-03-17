@@ -78,6 +78,12 @@ export interface Translations {
     feb: string;
     moreDates: string;
     closedDay: string;
+    promoCode: string;
+    applyCode: string;
+    promoApplied: string;
+    promoInvalid: string;
+    promoExpired: string;
+    discount: string;
   };
   gallery: {
     title: string;
@@ -202,6 +208,31 @@ export interface Translations {
       loadError: string;
       confirmDelete: string;
     };
+    promoCodesTab: {
+      title: string;
+      code: string;
+      description: string;
+      discountType: string;
+      percentage: string;
+      fixed: string;
+      discountValue: string;
+      maxUses: string;
+      unlimited: string;
+      uses: string;
+      expiresAt: string;
+      noExpiry: string;
+      active: string;
+      inactive: string;
+      addCode: string;
+      save: string;
+      saved: string;
+      saveError: string;
+      deleted: string;
+      deleteError: string;
+      loadError: string;
+      confirmDelete: string;
+      stripeReady: string;
+    };
   };
   barber: {
     cuts: string;
@@ -294,6 +325,12 @@ const en: Translations = {
     feb: "FEB",
     moreDates: "More dates",
     closedDay: "Closed on this day",
+    promoCode: "Promo Code",
+    applyCode: "Apply",
+    promoApplied: "Promo code applied!",
+    promoInvalid: "Invalid promo code",
+    promoExpired: "This promo code has expired",
+    discount: "Discount",
   },
   gallery: {
     title: "The Art of the Cut",
@@ -418,6 +455,31 @@ const en: Translations = {
       loadError: "Failed to load barbers",
       confirmDelete: "Are you sure you want to delete this barber?",
     },
+    promoCodesTab: {
+      title: "Promo Codes",
+      code: "Code",
+      description: "Description",
+      discountType: "Discount Type",
+      percentage: "Percentage (%)",
+      fixed: "Fixed Amount (€)",
+      discountValue: "Value",
+      maxUses: "Max Uses",
+      unlimited: "Unlimited",
+      uses: "Uses",
+      expiresAt: "Expires",
+      noExpiry: "No expiry",
+      active: "Active",
+      inactive: "Inactive",
+      addCode: "Add Promo Code",
+      save: "Save",
+      saved: "Saved successfully",
+      saveError: "Error saving",
+      deleted: "Promo code deleted",
+      deleteError: "Error deleting",
+      loadError: "Failed to load promo codes",
+      confirmDelete: "Are you sure you want to delete this promo code?",
+      stripeReady: "Stripe-ready (coupon ID will sync when connected)",
+    },
   },
   barber: {
     cuts: "Cuts",
@@ -510,6 +572,12 @@ const de: Translations = {
     feb: "FEB",
     moreDates: "Weitere Termine",
     closedDay: "An diesem Tag geschlossen",
+    promoCode: "Promo-Code",
+    applyCode: "Einlösen",
+    promoApplied: "Promo-Code angewendet!",
+    promoInvalid: "Ungültiger Promo-Code",
+    promoExpired: "Dieser Promo-Code ist abgelaufen",
+    discount: "Rabatt",
   },
   gallery: {
     title: "Die Kunst des Schnitts",
@@ -633,6 +701,31 @@ const de: Translations = {
       deleteError: "Fehler beim Löschen",
       loadError: "Fehler beim Laden der Barbiere",
       confirmDelete: "Möchtest du diesen Barbier wirklich löschen?",
+    },
+    promoCodesTab: {
+      title: "Promo-Codes",
+      code: "Code",
+      description: "Beschreibung",
+      discountType: "Rabattart",
+      percentage: "Prozent (%)",
+      fixed: "Fester Betrag (€)",
+      discountValue: "Wert",
+      maxUses: "Max. Nutzungen",
+      unlimited: "Unbegrenzt",
+      uses: "Nutzungen",
+      expiresAt: "Ablaufdatum",
+      noExpiry: "Kein Ablauf",
+      active: "Aktiv",
+      inactive: "Inaktiv",
+      addCode: "Promo-Code hinzufügen",
+      save: "Speichern",
+      saved: "Erfolgreich gespeichert",
+      saveError: "Fehler beim Speichern",
+      deleted: "Promo-Code gelöscht",
+      deleteError: "Fehler beim Löschen",
+      loadError: "Fehler beim Laden der Promo-Codes",
+      confirmDelete: "Möchtest du diesen Promo-Code wirklich löschen?",
+      stripeReady: "Stripe-bereit (Coupon-ID wird bei Verbindung synchronisiert)",
     },
   },
   barber: {

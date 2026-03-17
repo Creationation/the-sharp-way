@@ -87,6 +87,44 @@ const BookingFlow = () => {
   };
 
   const totalPrice = selectedServices.reduce((sum, s) => sum + parseInt(s.price.replace("€", "")), 0);
+
+  // Promo code state
+  const [promoInput, setPromoInput] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount_type: string; discount_value: number } | null>(null);
+  const [promoLoading, setPromoLoading] = useState(false);
+
+  const discountAmount = appliedPromo
+    ? appliedPromo.discount_type === "percentage"
+      ? Math.round(totalPrice * appliedPromo.discount_value / 100)
+      : Math.min(appliedPromo.discount_value, totalPrice)
+    : 0;
+  const finalPrice = totalPrice - discountAmount;
+
+  const applyPromo = async () => {
+    if (!promoInput.trim()) return;
+    setPromoLoading(true);
+    const { data, error } = await supabase
+      .from("promo_codes")
+      .select("code, discount_type, discount_value, max_uses, current_uses, active, expires_at")
+      .eq("code", promoInput.toUpperCase().trim())
+      .eq("active", true)
+      .maybeSingle();
+    setPromoLoading(false);
+    if (error || !data) {
+      toast.error(t.booking.promoInvalid);
+      return;
+    }
+    if (data.expires_at && new Date(data.expires_at) < new Date()) {
+      toast.error(t.booking.promoExpired);
+      return;
+    }
+    if (data.max_uses && data.current_uses >= data.max_uses) {
+      toast.error(t.booking.promoInvalid);
+      return;
+    }
+    setAppliedPromo({ code: data.code, discount_type: data.discount_type, discount_value: Number(data.discount_value) });
+    toast.success(t.booking.promoApplied);
+  };
   const totalDuration = selectedServices.reduce((sum, s) => sum + parseInt(s.duration), 0);
 
   const [takenSlots, setTakenSlots] = useState<string[]>([]);
@@ -147,7 +185,7 @@ const BookingFlow = () => {
     const dateStr = toDateStr(selectedDate);
 
     const serviceNames = selectedServices.map(s => s.name).join(", ");
-    const servicePrices = `€${totalPrice}`;
+    const servicePrices = appliedPromo ? `€${finalPrice} (was €${totalPrice})` : `€${totalPrice}`;
     const serviceDurations = `${totalDuration}min`;
 
     const { error } = await supabase.from("bookings").insert({
@@ -166,6 +204,11 @@ const BookingFlow = () => {
     if (error) {
       toast.error(t.toasts.bookingFailed);
       return;
+    }
+
+    // Increment promo code usage (non-blocking)
+    if (appliedPromo) {
+      supabase.rpc("use_promo_code" as any, { _code: appliedPromo.code }).then(() => {});
     }
 
     // Send confirmation email (non-blocking — failure doesn't affect booking)
@@ -426,9 +469,49 @@ const BookingFlow = () => {
             <span className="text-foreground text-sm">{totalDuration}min</span>
           </div>
           <div className="border-t border-border my-3" />
+
+          {/* Promo code input */}
+          <div className="flex items-center gap-2 mb-3">
+            <input
+              value={promoInput}
+              onChange={e => setPromoInput(e.target.value.toUpperCase())}
+              placeholder={t.booking.promoCode}
+              disabled={!!appliedPromo}
+              className="flex-1 bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:border-copper/50 transition-colors font-mono tracking-wider placeholder:font-sans placeholder:tracking-normal disabled:opacity-50"
+            />
+            {!appliedPromo ? (
+              <button
+                onClick={applyPromo}
+                disabled={promoLoading || !promoInput.trim()}
+                className="gradient-copper text-primary-foreground text-xs font-semibold px-4 py-2.5 rounded-xl disabled:opacity-50"
+              >
+                {promoLoading ? "..." : t.booking.applyCode}
+              </button>
+            ) : (
+              <button
+                onClick={() => { setAppliedPromo(null); setPromoInput(""); }}
+                className="text-destructive text-xs font-semibold px-3 py-2.5"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {appliedPromo && (
+            <div className="flex items-center justify-between mb-2 text-mint">
+              <span className="text-xs font-medium">{t.booking.discount} ({appliedPromo.code})</span>
+              <span className="text-sm font-semibold">-€{discountAmount}</span>
+            </div>
+          )}
+
           <div className="flex items-center justify-between">
             <span className="text-foreground font-semibold">{t.booking.total}</span>
-            <span className="text-copper font-heading text-2xl">€{totalPrice}</span>
+            <div className="flex items-center gap-2">
+              {appliedPromo && (
+                <span className="text-muted-foreground text-sm line-through">€{totalPrice}</span>
+              )}
+              <span className="text-copper font-heading text-2xl">€{finalPrice}</span>
+            </div>
           </div>
         </div>
       </div>

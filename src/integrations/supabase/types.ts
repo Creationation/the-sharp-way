@@ -164,6 +164,54 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_codes: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          current_uses: number
+          description: string
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          max_uses: number | null
+          min_order_amount: number | null
+          stripe_coupon_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          current_uses?: number
+          description?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          min_order_amount?: number | null
+          stripe_coupon_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          current_uses?: number
+          description?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          min_order_amount?: number | null
+          stripe_coupon_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       promotions: {
         Row: {
           active: boolean
@@ -239,6 +287,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      use_promo_code: { Args: { _code: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"

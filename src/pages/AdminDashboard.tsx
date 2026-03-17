@@ -14,6 +14,7 @@ import { translations } from "@/lib/translations";
 import UsersTab from "@/components/admin/UsersTab";
 import PromotionsTab from "@/components/admin/PromotionsTab";
 import BarbersTab from "@/components/admin/BarbersTab";
+import PromoCodesTab from "@/components/admin/PromoCodesTab";
 import { useBarbers } from "@/hooks/useBarbers";
 
 interface Booking {
@@ -54,7 +55,7 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  const [tab, setTab] = useState<"bookings" | "availability" | "users" | "promotions" | "barbers">("bookings");
+  const [tab, setTab] = useState<"bookings" | "availability" | "users" | "promotions" | "barbers" | "codes">("bookings");
   const { barbers: dbBarbers } = useBarbers();
   const barberNames = dbBarbers.map(b => b.name);
 
@@ -264,6 +265,14 @@ const AdminDashboard = () => {
           }`}
         >
           {t.admin.barbersTab.title}
+        </button>
+        <button
+          onClick={() => setTab("codes")}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+            tab === "codes" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+          }`}
+        >
+          {t.admin.promoCodesTab.title}
         </button>
       </div>
 
@@ -490,6 +499,9 @@ const AdminDashboard = () => {
 
       {/* ═══════════════════ BARBERS TAB ═══════════════════ */}
       {tab === "barbers" && <BarbersTab t={t.admin.barbersTab} />}
+
+      {/* ═══════════════════ PROMO CODES TAB ═══════════════════ */}
+      {tab === "codes" && <PromoCodesTab t={t.admin.promoCodesTab} />}
     </div>
   );
 };
