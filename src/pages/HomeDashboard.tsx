@@ -118,15 +118,19 @@ const HomeDashboard = () => {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Announcement strip */}
-      <div className="bg-surface border-b border-border pt-[env(safe-area-inset-top)] overflow-hidden">
-        <div className="py-2.5 whitespace-nowrap animate-marquee">
-          <span className="inline-block text-xs text-muted-foreground">
-            ✂️ <span className="text-copper font-medium">{lang === "de" ? "Neu:" : "New:"}</span>{" "}
-            {t.home.announcement} &nbsp;·&nbsp;{" "}
-            <span className="text-copper font-semibold cursor-pointer underline underline-offset-2" onClick={() => navigate("/book")}>{t.home.announcementLink}</span>
-          </span>
+      {bannerPromo && (
+        <div className="bg-surface border-b border-border pt-[env(safe-area-inset-top)] overflow-hidden">
+          <div className="py-2.5 whitespace-nowrap animate-marquee">
+            <span className="inline-block text-xs text-muted-foreground">
+              ✂️ <span className="text-copper font-medium">{lang === "de" ? "Neu:" : "New:"}</span>{" "}
+              {lang === "de" ? bannerPromo.title_de : bannerPromo.title_en} &nbsp;·&nbsp;{" "}
+              <span className="text-copper font-semibold cursor-pointer underline underline-offset-2" onClick={() => navigate("/book")}>
+                {lang === "de" ? bannerPromo.link_text_de : bannerPromo.link_text_en}
+              </span>
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Top bar */}
       <div className="px-5 pt-5 pb-3 flex items-center justify-between">
