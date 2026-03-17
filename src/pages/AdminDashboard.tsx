@@ -65,7 +65,7 @@ const AdminDashboard = () => {
   const [filter, setFilter] = useState<"all" | "confirmed" | "cancelled">("all");
 
   // — Availability tab state —
-  const [avBarber, setAvBarber] = useState(BARBERS[0]);
+  const [avBarber, setAvBarber] = useState("");
   const [avDate, setAvDate] = useState<Date>(new Date());
   const [dayOff, setDayOff] = useState(false);
   const [slotStates, setSlotStates] = useState<Record<string, SlotState>>({});
