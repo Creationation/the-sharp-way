@@ -166,6 +166,22 @@ const ProfileScreen = () => {
             <p className="text-muted-foreground text-xs text-center">
               {t.profile.stampsLabel(stamps)}
             </p>
+
+            {/* Claim reward button */}
+            {stamps >= 10 && !rewardPending && (
+              <button
+                onClick={claimReward}
+                disabled={claimingReward}
+                className="mt-3 w-full gradient-copper text-primary-foreground font-semibold py-3 rounded-full shadow-copper text-sm animate-pulse disabled:opacity-50 disabled:animate-none"
+              >
+                {claimingReward ? "..." : t.profile.claimReward}
+              </button>
+            )}
+            {rewardPending && (
+              <p className="mt-3 text-copper text-xs text-center font-medium">
+                {t.profile.rewardPending}
+              </p>
+            )}
           </div>
         </div>
       </div>
