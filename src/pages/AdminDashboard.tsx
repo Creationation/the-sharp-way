@@ -388,8 +388,8 @@ const AdminDashboard = () => {
           {/* Day Off toggle */}
           <div className="card-app px-4 py-3 flex items-center justify-between mb-5">
             <div>
-              <p className="text-foreground text-sm font-medium">Day Off</p>
-              <p className="text-muted-foreground text-xs">Close entire day for {avBarber}</p>
+              <p className="text-foreground text-sm font-medium">{t.admin.dayOff}</p>
+              <p className="text-muted-foreground text-xs">{t.admin.closeDayFor(avBarber)}</p>
             </div>
             <button onClick={() => setDayOff(v => !v)}>
               {dayOff
