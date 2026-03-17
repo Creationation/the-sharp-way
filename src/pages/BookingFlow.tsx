@@ -60,13 +60,14 @@ const BookingFlow = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { t, lang } = useLanguage();
+  const { barbers, loading: barbersLoading } = useBarbers();
 
   const [customDate, setCustomDate] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
 
   const availableDates = customDate ? getAvailableDates(customDate) : getAvailableDates();
 
-  const [selectedBarber, setSelectedBarber] = useState(barbers[0]);
+  const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
   const [selectedServices, setSelectedServices] = useState<typeof services>([services[0]]);
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
   const [selectedTime, setSelectedTime] = useState("12:00");
