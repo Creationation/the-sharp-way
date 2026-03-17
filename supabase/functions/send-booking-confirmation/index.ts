@@ -31,7 +31,7 @@ serve(async (req) => {
       ? `Buchungsbestätigung — ${service} mit ${barber}`
       : `Booking Confirmed — ${service} with ${barber}`;
 
-    const html = isDE ? `
+    const html = isDE ? `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
       <div style="font-family: sans-serif; max-width: 480px; margin: auto; background: #0f0f0f; color: #f5f0e8; padding: 32px; border-radius: 16px;">
         <h1 style="color: #b8935a; font-size: 28px; margin-bottom: 4px;">Dein Termin ist bestätigt ✂️</h1>
         <p style="color: #888; margin-bottom: 24px;">Hallo ${name}, wir freuen uns auf deinen Besuch.</p>
@@ -51,7 +51,7 @@ serve(async (req) => {
         <p style="color: #888; font-size: 12px; margin-top: 8px;">Lavaterstrasse 2, 1220 Wien · +43 664 4686073</p>
         <p style="color: #444; font-size: 11px; margin-top: 24px;">© 2026 The Sharp Cut</p>
       </div>
-    ` : `
+    </body></html>` : `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
       <div style="font-family: sans-serif; max-width: 480px; margin: auto; background: #0f0f0f; color: #f5f0e8; padding: 32px; border-radius: 16px;">
         <h1 style="color: #b8935a; font-size: 28px; margin-bottom: 4px;">You're Booked ✂️</h1>
         <p style="color: #888; margin-bottom: 24px;">Hi ${name}, we can't wait to see you.</p>
@@ -71,7 +71,7 @@ serve(async (req) => {
         <p style="color: #888; font-size: 12px; margin-top: 8px;">Lavaterstrasse 2, 1220 Wien · +43 664 4686073</p>
         <p style="color: #444; font-size: 11px; margin-top: 24px;">© 2026 The Sharp Cut</p>
       </div>
-    `;
+    </body></html>`;
 
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
