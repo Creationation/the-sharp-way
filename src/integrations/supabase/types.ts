@@ -119,6 +119,51 @@ export type Database = {
         }
         Relationships: []
       }
+      promotions: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          image_url: string | null
+          link_text_de: string
+          link_text_en: string
+          subtitle_de: string
+          subtitle_en: string
+          title_de: string
+          title_en: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          link_text_de?: string
+          link_text_en?: string
+          subtitle_de?: string
+          subtitle_en?: string
+          title_de?: string
+          title_en?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          link_text_de?: string
+          link_text_en?: string
+          subtitle_de?: string
+          subtitle_en?: string
+          title_de?: string
+          title_en?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
