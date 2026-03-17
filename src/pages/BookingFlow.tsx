@@ -170,11 +170,11 @@ const BookingFlow = () => {
         body: {
           email: user.email,
           name: displayName,
-          service: selectedService.name,
+          service: serviceNames,
           barber: selectedBarber.name,
           date: `${dayAbbr[selectedDate.getDay()]} ${selectedDate.getDate()} ${monthAbbr[selectedDate.getMonth()]}`,
           time: selectedTime,
-          price: selectedService.price,
+          price: servicePrices,
           lang,
         },
       }).catch(() => {}); // silent fail
