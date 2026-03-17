@@ -294,7 +294,7 @@ const de: Translations = {
   },
   gallery: {
     title: "Die Kunst des Schnitts",
-    filters: ["Alle", "Fades", "Bärte", "Klassisch"],
+    filters: ["Alle", "Fades", "Bärte", "Klassisch", "Frauen"],
   },
   reviews: {
     title: "Bewertungen",
