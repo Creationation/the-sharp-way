@@ -81,7 +81,7 @@ const AdminDashboard = () => {
       .order("booking_time", { ascending: true });
 
     if (error) {
-      toast.error("Failed to load bookings");
+      toast.error(t.admin.loadFailed);
       setLoadingBookings(false);
       return;
     }
@@ -172,23 +172,23 @@ const AdminDashboard = () => {
 
     setSavingAv(false);
     if (error) {
-      toast.error("Failed to save availability");
+      toast.error(t.admin.saveFailed);
     } else {
-      toast.success("Availability saved");
+      toast.success(t.admin.savedSuccess);
     }
   };
 
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
-    if (error) { toast.error("Error updating booking"); return; }
-    toast.success(status === "cancelled" ? "Booking cancelled" : "Status updated");
+    if (error) { toast.error(t.admin.updateError); return; }
+    toast.success(status === "cancelled" ? t.admin.bookingCancelled : t.admin.statusUpdated);
     fetchBookings();
   };
 
   const deleteBooking = async (id: string) => {
     const { error } = await supabase.from("bookings").delete().eq("id", id);
-    if (error) { toast.error("Error deleting booking"); return; }
-    toast.success("Booking deleted");
+    if (error) { toast.error(t.admin.deleteError); return; }
+    toast.success(t.admin.bookingDeleted);
     fetchBookings();
   };
 
@@ -208,7 +208,7 @@ const AdminDashboard = () => {
         <button onClick={() => navigate("/home")} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
           <ArrowLeft size={18} className="text-foreground" />
         </button>
-        <h1 className="font-heading text-2xl text-foreground">Admin Dashboard</h1>
+        <h1 className="font-heading text-2xl text-foreground">{t.admin.title}</h1>
       </div>
 
       {/* Tab switcher */}
@@ -219,7 +219,7 @@ const AdminDashboard = () => {
             tab === "bookings" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
           }`}
         >
-          Bookings
+          {t.admin.bookings}
         </button>
         <button
           onClick={() => setTab("availability")}
@@ -227,7 +227,7 @@ const AdminDashboard = () => {
             tab === "availability" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
           }`}
         >
-          Availability
+          {t.admin.availability}
         </button>
         <button
           onClick={() => setTab("users")}
@@ -245,15 +245,15 @@ const AdminDashboard = () => {
           <div className="px-5 mb-5 grid grid-cols-3 gap-3">
             <div className="card-app p-3 text-center">
               <p className="text-copper font-heading text-2xl">{bookings.length}</p>
-              <p className="text-muted-foreground text-[10px]">Total</p>
+              <p className="text-muted-foreground text-[10px]">{t.admin.total}</p>
             </div>
             <div className="card-app p-3 text-center">
               <p className="text-mint font-heading text-2xl">{bookings.filter(b => b.status === "confirmed").length}</p>
-              <p className="text-muted-foreground text-[10px]">Confirmed</p>
+              <p className="text-muted-foreground text-[10px]">{t.admin.confirmed}</p>
             </div>
             <div className="card-app p-3 text-center">
               <p className="text-destructive font-heading text-2xl">{bookings.filter(b => b.status === "cancelled").length}</p>
-              <p className="text-muted-foreground text-[10px]">Cancelled</p>
+              <p className="text-muted-foreground text-[10px]">{t.admin.cancelled}</p>
             </div>
           </div>
 
@@ -266,7 +266,7 @@ const AdminDashboard = () => {
                   filter === f ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
                 }`}
               >
-                {f === "all" ? "All" : f === "confirmed" ? "Confirmed" : "Cancelled"}
+                {f === "all" ? t.admin.all : f === "confirmed" ? t.admin.confirmed : t.admin.cancelled}
               </button>
             ))}
           </div>
@@ -279,7 +279,7 @@ const AdminDashboard = () => {
             <div className="px-5 space-y-3">
               {filtered.length === 0 ? (
                 <div className="card-app p-8 text-center">
-                  <p className="text-muted-foreground">No bookings</p>
+                  <p className="text-muted-foreground">{t.admin.noBookings}</p>
                 </div>
               ) : (
                 filtered.map(b => {
@@ -289,12 +289,12 @@ const AdminDashboard = () => {
                       <div className="flex items-start justify-between mb-2">
                         <div>
                           <p className="text-foreground font-medium text-sm">{b.service_name}</p>
-                          <p className="text-muted-foreground text-xs">with {b.barber_name}</p>
+                          <p className="text-muted-foreground text-xs">{t.admin.with} {b.barber_name}</p>
                         </div>
                         <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${
                           b.status === "confirmed" ? "bg-mint/20 text-mint" : "bg-destructive/20 text-destructive"
                         }`}>
-                          {b.status === "confirmed" ? "Confirmed" : "Cancelled"}
+                          {b.status === "confirmed" ? t.admin.confirmed : t.admin.cancelled}
                         </span>
                       </div>
 
@@ -320,7 +320,7 @@ const AdminDashboard = () => {
                             onClick={() => updateStatus(b.id, "cancelled")}
                             className="flex items-center gap-1 text-xs text-destructive bg-destructive/10 px-3 py-1.5 rounded-full"
                           >
-                            <XCircle size={12} /> Cancel
+                            <XCircle size={12} /> {t.admin.cancel}
                           </button>
                         )}
                         {b.status === "cancelled" && (
@@ -328,14 +328,14 @@ const AdminDashboard = () => {
                             onClick={() => updateStatus(b.id, "confirmed")}
                             className="flex items-center gap-1 text-xs text-mint bg-mint/10 px-3 py-1.5 rounded-full"
                           >
-                            <CheckCircle size={12} /> Confirm
+                            <CheckCircle size={12} /> {t.admin.confirm}
                           </button>
                         )}
                         <button
                           onClick={() => deleteBooking(b.id)}
                           className="flex items-center gap-1 text-xs text-muted-foreground bg-surface px-3 py-1.5 rounded-full"
                         >
-                          <Trash2 size={12} /> Delete
+                          <Trash2 size={12} /> {t.admin.delete}
                         </button>
                       </div>
                     </div>
@@ -388,8 +388,8 @@ const AdminDashboard = () => {
           {/* Day Off toggle */}
           <div className="card-app px-4 py-3 flex items-center justify-between mb-5">
             <div>
-              <p className="text-foreground text-sm font-medium">Day Off</p>
-              <p className="text-muted-foreground text-xs">Close entire day for {avBarber}</p>
+              <p className="text-foreground text-sm font-medium">{t.admin.dayOff}</p>
+              <p className="text-muted-foreground text-xs">{t.admin.closeDayFor(avBarber)}</p>
             </div>
             <button onClick={() => setDayOff(v => !v)}>
               {dayOff
@@ -401,9 +401,9 @@ const AdminDashboard = () => {
 
           {/* Legend */}
           <div className="flex gap-4 mb-3 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-mint inline-block" /> Available</span>
-            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-copper inline-block" /> Client booked</span>
-            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-destructive inline-block" /> Blocked</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-mint inline-block" /> {t.admin.available}</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-copper inline-block" /> {t.admin.clientBooked}</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-destructive inline-block" /> {t.admin.blocked}</span>
           </div>
 
           {/* Slot grid */}
@@ -445,11 +445,11 @@ const AdminDashboard = () => {
             className="w-full gradient-copper text-primary-foreground font-semibold py-3.5 rounded-full shadow-copper flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <Save size={16} />
-            {savingAv ? "Saving..." : "Save Availability"}
+            {savingAv ? t.admin.saving : t.admin.saveAvailability}
           </button>
 
           <p className="text-center text-muted-foreground text-[10px] mt-3">
-            Click a slot to block/unblock it. Client bookings (amber) cannot be modified here.
+            {t.admin.slotHint}
           </p>
         </div>
       )}

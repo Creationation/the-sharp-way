@@ -120,7 +120,35 @@ export interface Translations {
     gold: string;
   };
   admin: {
+    title: string;
+    bookings: string;
+    availability: string;
     users: string;
+    total: string;
+    confirmed: string;
+    cancelled: string;
+    all: string;
+    noBookings: string;
+    with: string;
+    cancel: string;
+    confirm: string;
+    delete: string;
+    dayOff: string;
+    closeDayFor: (name: string) => string;
+    available: string;
+    clientBooked: string;
+    blocked: string;
+    saving: string;
+    saveAvailability: string;
+    slotHint: string;
+    savedSuccess: string;
+    saveFailed: string;
+    loadFailed: string;
+    statusUpdated: string;
+    updateError: string;
+    bookingDeleted: string;
+    deleteError: string;
+    bookingCancelled: string;
     usersTab: {
       title: string;
       search: string;
@@ -268,7 +296,35 @@ const en: Translations = {
     gold: "Gold",
   },
   admin: {
+    title: "Admin Dashboard",
+    bookings: "Bookings",
+    availability: "Availability",
     users: "Users",
+    total: "Total",
+    confirmed: "Confirmed",
+    cancelled: "Cancelled",
+    all: "All",
+    noBookings: "No bookings",
+    with: "with",
+    cancel: "Cancel",
+    confirm: "Confirm",
+    delete: "Delete",
+    dayOff: "Day Off",
+    closeDayFor: (name) => `Close entire day for ${name}`,
+    available: "Available",
+    clientBooked: "Client booked",
+    blocked: "Blocked",
+    saving: "Saving...",
+    saveAvailability: "Save Availability",
+    slotHint: "Click a slot to block/unblock it. Client bookings (amber) cannot be modified here.",
+    savedSuccess: "Availability saved",
+    saveFailed: "Failed to save availability",
+    loadFailed: "Failed to load bookings",
+    statusUpdated: "Status updated",
+    updateError: "Error updating booking",
+    bookingDeleted: "Booking deleted",
+    deleteError: "Error deleting booking",
+    bookingCancelled: "Booking cancelled",
     usersTab: {
       title: "Users",
       search: "Search by name, email, phone...",
@@ -416,7 +472,35 @@ const de: Translations = {
     gold: "Gold",
   },
   admin: {
+    title: "Admin-Bereich",
+    bookings: "Buchungen",
+    availability: "Verfügbarkeit",
     users: "Kunden",
+    total: "Gesamt",
+    confirmed: "Bestätigt",
+    cancelled: "Storniert",
+    all: "Alle",
+    noBookings: "Keine Buchungen",
+    with: "mit",
+    cancel: "Stornieren",
+    confirm: "Bestätigen",
+    delete: "Löschen",
+    dayOff: "Freier Tag",
+    closeDayFor: (name) => `Ganzen Tag schließen für ${name}`,
+    available: "Verfügbar",
+    clientBooked: "Kundenreservierung",
+    blocked: "Gesperrt",
+    saving: "Speichern...",
+    saveAvailability: "Verfügbarkeit speichern",
+    slotHint: "Klicke auf einen Slot um ihn zu sperren/entsperren. Kundenbuchungen (amber) können hier nicht geändert werden.",
+    savedSuccess: "Verfügbarkeit gespeichert",
+    saveFailed: "Fehler beim Speichern der Verfügbarkeit",
+    loadFailed: "Fehler beim Laden der Buchungen",
+    statusUpdated: "Status aktualisiert",
+    updateError: "Fehler beim Aktualisieren der Buchung",
+    bookingDeleted: "Buchung gelöscht",
+    deleteError: "Fehler beim Löschen der Buchung",
+    bookingCancelled: "Buchung storniert",
     usersTab: {
       title: "Kunden",
       search: "Nach Name, E-Mail, Telefon suchen...",
