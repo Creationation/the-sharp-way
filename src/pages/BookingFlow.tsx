@@ -36,22 +36,27 @@ const MONTH_ABBR: Record<string, string[]> = {
   de: ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"],
 };
 
-// Generate next 6 open days (Tue–Sat, skip Monday=1)
-function getAvailableDates(): Date[] {
+// Generate next 6 open days from a start date (Tue–Sat, skip Monday=1 and Sunday=0)
+function getAvailableDates(from?: Date): Date[] {
   const result: Date[] = [];
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
+  const d = from ? new Date(from) : new Date();
+  if (!from) d.setDate(d.getDate() + 1);
   d.setHours(0, 0, 0, 0);
   while (result.length < 6) {
-    if (d.getDay() !== 1) result.push(new Date(d));
+    if (d.getDay() !== 1 && d.getDay() !== 0) result.push(new Date(d));
     d.setDate(d.getDate() + 1);
   }
   return result;
 }
 
 function toDateStr(d: Date): string {
-  return d.toISOString().split("T")[0];
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
+
+const MONTH_NAMES: Record<string, string[]> = {
+  en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  de: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+};
 
 const allTimeSlots: string[] = [];
 for (let h = 10; h <= 19; h++) {
