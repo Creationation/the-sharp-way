@@ -14,6 +14,7 @@ import { translations } from "@/lib/translations";
 import UsersTab from "@/components/admin/UsersTab";
 import PromotionsTab from "@/components/admin/PromotionsTab";
 import BarbersTab from "@/components/admin/BarbersTab";
+import PromoCodesTab from "@/components/admin/PromoCodesTab";
 import { useBarbers } from "@/hooks/useBarbers";
 
 interface Booking {
