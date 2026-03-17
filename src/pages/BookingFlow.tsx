@@ -464,9 +464,49 @@ const BookingFlow = () => {
             <span className="text-foreground text-sm">{totalDuration}min</span>
           </div>
           <div className="border-t border-border my-3" />
+
+          {/* Promo code input */}
+          <div className="flex items-center gap-2 mb-3">
+            <input
+              value={promoInput}
+              onChange={e => setPromoInput(e.target.value.toUpperCase())}
+              placeholder={t.booking.promoCode}
+              disabled={!!appliedPromo}
+              className="flex-1 bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:border-copper/50 transition-colors font-mono tracking-wider placeholder:font-sans placeholder:tracking-normal disabled:opacity-50"
+            />
+            {!appliedPromo ? (
+              <button
+                onClick={applyPromo}
+                disabled={promoLoading || !promoInput.trim()}
+                className="gradient-copper text-primary-foreground text-xs font-semibold px-4 py-2.5 rounded-xl disabled:opacity-50"
+              >
+                {promoLoading ? "..." : t.booking.applyCode}
+              </button>
+            ) : (
+              <button
+                onClick={() => { setAppliedPromo(null); setPromoInput(""); }}
+                className="text-destructive text-xs font-semibold px-3 py-2.5"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {appliedPromo && (
+            <div className="flex items-center justify-between mb-2 text-mint">
+              <span className="text-xs font-medium">{t.booking.discount} ({appliedPromo.code})</span>
+              <span className="text-sm font-semibold">-€{discountAmount}</span>
+            </div>
+          )}
+
           <div className="flex items-center justify-between">
             <span className="text-foreground font-semibold">{t.booking.total}</span>
-            <span className="text-copper font-heading text-2xl">€{totalPrice}</span>
+            <div className="flex items-center gap-2">
+              {appliedPromo && (
+                <span className="text-muted-foreground text-sm line-through">€{totalPrice}</span>
+              )}
+              <span className="text-copper font-heading text-2xl">€{finalPrice}</span>
+            </div>
           </div>
         </div>
       </div>
