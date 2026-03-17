@@ -32,7 +32,7 @@ const AuthScreen = () => {
           },
         });
         if (error) throw error;
-        toast.success("Account created!");
+        toast.success(t.toasts.accountCreated);
         navigate("/home");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
