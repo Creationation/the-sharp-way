@@ -55,7 +55,7 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  const [tab, setTab] = useState<"bookings" | "availability" | "users" | "promotions" | "barbers">("bookings");
+  const [tab, setTab] = useState<"bookings" | "availability" | "users" | "promotions" | "barbers" | "codes">("bookings");
   const { barbers: dbBarbers } = useBarbers();
   const barberNames = dbBarbers.map(b => b.name);
 
