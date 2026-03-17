@@ -190,7 +190,7 @@ const ProfileScreen = () => {
                   </div>
                   {b.status === "cancelled" && (
                     <span className="text-[10px] bg-destructive/20 text-destructive px-2 py-0.5 rounded-full flex-shrink-0">
-                      {lang === "de" ? "Storniert" : "Cancelled"}
+                      {t.common.cancelled}
                     </span>
                   )}
                 </div>
