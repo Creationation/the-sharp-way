@@ -208,7 +208,7 @@ const AdminDashboard = () => {
         <button onClick={() => navigate("/home")} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
           <ArrowLeft size={18} className="text-foreground" />
         </button>
-        <h1 className="font-heading text-2xl text-foreground">Admin Dashboard</h1>
+        <h1 className="font-heading text-2xl text-foreground">{t.admin.title}</h1>
       </div>
 
       {/* Tab switcher */}
