@@ -303,7 +303,7 @@ const ProfileScreen = () => {
         {[
           { label: t.profile.reviews, action: () => navigate("/reviews") },
           { label: t.profile.contact, action: () => navigate("/contact") },
-          { label: t.profile.about, action: () => {} },
+          
         ].map(item => (
           <button
             key={item.label}

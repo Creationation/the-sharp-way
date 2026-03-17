@@ -146,6 +146,7 @@ const BookingFlow = () => {
   const [saving, setSaving] = useState(false);
   const [draftRestored, setDraftRestored] = useState(false);
   const [hasRestoredDraft, setHasRestoredDraft] = useState(false);
+  const [promoInput, setPromoInput] = useState("");
 
   // Restore draft from localStorage (or set default barber) when barbers load
   useEffect(() => {
@@ -228,7 +229,6 @@ const BookingFlow = () => {
   const totalPrice = selectedServices.reduce((sum, s) => sum + parseInt(s.price.replace("€", "")), 0);
 
   // Promo code state
-  const [promoInput, setPromoInput] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount_type: string; discount_value: number } | null>(null);
   const [promoLoading, setPromoLoading] = useState(false);
 
