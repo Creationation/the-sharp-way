@@ -30,6 +30,18 @@ interface BookingInfo {
   booking_time: string;
 }
 
+interface PromoData {
+  id: string;
+  type: string;
+  active: boolean;
+  title_en: string;
+  title_de: string;
+  subtitle_en: string;
+  subtitle_de: string;
+  link_text_en: string;
+  link_text_de: string;
+}
+
 const HomeDashboard = () => {
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
@@ -38,6 +50,8 @@ const HomeDashboard = () => {
   const [query, setQuery] = useState("");
   const [lastBooking, setLastBooking] = useState<BookingInfo | null>(null);
   const [nextBooking, setNextBooking] = useState<BookingInfo | null>(null);
+  const [bannerPromo, setBannerPromo] = useState<PromoData | null>(null);
+  const [cardPromo, setCardPromo] = useState<PromoData | null>(null);
 
   useEffect(() => {
     if (!user) return;
