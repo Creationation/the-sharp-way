@@ -206,15 +206,22 @@ const BookingFlow = () => {
       return;
     }
 
-    // Increment promo code usage
+    // Increment promo code usage (non-blocking)
     if (appliedPromo) {
-      supabase.rpc("increment_promo_usage" as any, { _code: appliedPromo.code }).then(() => {});
-      // Fallback: direct update
       supabase
         .from("promo_codes")
-        .update({ current_uses: undefined as any })
+        .select("current_uses")
         .eq("code", appliedPromo.code)
-        .then(() => {});
+        .single()
+        .then(({ data: pc }) => {
+          if (pc) {
+            supabase
+              .from("promo_codes")
+              .update({ current_uses: (pc as any).current_uses + 1 })
+              .eq("code", appliedPromo.code)
+              .then(() => {});
+          }
+        });
     }
 
     // Send confirmation email (non-blocking — failure doesn't affect booking)
