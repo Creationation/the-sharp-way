@@ -449,7 +449,7 @@ const AdminDashboard = () => {
           </button>
 
           <p className="text-center text-muted-foreground text-[10px] mt-3">
-            Click a slot to block/unblock it. Client bookings (amber) cannot be modified here.
+            {t.admin.slotHint}
           </p>
         </div>
       )}
