@@ -419,6 +419,8 @@ const en: Translations = {
       confirmDelete: "Are you sure you want to delete this barber?",
     },
   },
+  barber: {
+    cuts: "Cuts",
     experience: "Experience",
     status: "Status",
     topRated: "Top Rated",
