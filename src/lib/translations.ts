@@ -127,6 +127,10 @@ export interface Translations {
     about: string;
     language: string;
     gold: string;
+    claimReward: string;
+    rewardPending: string;
+    rewardClaimed: string;
+    freeCutReady: string;
   };
   admin: {
     title: string;
