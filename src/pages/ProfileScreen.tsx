@@ -186,17 +186,6 @@ const ProfileScreen = () => {
         </div>
       </div>
 
-      {/* Points */}
-      <div className="px-5 mb-5">
-        <div className="card-app p-4 flex items-center gap-4">
-          <Trophy size={24} className="text-copper" />
-          <div className="flex-1">
-            <p className="text-foreground font-semibold text-sm">{totalPoints} Sharp Points</p>
-            <p className="text-muted-foreground text-xs">{t.profile.earnPoints}</p>
-          </div>
-          <button className="text-copper text-xs font-semibold">{t.profile.redeem}</button>
-        </div>
-      </div>
 
       {/* My Bookings */}
       <div className="px-5 mb-5">
