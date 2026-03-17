@@ -60,7 +60,7 @@ const ContactScreen = () => {
       {/* Contact info */}
       <div className="px-5 space-y-2 mb-5">
         {[
-          { icon: MapPin, label: "Lavaterstrasse 2, 1220 Wien", sub: "Austria", href: "https://maps.google.com/?q=Lavaterstrasse+2,+1220+Wien" },
+          { icon: MapPin, label: "Lavaterstrasse 2, 1220 Wien", sub: "Austria", href: "https://www.google.com/maps/dir/?api=1&destination=Lavaterstrasse+2,+1220+Wien,+Austria" },
           { icon: Phone, label: "+43 664 4686073", sub: t.contact.callUs, href: "tel:+436644686073" },
           { icon: MessageCircle, label: "WhatsApp", sub: t.contact.chatUs, href: whatsappUrl },
         ].map((item, i) => (
