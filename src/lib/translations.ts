@@ -547,6 +547,12 @@ const de: Translations = {
     feb: "FEB",
     moreDates: "Weitere Termine",
     closedDay: "An diesem Tag geschlossen",
+    promoCode: "Promo-Code",
+    applyCode: "Einlösen",
+    promoApplied: "Promo-Code angewendet!",
+    promoInvalid: "Ungültiger Promo-Code",
+    promoExpired: "Dieser Promo-Code ist abgelaufen",
+    discount: "Rabatt",
   },
   gallery: {
     title: "Die Kunst des Schnitts",
