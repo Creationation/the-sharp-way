@@ -667,6 +667,10 @@ const de: Translations = {
     about: "Über The Sharp Cut",
     language: "Sprache",
     gold: "Gold",
+    claimReward: "🎁 Gratis-Schnitt einlösen!",
+    rewardPending: "⏳ Anfrage wird bearbeitet...",
+    rewardClaimed: "Belohnung angefragt!",
+    freeCutReady: "Du hast einen GRATIS-Schnitt verdient! Tippe zum Einlösen.",
   },
   admin: {
     title: "Admin-Bereich",
