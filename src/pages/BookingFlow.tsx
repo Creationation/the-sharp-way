@@ -4,16 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useBarbers, type Barber } from "@/hooks/useBarbers";
 import { toast } from "sonner";
-import barber1 from "@/assets/barber-1.jpg";
-import barber2 from "@/assets/barber-2.jpg";
-import barber3 from "@/assets/barber-3.jpg";
-
-const barbers = [
-  { id: 1, name: "Marco", rating: 4.9, image: barber1 },
-  { id: 2, name: "Lukas", rating: 4.8, image: barber2 },
-  { id: 3, name: "Daniel", rating: 4.7, image: barber3 },
-];
 
 const services = [
   { name: "Haarschnitt", price: "€20", duration: "30min" },
@@ -68,19 +60,24 @@ const BookingFlow = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { t, lang } = useLanguage();
+  const { barbers, loading: barbersLoading } = useBarbers();
 
   const [customDate, setCustomDate] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
 
   const availableDates = customDate ? getAvailableDates(customDate) : getAvailableDates();
 
-  const [selectedBarber, setSelectedBarber] = useState(barbers[0]);
+  const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
   const [selectedServices, setSelectedServices] = useState<typeof services>([services[0]]);
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
   const [selectedTime, setSelectedTime] = useState("12:00");
   const [confirmed, setConfirmed] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // Set initial barber when loaded
+  useEffect(() => {
+    if (barbers.length > 0 && !selectedBarber) setSelectedBarber(barbers[0]);
+  }, [barbers]);
   const toggleService = (s: typeof services[0]) => {
     setSelectedServices(prev => {
       const exists = prev.some(p => p.name === s.name);
@@ -101,8 +98,8 @@ const BookingFlow = () => {
   const monthAbbr = MONTH_ABBR[lang] ?? MONTH_ABBR.en;
 
   useEffect(() => {
-    fetchAvailability();
-  }, [selectedBarber.name, selectedDayIdx]);
+    if (selectedBarber) fetchAvailability();
+  }, [selectedBarber?.name, selectedDayIdx]);
 
   const fetchAvailability = async () => {
     setLoadingSlots(true);
@@ -190,6 +187,14 @@ const BookingFlow = () => {
 
     setConfirmed(true);
   };
+
+  if (barbersLoading || !selectedBarber) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-copper border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (confirmed) {
     return (

@@ -3,18 +3,12 @@ import { Bell, Search, MapPin, Star, ChevronRight, X, Calendar, Clock } from "lu
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useBarbers } from "@/hooks/useBarbers";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import barber1 from "@/assets/barber-1.jpg";
-import barber2 from "@/assets/barber-2.jpg";
-import barber3 from "@/assets/barber-3.jpg";
 import heroBg from "@/assets/hero-bg.jpg";
 
-const barbers = [
-  { id: 1, name: "Marco", specialty: "Classic Cuts & Shaves", rating: 4.9, cuts: 847, years: 12, image: barber1, available: true },
-  { id: 2, name: "Lukas", specialty: "Fades & Modern Styles", rating: 4.8, cuts: 623, years: 7, image: barber2, available: true },
-  { id: 3, name: "Daniel", specialty: "Beard Sculpting", rating: 4.7, cuts: 510, years: 9, image: barber3, available: false },
-];
 
 const quickServices = [
   { name: "Haarschnitt", price: "€20", icon: "✂️" },
@@ -46,6 +40,11 @@ const HomeDashboard = () => {
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
   const { user } = useAuth();
+  const { barbers } = useBarbers();
+
+  const getBarberImage = (name: string) => {
+    return barbers.find(b => b.name === name)?.image || barber1;
+  };
 
   const [query, setQuery] = useState("");
   const [lastBooking, setLastBooking] = useState<BookingInfo | null>(null);
@@ -106,7 +105,7 @@ const HomeDashboard = () => {
   const q = query.toLowerCase().trim();
 
   const filteredBarbers = q
-    ? barbers.filter(b => b.name.toLowerCase().includes(q) || b.specialty.toLowerCase().includes(q))
+    ? barbers.filter(b => b.name.toLowerCase().includes(q) || (lang === "de" ? b.specialty_de : b.specialty_en).toLowerCase().includes(q))
     : barbers;
 
   const filteredServices = q
@@ -192,7 +191,7 @@ const HomeDashboard = () => {
                         <img src={b.image} alt={b.name} className="w-10 h-10 rounded-full object-cover" />
                         <div className="flex-1 text-left">
                           <p className="text-foreground text-sm font-medium">{b.name}</p>
-                          <p className="text-muted-foreground text-xs">{b.specialty}</p>
+                          <p className="text-muted-foreground text-xs">{lang === "de" ? b.specialty_de : b.specialty_en}</p>
                         </div>
                         <div className="flex items-center gap-1">
                           <Star size={11} className="text-copper fill-copper" />
@@ -266,7 +265,7 @@ const HomeDashboard = () => {
               {nextBooking ? (
                 <div className="card-app p-4 flex items-center gap-4">
                   <img
-                    src={nextBooking.barber_name === "Marco" ? barber1 : nextBooking.barber_name === "Lukas" ? barber2 : barber3}
+                    src={getBarberImage(nextBooking.barber_name)}
                     alt={nextBooking.barber_name}
                     className="w-12 h-12 rounded-full object-cover"
                   />
@@ -298,7 +297,7 @@ const HomeDashboard = () => {
               <h3 className="font-heading text-lg text-foreground mb-3">{t.home.lastAppointment}</h3>
               <div className="card-app p-4 flex items-center gap-4">
                 <img
-                  src={lastBooking.barber_name === "Marco" ? barber1 : lastBooking.barber_name === "Lukas" ? barber2 : barber3}
+                  src={getBarberImage(lastBooking.barber_name)}
                   alt={lastBooking.barber_name}
                   className="w-12 h-12 rounded-full object-cover"
                 />
@@ -348,7 +347,7 @@ const HomeDashboard = () => {
                     </div>
                     <div className="p-3">
                       <p className="text-foreground font-semibold text-sm">{b.name}</p>
-                      <p className="text-muted-foreground text-[11px] mb-2">{b.specialty}</p>
+                      <p className="text-muted-foreground text-[11px] mb-2">{lang === "de" ? b.specialty_de : b.specialty_en}</p>
                       <div className="flex items-center gap-1 mb-3">
                         <Star size={12} className="text-copper fill-copper" />
                         <span className="text-foreground text-xs font-medium">{b.rating}</span>

@@ -182,6 +182,26 @@ export interface Translations {
       saveError: string;
       loadError: string;
     };
+    barbersTab: {
+      title: string;
+      name: string;
+      specialtyEn: string;
+      specialtyDe: string;
+      rating: string;
+      cuts: string;
+      years: string;
+      imageKey: string;
+      available: string;
+      unavailable: string;
+      addBarber: string;
+      save: string;
+      saved: string;
+      saveError: string;
+      deleted: string;
+      deleteError: string;
+      loadError: string;
+      confirmDelete: string;
+    };
   };
   barber: {
     cuts: string;
@@ -378,6 +398,26 @@ const en: Translations = {
       saveError: "Error saving",
       loadError: "Failed to load promotions",
     },
+    barbersTab: {
+      title: "Barbers",
+      name: "Name",
+      specialtyEn: "Specialty (EN)",
+      specialtyDe: "Specialty (DE)",
+      rating: "Rating",
+      cuts: "Cuts",
+      years: "Years",
+      imageKey: "Photo",
+      available: "Available",
+      unavailable: "Unavailable",
+      addBarber: "Add Barber",
+      save: "Save",
+      saved: "Saved successfully",
+      saveError: "Error saving",
+      deleted: "Barber deleted",
+      deleteError: "Error deleting",
+      loadError: "Failed to load barbers",
+      confirmDelete: "Are you sure you want to delete this barber?",
+    },
   },
   barber: {
     cuts: "Cuts",
@@ -573,6 +613,26 @@ const de: Translations = {
       saved: "Erfolgreich gespeichert",
       saveError: "Fehler beim Speichern",
       loadError: "Fehler beim Laden der Aktionen",
+    },
+    barbersTab: {
+      title: "Barbiere",
+      name: "Name",
+      specialtyEn: "Spezialität (EN)",
+      specialtyDe: "Spezialität (DE)",
+      rating: "Bewertung",
+      cuts: "Schnitte",
+      years: "Jahre",
+      imageKey: "Foto",
+      available: "Verfügbar",
+      unavailable: "Nicht verfügbar",
+      addBarber: "Barbier hinzufügen",
+      save: "Speichern",
+      saved: "Erfolgreich gespeichert",
+      saveError: "Fehler beim Speichern",
+      deleted: "Barbier gelöscht",
+      deleteError: "Fehler beim Löschen",
+      loadError: "Fehler beim Laden der Barbiere",
+      confirmDelete: "Möchtest du diesen Barbier wirklich löschen?",
     },
   },
   barber: {

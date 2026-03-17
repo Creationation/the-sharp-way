@@ -13,6 +13,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/lib/translations";
 import UsersTab from "@/components/admin/UsersTab";
 import PromotionsTab from "@/components/admin/PromotionsTab";
+import BarbersTab from "@/components/admin/BarbersTab";
+import { useBarbers } from "@/hooks/useBarbers";
 
 interface Booking {
   id: string;
@@ -35,7 +37,7 @@ interface Profile {
   phone: string | null;
 }
 
-const BARBERS = ["Marco", "Lukas", "Daniel"];
+// BARBERS list is now fetched from DB via useBarbers hook
 
 const ALL_SLOTS: string[] = [];
 for (let h = 10; h <= 19; h++) {
@@ -52,7 +54,9 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  const [tab, setTab] = useState<"bookings" | "availability" | "users" | "promotions">("bookings");
+  const [tab, setTab] = useState<"bookings" | "availability" | "users" | "promotions" | "barbers">("bookings");
+  const { barbers: dbBarbers } = useBarbers();
+  const barberNames = dbBarbers.map(b => b.name);
 
   // — Bookings tab state —
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -61,12 +65,17 @@ const AdminDashboard = () => {
   const [filter, setFilter] = useState<"all" | "confirmed" | "cancelled">("all");
 
   // — Availability tab state —
-  const [avBarber, setAvBarber] = useState(BARBERS[0]);
+  const [avBarber, setAvBarber] = useState("");
   const [avDate, setAvDate] = useState<Date>(new Date());
   const [dayOff, setDayOff] = useState(false);
   const [slotStates, setSlotStates] = useState<Record<string, SlotState>>({});
   const [loadingAv, setLoadingAv] = useState(false);
   const [savingAv, setSavingAv] = useState(false);
+
+  // Set initial avBarber when barbers load
+  useEffect(() => {
+    if (barberNames.length > 0 && !avBarber) setAvBarber(barberNames[0]);
+  }, [barberNames]);
 
   useEffect(() => {
     if (!authLoading && !isAdmin) {
@@ -248,6 +257,14 @@ const AdminDashboard = () => {
         >
           {t.admin.promotions}
         </button>
+        <button
+          onClick={() => setTab("barbers")}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+            tab === "barbers" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+          }`}
+        >
+          {t.admin.barbersTab.title}
+        </button>
       </div>
 
       {/* ═══════════════════ BOOKINGS TAB ═══════════════════ */}
@@ -363,7 +380,7 @@ const AdminDashboard = () => {
         <div className="px-5">
           {/* Barber selector */}
           <div className="flex gap-2 mb-5">
-            {BARBERS.map(b => (
+            {barberNames.map(b => (
               <button
                 key={b}
                 onClick={() => setAvBarber(b)}
@@ -470,6 +487,9 @@ const AdminDashboard = () => {
 
       {/* ═══════════════════ PROMOTIONS TAB ═══════════════════ */}
       {tab === "promotions" && <PromotionsTab t={t.admin.promosTab} />}
+
+      {/* ═══════════════════ BARBERS TAB ═══════════════════ */}
+      {tab === "barbers" && <BarbersTab t={t.admin.barbersTab} />}
     </div>
   );
 };
