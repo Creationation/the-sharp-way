@@ -275,6 +275,14 @@ const AdminDashboard = () => {
         >
           {t.admin.promoCodesTab.title}
         </button>
+        <button
+          onClick={() => setTab("loyalty")}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+            tab === "loyalty" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+          }`}
+        >
+          {t.admin.loyaltyTab.title}
+        </button>
       </div>
 
       {/* ═══════════════════ BOOKINGS TAB ═══════════════════ */}
