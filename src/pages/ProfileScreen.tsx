@@ -29,6 +29,7 @@ const ProfileScreen = () => {
   const [totalPoints, setTotalPoints] = useState(0);
 
   useEffect(() => {
+    if (loading) return;
     if (!user) {
       navigate("/auth");
       return;
