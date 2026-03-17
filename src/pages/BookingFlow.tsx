@@ -351,7 +351,7 @@ const BookingFlow = () => {
       </div>
 
       {/* CTA */}
-      <div className="fixed bottom-16 left-0 right-0 z-40 px-5 pt-3 pb-5 bg-background border-t border-border">
+      <div className="fixed bottom-16 left-0 right-0 z-40 px-5 pt-3 pb-8 bg-background border-t border-border">
         <button
           onClick={handleConfirm}
           disabled={saving || dayOff}
