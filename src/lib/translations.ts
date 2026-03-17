@@ -78,6 +78,12 @@ export interface Translations {
     feb: string;
     moreDates: string;
     closedDay: string;
+    promoCode: string;
+    applyCode: string;
+    promoApplied: string;
+    promoInvalid: string;
+    promoExpired: string;
+    discount: string;
   };
   gallery: {
     title: string;
