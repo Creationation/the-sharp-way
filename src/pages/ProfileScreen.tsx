@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Trophy, Gift, ChevronRight, Calendar, Clock, LogOut, Shield } from "lucide-react";
+import { ArrowLeft, Trophy, Gift, ChevronRight, Calendar, Clock, LogOut, Shield, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 interface Booking {
   id: string;
@@ -16,8 +17,6 @@ interface Booking {
   status: string;
 }
 
-const stamps = 4;
-
 const ProfileScreen = () => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
@@ -25,6 +24,7 @@ const ProfileScreen = () => {
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancelling, setCancelling] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -43,9 +43,29 @@ const ProfileScreen = () => {
     setLoading(false);
   };
 
+  const cancelBooking = async (id: string) => {
+    setCancelling(id);
+    const { error } = await supabase
+      .from("bookings")
+      .update({ status: "cancelled" })
+      .eq("id", id);
+    setCancelling(null);
+    if (error) {
+      toast.error(lang === "de" ? "Fehler beim Stornieren" : "Failed to cancel booking");
+    } else {
+      toast.success(lang === "de" ? "Termin storniert" : "Booking cancelled");
+      fetchBookings();
+    }
+  };
+
   const today = new Date().toISOString().split("T")[0];
   const upcoming = bookings.filter(b => b.booking_date >= today && b.status === "confirmed");
   const past = bookings.filter(b => b.booking_date < today || b.status === "cancelled");
+
+  // Real loyalty stamps — total confirmed bookings ever
+  const totalConfirmed = bookings.filter(b => b.status === "confirmed").length;
+  const stamps = totalConfirmed % 10;
+  const totalPoints = totalConfirmed * 50;
 
   const handleSignOut = async () => {
     await signOut();
@@ -116,7 +136,7 @@ const ProfileScreen = () => {
         <div className="card-app p-4 flex items-center gap-4">
           <Trophy size={24} className="text-copper" />
           <div className="flex-1">
-            <p className="text-foreground font-semibold text-sm">{t.profile.points}</p>
+            <p className="text-foreground font-semibold text-sm">{totalPoints} Sharp Points</p>
             <p className="text-muted-foreground text-xs">{t.profile.earnPoints}</p>
           </div>
           <button className="text-copper text-xs font-semibold">{t.profile.redeem}</button>
@@ -160,18 +180,37 @@ const ProfileScreen = () => {
         ) : (
           <div className="space-y-2">
             {(activeTab === "upcoming" ? upcoming : past).map(b => (
-              <div key={b.id} className="card-app p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <Calendar size={16} className="text-copper" />
-                  <span className="text-foreground text-sm font-medium">
-                    {b.service_name} {t.profile.with} {b.barber_name}
-                  </span>
+              <div key={b.id} className={`card-app p-4 ${b.status === "cancelled" ? "opacity-60" : ""}`}>
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <Calendar size={16} className="text-copper flex-shrink-0" />
+                    <span className="text-foreground text-sm font-medium">
+                      {b.service_name} {t.profile.with} {b.barber_name}
+                    </span>
+                  </div>
+                  {b.status === "cancelled" && (
+                    <span className="text-[10px] bg-destructive/20 text-destructive px-2 py-0.5 rounded-full flex-shrink-0">
+                      {lang === "de" ? "Storniert" : "Cancelled"}
+                    </span>
+                  )}
                 </div>
-                <div className="flex items-center gap-3 text-muted-foreground text-xs">
+                <div className="flex items-center gap-3 text-muted-foreground text-xs mb-3">
                   <Clock size={12} />
                   <span>{format(new Date(b.booking_date), "dd/MM/yyyy")} · {b.booking_time}</span>
                   <span className="text-copper font-semibold">{b.service_price}</span>
                 </div>
+                {activeTab === "upcoming" && b.status === "confirmed" && (
+                  <button
+                    onClick={() => cancelBooking(b.id)}
+                    disabled={cancelling === b.id}
+                    className="flex items-center gap-1.5 text-xs text-destructive bg-destructive/10 px-3 py-1.5 rounded-full disabled:opacity-50"
+                  >
+                    <XCircle size={12} />
+                    {cancelling === b.id
+                      ? (lang === "de" ? "Wird storniert..." : "Cancelling...")
+                      : (lang === "de" ? "Termin stornieren" : "Cancel booking")}
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -186,7 +225,12 @@ const ProfileScreen = () => {
           <p className="text-muted-foreground text-xs mb-3">{t.profile.referSub}</p>
           <div className="bg-surface rounded-xl px-4 py-2.5 flex items-center justify-between">
             <span className="text-copper font-mono font-semibold text-sm">SHARP-FR1END</span>
-            <button className="text-foreground text-xs">{t.profile.copy}</button>
+            <button
+              onClick={() => { navigator.clipboard.writeText("SHARP-FR1END"); toast.success("Copied!"); }}
+              className="text-foreground text-xs"
+            >
+              {t.profile.copy}
+            </button>
           </div>
         </div>
       </div>

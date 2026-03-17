@@ -148,6 +148,23 @@ const BookingFlow = () => {
       return;
     }
 
+    // Send confirmation email (non-blocking — failure doesn't affect booking)
+    if (user.email) {
+      const displayName = user.user_metadata?.full_name || user.email.split("@")[0];
+      supabase.functions.invoke("send-booking-confirmation", {
+        body: {
+          email: user.email,
+          name: displayName,
+          service: selectedService.name,
+          barber: selectedBarber.name,
+          date: `${dayAbbr[selectedDate.getDay()]} ${selectedDate.getDate()} ${monthAbbr[selectedDate.getMonth()]}`,
+          time: selectedTime,
+          price: selectedService.price,
+          lang,
+        },
+      }).catch(() => {}); // silent fail
+    }
+
     setConfirmed(true);
   };
 
