@@ -226,7 +226,7 @@ const ProfileScreen = () => {
           <div className="bg-surface rounded-xl px-4 py-2.5 flex items-center justify-between">
             <span className="text-copper font-mono font-semibold text-sm">SHARP-FR1END</span>
             <button
-              onClick={() => { navigator.clipboard.writeText("SHARP-FR1END"); toast.success("Copied!"); }}
+              onClick={() => { navigator.clipboard.writeText("SHARP-FR1END"); toast.success(t.toasts.copied); }}
               className="text-foreground text-xs"
             >
               {t.profile.copy}

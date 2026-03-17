@@ -288,7 +288,7 @@ const BookingFlow = () => {
         {dayOff ? (
           <div className="card-app p-4 text-center">
             <p className="text-muted-foreground text-sm">
-              {lang === "de" ? "Dieser Barbier ist heute nicht verfügbar" : "This barber is not available on this day"}
+              {t.common.barberUnavailable}
             </p>
           </div>
         ) : loadingSlots ? (
