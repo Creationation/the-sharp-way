@@ -32,7 +32,7 @@ interface BookingInfo {
 
 const HomeDashboard = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { user } = useAuth();
 
   const [query, setQuery] = useState("");
