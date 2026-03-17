@@ -16,6 +16,7 @@ import PromotionsTab from "@/components/admin/PromotionsTab";
 import BarbersTab from "@/components/admin/BarbersTab";
 import PromoCodesTab from "@/components/admin/PromoCodesTab";
 import LoyaltyTab from "@/components/admin/LoyaltyTab";
+import RewardsTab from "@/components/admin/RewardsTab";
 import NotificationsTab from "@/components/admin/NotificationsTab";
 import { useBarbers } from "@/hooks/useBarbers";
 
