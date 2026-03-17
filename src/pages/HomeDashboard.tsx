@@ -219,32 +219,27 @@ const HomeDashboard = () => {
             </div>
           </div>
 
-          {/* Last Appointment — real data if logged in */}
+          {/* Next Appointment */}
           {user && (
             <div className="px-5 mb-6">
-              <h3 className="font-heading text-lg text-foreground mb-3">{t.home.lastAppointment}</h3>
-              {lastBooking ? (
+              <h3 className="font-heading text-lg text-foreground mb-3">{t.home.nextAppointment}</h3>
+              {nextBooking ? (
                 <div className="card-app p-4 flex items-center gap-4">
                   <img
-                    src={lastBooking.barber_name === "Marco" ? barber1 : lastBooking.barber_name === "Lukas" ? barber2 : barber3}
-                    alt={lastBooking.barber_name}
+                    src={nextBooking.barber_name === "Marco" ? barber1 : nextBooking.barber_name === "Lukas" ? barber2 : barber3}
+                    alt={nextBooking.barber_name}
                     className="w-12 h-12 rounded-full object-cover"
                   />
                   <div className="flex-1">
-                    <p className="text-foreground font-semibold text-sm">{lastBooking.service_name}</p>
+                    <p className="text-foreground font-semibold text-sm">{nextBooking.service_name}</p>
+                    <p className="text-muted-foreground text-xs">{nextBooking.barber_name}</p>
                     <div className="flex items-center gap-2 text-muted-foreground text-xs mt-0.5">
                       <Calendar size={11} />
-                      <span>{format(new Date(lastBooking.booking_date), "dd/MM/yyyy")}</span>
+                      <span>{format(new Date(nextBooking.booking_date), "dd/MM/yyyy")}</span>
                       <Clock size={11} />
-                      <span>{lastBooking.booking_time}</span>
+                      <span>{nextBooking.booking_time}</span>
                     </div>
                   </div>
-                  <button
-                    onClick={() => navigate("/book")}
-                    className="text-copper text-xs font-semibold border border-copper rounded-full px-3 py-1.5"
-                  >
-                    {t.home.rebook}
-                  </button>
                 </div>
               ) : (
                 <div className="card-app p-4 text-center">
@@ -254,6 +249,36 @@ const HomeDashboard = () => {
                   </button>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Last Appointment */}
+          {user && lastBooking && (
+            <div className="px-5 mb-6">
+              <h3 className="font-heading text-lg text-foreground mb-3">{t.home.lastAppointment}</h3>
+              <div className="card-app p-4 flex items-center gap-4">
+                <img
+                  src={lastBooking.barber_name === "Marco" ? barber1 : lastBooking.barber_name === "Lukas" ? barber2 : barber3}
+                  alt={lastBooking.barber_name}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+                <div className="flex-1">
+                  <p className="text-foreground font-semibold text-sm">{lastBooking.service_name}</p>
+                  <p className="text-muted-foreground text-xs">{lastBooking.barber_name}</p>
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs mt-0.5">
+                    <Calendar size={11} />
+                    <span>{format(new Date(lastBooking.booking_date), "dd/MM/yyyy")}</span>
+                    <Clock size={11} />
+                    <span>{lastBooking.booking_time}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigate("/book")}
+                  className="text-copper text-xs font-semibold border border-copper rounded-full px-3 py-1.5"
+                >
+                  {t.home.rebook}
+                </button>
+              </div>
             </div>
           )}
 
