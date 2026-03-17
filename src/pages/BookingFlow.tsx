@@ -328,43 +328,47 @@ const BookingFlow = () => {
       <div className="px-5 mb-5">
         <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">{t.booking.selectService}</h3>
         <div className="space-y-2">
-          {services.map(s => (
-            <button
-              key={s.name}
-              onClick={() => setSelectedService(s)}
-              className={`w-full card-app p-4 flex items-center justify-between transition-all ${
-                selectedService.name === s.name ? "border-copper" : ""
-              }`}
-            >
-              <div className="text-left">
-                <p className="text-foreground text-sm font-medium">{s.name}</p>
-                <p className="text-muted-foreground text-xs">{s.duration}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-copper font-semibold text-sm">{s.price}</span>
-                {selectedService.name === s.name && (
-                  <div className="w-5 h-5 rounded-full gradient-copper flex items-center justify-center">
-                    <Check size={12} className="text-primary-foreground" />
-                  </div>
-                )}
-              </div>
-            </button>
-          ))}
+          {services.map(s => {
+            const isSelected = selectedServices.some(sel => sel.name === s.name);
+            return (
+              <button
+                key={s.name}
+                onClick={() => toggleService(s)}
+                className={`w-full card-app p-4 flex items-center justify-between transition-all ${
+                  isSelected ? "border-copper" : ""
+                }`}
+              >
+                <div className="text-left">
+                  <p className="text-foreground text-sm font-medium">{s.name}</p>
+                  <p className="text-muted-foreground text-xs">{s.duration}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-copper font-semibold text-sm">{s.price}</span>
+                  {isSelected && (
+                    <div className="w-5 h-5 rounded-full gradient-copper flex items-center justify-center">
+                      <Check size={12} className="text-primary-foreground" />
+                    </div>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Summary */}
       <div className="px-5 mb-6">
         <div className="card-app p-4 border-copper/30">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-muted-foreground text-xs">{t.booking.service}</span>
-            <span className="text-foreground text-sm font-medium">{selectedService.name}</span>
-          </div>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-muted-foreground text-xs">{t.booking.duration}</span>
-            <span className="text-foreground text-sm">{selectedService.duration}</span>
-          </div>
-          <div className="flex items-center justify-between mb-2">
+          {selectedServices.map((s, i) => (
+            <div key={s.name} className={`flex items-center justify-between ${i < selectedServices.length - 1 ? "mb-2" : "mb-2"}`}>
+              <div>
+                <span className="text-foreground text-sm font-medium">{s.name}</span>
+                <span className="text-muted-foreground text-xs ml-2">({s.duration})</span>
+              </div>
+              <span className="text-copper font-semibold text-sm">{s.price}</span>
+            </div>
+          ))}
+          <div className="flex items-center justify-between mb-2 mt-1">
             <span className="text-muted-foreground text-xs">{t.booking.barber}</span>
             <span className="text-foreground text-sm">{selectedBarber.name}</span>
           </div>
@@ -374,10 +378,14 @@ const BookingFlow = () => {
               {dayAbbr[selectedDate.getDay()]} {selectedDate.getDate()} {monthAbbr[selectedDate.getMonth()]} · {selectedTime}
             </span>
           </div>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-muted-foreground text-xs">{t.booking.duration}</span>
+            <span className="text-foreground text-sm">{totalDuration}min</span>
+          </div>
           <div className="border-t border-border my-3" />
           <div className="flex items-center justify-between">
             <span className="text-foreground font-semibold">{t.booking.total}</span>
-            <span className="text-copper font-heading text-2xl">{selectedService.price}</span>
+            <span className="text-copper font-heading text-2xl">€{totalPrice}</span>
           </div>
         </div>
       </div>
