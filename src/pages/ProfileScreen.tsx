@@ -19,7 +19,7 @@ interface Booking {
 
 const ProfileScreen = () => {
   const navigate = useNavigate();
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, signOut, loading: authLoading } = useAuth();
   const { t, lang, setLang } = useLanguage();
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -29,13 +29,14 @@ const ProfileScreen = () => {
   const [totalPoints, setTotalPoints] = useState(0);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate("/auth");
       return;
     }
     fetchBookings();
     fetchLoyalty();
-  }, [user]);
+  }, [user, authLoading]);
 
   const fetchBookings = async () => {
     const { data } = await supabase
@@ -83,7 +84,7 @@ const ProfileScreen = () => {
     navigate("/home");
   };
 
-  if (!user) return null;
+  if (authLoading || !user) return null;
 
   return (
     <div className="min-h-screen bg-background pb-24">
