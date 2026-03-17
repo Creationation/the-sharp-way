@@ -233,6 +233,19 @@ export interface Translations {
       confirmDelete: string;
       stripeReady: string;
     };
+    loyaltyTab: {
+      title: string;
+      search: string;
+      stamps: string;
+      points: string;
+      freeCuts: string;
+      save: string;
+      saved: string;
+      saveError: string;
+      loadError: string;
+      noUsers: string;
+      stampsOf10: string;
+    };
   };
   barber: {
     cuts: string;
@@ -480,6 +493,19 @@ const en: Translations = {
       confirmDelete: "Are you sure you want to delete this promo code?",
       stripeReady: "Stripe-ready (coupon ID will sync when connected)",
     },
+    loyaltyTab: {
+      title: "Loyalty",
+      search: "Search by name or email...",
+      stamps: "Stamps",
+      points: "Sharp Points",
+      freeCuts: "Free Cuts Earned",
+      save: "Save",
+      saved: "Loyalty updated",
+      saveError: "Error saving loyalty",
+      loadError: "Failed to load loyalty data",
+      noUsers: "No users found",
+      stampsOf10: "every 10th cut free",
+    },
   },
   barber: {
     cuts: "Cuts",
@@ -726,6 +752,19 @@ const de: Translations = {
       loadError: "Fehler beim Laden der Promo-Codes",
       confirmDelete: "Möchtest du diesen Promo-Code wirklich löschen?",
       stripeReady: "Stripe-bereit (Coupon-ID wird bei Verbindung synchronisiert)",
+    },
+    loyaltyTab: {
+      title: "Treueprogramm",
+      search: "Nach Name oder E-Mail suchen...",
+      stamps: "Stempel",
+      points: "Sharp Points",
+      freeCuts: "Gratis-Schnitte",
+      save: "Speichern",
+      saved: "Treuedaten aktualisiert",
+      saveError: "Fehler beim Speichern",
+      loadError: "Fehler beim Laden der Treuedaten",
+      noUsers: "Keine Benutzer gefunden",
+      stampsOf10: "jeder 10. Schnitt gratis",
     },
   },
   barber: {

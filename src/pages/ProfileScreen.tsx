@@ -25,6 +25,8 @@ const ProfileScreen = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState<string | null>(null);
+  const [stamps, setStamps] = useState(0);
+  const [totalPoints, setTotalPoints] = useState(0);
 
   useEffect(() => {
     if (!user) {
@@ -32,6 +34,7 @@ const ProfileScreen = () => {
       return;
     }
     fetchBookings();
+    fetchLoyalty();
   }, [user]);
 
   const fetchBookings = async () => {
@@ -62,10 +65,18 @@ const ProfileScreen = () => {
   const upcoming = bookings.filter(b => b.booking_date >= today && b.status === "confirmed");
   const past = bookings.filter(b => b.booking_date < today || b.status === "cancelled");
 
-  // Real loyalty stamps — total confirmed bookings ever
-  const totalConfirmed = bookings.filter(b => b.status === "confirmed").length;
-  const stamps = totalConfirmed % 10;
-  const totalPoints = totalConfirmed * 50;
+  const fetchLoyalty = async () => {
+    const { data } = await supabase
+      .from("user_loyalty")
+      .select("stamps, total_points")
+      .eq("user_id", user!.id)
+      .maybeSingle();
+    if (data) {
+      setStamps((data as any).stamps ?? 0);
+      setTotalPoints((data as any).total_points ?? 0);
+    }
+  };
+
 
   const handleSignOut = async () => {
     await signOut();
