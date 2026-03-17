@@ -16,6 +16,7 @@ import PromotionsTab from "@/components/admin/PromotionsTab";
 import BarbersTab from "@/components/admin/BarbersTab";
 import PromoCodesTab from "@/components/admin/PromoCodesTab";
 import LoyaltyTab from "@/components/admin/LoyaltyTab";
+import NotificationsTab from "@/components/admin/NotificationsTab";
 import { useBarbers } from "@/hooks/useBarbers";
 
 interface Booking {
@@ -56,7 +57,7 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  const [tab, setTab] = useState<"bookings" | "availability" | "users" | "promotions" | "barbers" | "codes" | "loyalty">("bookings");
+  const [tab, setTab] = useState<"bookings" | "availability" | "users" | "promotions" | "barbers" | "codes" | "loyalty" | "notifications">("bookings");
   const { barbers: dbBarbers } = useBarbers();
   const barberNames = dbBarbers.map(b => b.name);
 
@@ -282,6 +283,14 @@ const AdminDashboard = () => {
           }`}
         >
           {t.admin.loyaltyTab.title}
+        </button>
+        <button
+          onClick={() => setTab("notifications")}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+            tab === "notifications" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+          }`}
+        >
+          🔔 Notifications
         </button>
       </div>
 
@@ -514,6 +523,13 @@ const AdminDashboard = () => {
 
       {/* ═══════════════════ LOYALTY TAB ═══════════════════ */}
       {tab === "loyalty" && <LoyaltyTab t={t.admin.loyaltyTab} />}
+
+      {/* ═══════════════════ NOTIFICATIONS TAB ═══════════════════ */}
+      {tab === "notifications" && (
+        <div className="px-5">
+          <NotificationsTab />
+        </div>
+      )}
     </div>
   );
 };
