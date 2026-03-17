@@ -72,7 +72,11 @@ const AdminDashboard = () => {
   const [loadingAv, setLoadingAv] = useState(false);
   const [savingAv, setSavingAv] = useState(false);
 
+  // Set initial avBarber when barbers load
   useEffect(() => {
+    if (barberNames.length > 0 && !avBarber) setAvBarber(barberNames[0]);
+  }, [barberNames]);
+
     if (!authLoading && !isAdmin) {
       navigate("/home");
       return;
