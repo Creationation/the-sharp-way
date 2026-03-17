@@ -78,7 +78,7 @@ const BookingFlow = () => {
   useEffect(() => {
     if (barbers.length > 0 && !selectedBarber) setSelectedBarber(barbers[0]);
   }, [barbers]);
-
+  const toggleService = (s: typeof services[0]) => {
     setSelectedServices(prev => {
       const exists = prev.some(p => p.name === s.name);
       if (exists && prev.length === 1) return prev; // keep at least one
