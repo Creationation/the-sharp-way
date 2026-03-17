@@ -227,7 +227,7 @@ const AdminDashboard = () => {
             tab === "availability" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
           }`}
         >
-          Availability
+          {t.admin.availability}
         </button>
         <button
           onClick={() => setTab("users")}
