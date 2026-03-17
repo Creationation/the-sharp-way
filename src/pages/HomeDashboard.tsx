@@ -23,7 +23,7 @@ const quickServices = [
   { name: "Komplett Service", price: "€38", icon: "⭐" },
 ];
 
-interface LastBooking {
+interface BookingInfo {
   service_name: string;
   barber_name: string;
   booking_date: string;

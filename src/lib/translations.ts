@@ -27,6 +27,7 @@ export interface Translations {
     promoSub: string;
     bookNow: string;
     lastAppointment: string;
+    nextAppointment: string;
     lastService: string;
     rebook: string;
     ourBarbers: string;
