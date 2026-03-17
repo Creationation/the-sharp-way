@@ -74,7 +74,11 @@ const BookingFlow = () => {
   const [confirmed, setConfirmed] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const toggleService = (s: typeof services[0]) => {
+  // Set initial barber when loaded
+  useEffect(() => {
+    if (barbers.length > 0 && !selectedBarber) setSelectedBarber(barbers[0]);
+  }, [barbers]);
+
     setSelectedServices(prev => {
       const exists = prev.some(p => p.name === s.name);
       if (exists && prev.length === 1) return prev; // keep at least one
