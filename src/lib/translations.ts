@@ -173,6 +173,22 @@ const en: Translations = {
     allCat: "All",
     bookBtn: "Book This Service",
   },
+  toasts: {
+    signInToBook: "Sign in to book an appointment",
+    bookingFailed: "Booking failed. Please try again.",
+    cancelError: "Failed to cancel booking",
+    bookingCancelled: "Booking cancelled",
+    cancelling: "Cancelling...",
+    copied: "Copied!",
+    accountCreated: "Account created!",
+    welcomeBack: "Welcome back!",
+  },
+  common: {
+    noAppointments: "No appointments yet",
+    cancelled: "Cancelled",
+    cancelBooking: "Cancel booking",
+    barberUnavailable: "This barber is not available on this day",
+  },
   booking: {
     title: "Book Now",
     selectBarber: "SELECT BARBER",
