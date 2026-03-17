@@ -207,8 +207,8 @@ const ProfileScreen = () => {
                   >
                     <XCircle size={12} />
                     {cancelling === b.id
-                      ? (lang === "de" ? "Wird storniert..." : "Cancelling...")
-                      : (lang === "de" ? "Termin stornieren" : "Cancel booking")}
+                      ? t.toasts.cancelling
+                      : t.common.cancelBooking}
                   </button>
                 )}
               </div>
