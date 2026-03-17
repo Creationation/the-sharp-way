@@ -153,7 +153,7 @@ const AdminDashboard = () => {
 
   const saveAvailability = async () => {
     setSavingAv(true);
-    const dateStr = avDate.toISOString().split("T")[0];
+    const dateStr = format(avDate, "yyyy-MM-dd");
     const blockedSlots = Object.entries(slotStates)
       .filter(([, state]) => state === "blocked")
       .map(([slot]) => slot);
