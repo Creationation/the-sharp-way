@@ -305,6 +305,22 @@ const de: Translations = {
     allCat: "Alle",
     bookBtn: "Service buchen",
   },
+  toasts: {
+    signInToBook: "Melde dich an, um einen Termin zu buchen",
+    bookingFailed: "Buchung fehlgeschlagen. Bitte versuche es erneut.",
+    cancelError: "Fehler beim Stornieren",
+    bookingCancelled: "Termin storniert",
+    cancelling: "Wird storniert...",
+    copied: "Kopiert!",
+    accountCreated: "Konto erstellt!",
+    welcomeBack: "Willkommen zurück!",
+  },
+  common: {
+    noAppointments: "Noch keine Termine",
+    cancelled: "Storniert",
+    cancelBooking: "Termin stornieren",
+    barberUnavailable: "Dieser Barbier ist heute nicht verfügbar",
+  },
   booking: {
     title: "Jetzt buchen",
     selectBarber: "BARBIER WÄHLEN",
