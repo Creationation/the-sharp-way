@@ -27,6 +27,8 @@ const ProfileScreen = () => {
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [stamps, setStamps] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);
+  const [rewardPending, setRewardPending] = useState(false);
+  const [claimingReward, setClaimingReward] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -67,14 +69,39 @@ const ProfileScreen = () => {
   const past = bookings.filter(b => b.booking_date < today || b.status === "cancelled");
 
   const fetchLoyalty = async () => {
-    const { data } = await supabase
-      .from("user_loyalty")
-      .select("stamps, total_points")
-      .eq("user_id", user!.id)
-      .maybeSingle();
-    if (data) {
-      setStamps((data as any).stamps ?? 0);
-      setTotalPoints((data as any).total_points ?? 0);
+    const [loyaltyRes, rewardRes] = await Promise.all([
+      supabase
+        .from("user_loyalty")
+        .select("stamps, total_points")
+        .eq("user_id", user!.id)
+        .maybeSingle(),
+      supabase
+        .from("reward_requests")
+        .select("id")
+        .eq("user_id", user!.id)
+        .eq("status", "pending")
+        .limit(1),
+    ]);
+
+    if (loyaltyRes.data) {
+      setStamps((loyaltyRes.data as any).stamps ?? 0);
+      setTotalPoints((loyaltyRes.data as any).total_points ?? 0);
+    }
+    setRewardPending((rewardRes.data?.length ?? 0) > 0);
+  };
+
+  const claimReward = async () => {
+    setClaimingReward(true);
+    const { error } = await supabase
+      .from("reward_requests")
+      .insert({ user_id: user!.id, stamps_at_request: stamps });
+
+    setClaimingReward(false);
+    if (error) {
+      toast.error("Error submitting request");
+    } else {
+      toast.success(t.profile.rewardClaimed);
+      setRewardPending(true);
     }
   };
 
@@ -139,6 +166,22 @@ const ProfileScreen = () => {
             <p className="text-muted-foreground text-xs text-center">
               {t.profile.stampsLabel(stamps)}
             </p>
+
+            {/* Claim reward button */}
+            {stamps >= 10 && !rewardPending && (
+              <button
+                onClick={claimReward}
+                disabled={claimingReward}
+                className="mt-3 w-full gradient-copper text-primary-foreground font-semibold py-3 rounded-full shadow-copper text-sm animate-pulse disabled:opacity-50 disabled:animate-none"
+              >
+                {claimingReward ? "..." : t.profile.claimReward}
+              </button>
+            )}
+            {rewardPending && (
+              <p className="mt-3 text-copper text-xs text-center font-medium">
+                {t.profile.rewardPending}
+              </p>
+            )}
           </div>
         </div>
       </div>

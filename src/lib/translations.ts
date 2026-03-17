@@ -127,6 +127,10 @@ export interface Translations {
     about: string;
     language: string;
     gold: string;
+    claimReward: string;
+    rewardPending: string;
+    rewardClaimed: string;
+    freeCutReady: string;
   };
   admin: {
     title: string;
@@ -245,6 +249,18 @@ export interface Translations {
       loadError: string;
       noUsers: string;
       stampsOf10: string;
+    };
+    rewardsTab: {
+      title: string;
+      pending: string;
+      approved: string;
+      rejected: string;
+      noRequests: string;
+      approve: string;
+      reject: string;
+      requestedOn: string;
+      stampsAtRequest: string;
+      loadError: string;
     };
   };
   barber: {
@@ -387,6 +403,10 @@ const en: Translations = {
     about: "About The Sharp Cut",
     language: "Language",
     gold: "Gold",
+    claimReward: "🎁 Claim your FREE cut!",
+    rewardPending: "⏳ Reward request pending...",
+    rewardClaimed: "Reward requested!",
+    freeCutReady: "You've earned a FREE cut! Tap to claim.",
   },
   admin: {
     title: "Admin Dashboard",
@@ -505,6 +525,18 @@ const en: Translations = {
       loadError: "Failed to load loyalty data",
       noUsers: "No users found",
       stampsOf10: "every 10th cut free",
+    },
+    rewardsTab: {
+      title: "Rewards",
+      pending: "Pending",
+      approved: "Approved",
+      rejected: "Rejected",
+      noRequests: "No reward requests",
+      approve: "Approve",
+      reject: "Reject",
+      requestedOn: "Requested on",
+      stampsAtRequest: "Stamps at request",
+      loadError: "Failed to load reward requests",
     },
   },
   barber: {
@@ -647,6 +679,10 @@ const de: Translations = {
     about: "Über The Sharp Cut",
     language: "Sprache",
     gold: "Gold",
+    claimReward: "🎁 Gratis-Schnitt einlösen!",
+    rewardPending: "⏳ Anfrage wird bearbeitet...",
+    rewardClaimed: "Belohnung angefragt!",
+    freeCutReady: "Du hast einen GRATIS-Schnitt verdient! Tippe zum Einlösen.",
   },
   admin: {
     title: "Admin-Bereich",
@@ -765,6 +801,18 @@ const de: Translations = {
       loadError: "Fehler beim Laden der Treuedaten",
       noUsers: "Keine Benutzer gefunden",
       stampsOf10: "jeder 10. Schnitt gratis",
+    },
+    rewardsTab: {
+      title: "Belohnungen",
+      pending: "Ausstehend",
+      approved: "Genehmigt",
+      rejected: "Abgelehnt",
+      noRequests: "Keine Belohnungsanfragen",
+      approve: "Genehmigen",
+      reject: "Ablehnen",
+      requestedOn: "Angefragt am",
+      stampsAtRequest: "Stempel bei Anfrage",
+      loadError: "Fehler beim Laden der Anfragen",
     },
   },
   barber: {

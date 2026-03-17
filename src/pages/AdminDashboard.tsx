@@ -16,6 +16,7 @@ import PromotionsTab from "@/components/admin/PromotionsTab";
 import BarbersTab from "@/components/admin/BarbersTab";
 import PromoCodesTab from "@/components/admin/PromoCodesTab";
 import LoyaltyTab from "@/components/admin/LoyaltyTab";
+import RewardsTab from "@/components/admin/RewardsTab";
 import NotificationsTab from "@/components/admin/NotificationsTab";
 import { useBarbers } from "@/hooks/useBarbers";
 
@@ -57,7 +58,7 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  const [tab, setTab] = useState<"bookings" | "availability" | "users" | "promotions" | "barbers" | "codes" | "loyalty" | "notifications">("bookings");
+  const [tab, setTab] = useState<"bookings" | "availability" | "users" | "promotions" | "barbers" | "codes" | "loyalty" | "rewards" | "notifications">("bookings");
   const { barbers: dbBarbers } = useBarbers();
   const barberNames = dbBarbers.map(b => b.name);
 
@@ -283,6 +284,14 @@ const AdminDashboard = () => {
           }`}
         >
           {t.admin.loyaltyTab.title}
+        </button>
+        <button
+          onClick={() => setTab("rewards")}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+            tab === "rewards" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+          }`}
+        >
+          🎁 {t.admin.rewardsTab.title}
         </button>
         <button
           onClick={() => setTab("notifications")}
@@ -523,6 +532,9 @@ const AdminDashboard = () => {
 
       {/* ═══════════════════ LOYALTY TAB ═══════════════════ */}
       {tab === "loyalty" && <LoyaltyTab t={t.admin.loyaltyTab} />}
+
+      {/* ═══════════════════ REWARDS TAB ═══════════════════ */}
+      {tab === "rewards" && <RewardsTab t={t.admin.rewardsTab} />}
 
       {/* ═══════════════════ NOTIFICATIONS TAB ═══════════════════ */}
       {tab === "notifications" && (
