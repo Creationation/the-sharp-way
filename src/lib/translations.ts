@@ -120,7 +120,35 @@ export interface Translations {
     gold: string;
   };
   admin: {
+    title: string;
+    bookings: string;
+    availability: string;
     users: string;
+    total: string;
+    confirmed: string;
+    cancelled: string;
+    all: string;
+    noBookings: string;
+    with: string;
+    cancel: string;
+    confirm: string;
+    delete: string;
+    dayOff: string;
+    closeDayFor: (name: string) => string;
+    available: string;
+    clientBooked: string;
+    blocked: string;
+    saving: string;
+    saveAvailability: string;
+    slotHint: string;
+    savedSuccess: string;
+    saveFailed: string;
+    loadFailed: string;
+    statusUpdated: string;
+    updateError: string;
+    bookingDeleted: string;
+    deleteError: string;
+    bookingCancelled: string;
     usersTab: {
       title: string;
       search: string;
