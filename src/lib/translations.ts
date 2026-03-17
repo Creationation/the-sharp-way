@@ -41,6 +41,22 @@ export interface Translations {
     allCat: string;
     bookBtn: string;
   };
+  toasts: {
+    signInToBook: string;
+    bookingFailed: string;
+    cancelError: string;
+    bookingCancelled: string;
+    cancelling: string;
+    copied: string;
+    accountCreated: string;
+    welcomeBack: string;
+  };
+  common: {
+    noAppointments: string;
+    cancelled: string;
+    cancelBooking: string;
+    barberUnavailable: string;
+  };
   booking: {
     title: string;
     selectBarber: string;
