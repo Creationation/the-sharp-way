@@ -37,7 +37,7 @@ interface Profile {
   phone: string | null;
 }
 
-const BARBERS = ["Marco", "Lukas", "Daniel"];
+// BARBERS list is now fetched from DB via useBarbers hook
 
 const ALL_SLOTS: string[] = [];
 for (let h = 10; h <= 19; h++) {
