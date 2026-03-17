@@ -12,6 +12,7 @@ import { de as deLocale, enUS } from "date-fns/locale";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/lib/translations";
 import UsersTab from "@/components/admin/UsersTab";
+import PromotionsTab from "@/components/admin/PromotionsTab";
 
 interface Booking {
   id: string;
