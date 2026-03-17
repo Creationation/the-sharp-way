@@ -206,6 +206,17 @@ const BookingFlow = () => {
       return;
     }
 
+    // Increment promo code usage
+    if (appliedPromo) {
+      supabase.rpc("increment_promo_usage" as any, { _code: appliedPromo.code }).then(() => {});
+      // Fallback: direct update
+      supabase
+        .from("promo_codes")
+        .update({ current_uses: undefined as any })
+        .eq("code", appliedPromo.code)
+        .then(() => {});
+    }
+
     // Send confirmation email (non-blocking — failure doesn't affect booking)
     if (user.email) {
       const displayName = user.user_metadata?.full_name || user.email.split("@")[0];
