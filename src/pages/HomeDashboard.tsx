@@ -232,26 +232,32 @@ const HomeDashboard = () => {
       {!q && (
         <>
           {/* Promo card */}
-          <div className="px-5 mb-6">
-            <div className="relative rounded-2xl overflow-hidden border border-copper/30">
-              <div className="absolute inset-0 gradient-copper opacity-10" />
-              <div className="relative flex items-center p-5">
-                <div className="flex-1">
-                  <p className="text-copper font-heading text-2xl mb-1">{t.home.promoTitle}</p>
-                  <p className="text-muted-foreground text-xs mb-3">{t.home.promoSub}</p>
-                  <button
-                    onClick={() => navigate("/book")}
-                    className="gradient-copper text-primary-foreground text-xs font-semibold px-4 py-2 rounded-full"
-                  >
-                    {t.home.bookNow}
-                  </button>
-                </div>
-                <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 ml-3">
-                  <img src={heroBg} alt="" className="w-full h-full object-cover" />
+          {cardPromo && (
+            <div className="px-5 mb-6">
+              <div className="relative rounded-2xl overflow-hidden border border-copper/30">
+                <div className="absolute inset-0 gradient-copper opacity-10" />
+                <div className="relative flex items-center p-5">
+                  <div className="flex-1">
+                    <p className="text-copper font-heading text-2xl mb-1">
+                      {lang === "de" ? cardPromo.title_de : cardPromo.title_en}
+                    </p>
+                    <p className="text-muted-foreground text-xs mb-3">
+                      {lang === "de" ? cardPromo.subtitle_de : cardPromo.subtitle_en}
+                    </p>
+                    <button
+                      onClick={() => navigate("/book")}
+                      className="gradient-copper text-primary-foreground text-xs font-semibold px-4 py-2 rounded-full"
+                    >
+                      {lang === "de" ? cardPromo.link_text_de : cardPromo.link_text_en}
+                    </button>
+                  </div>
+                  <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 ml-3">
+                    <img src={heroBg} alt="" className="w-full h-full object-cover" />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Next Appointment */}
           {user && (
