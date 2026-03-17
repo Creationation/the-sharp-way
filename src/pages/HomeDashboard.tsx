@@ -105,7 +105,7 @@ const HomeDashboard = () => {
   const q = query.toLowerCase().trim();
 
   const filteredBarbers = q
-    ? barbers.filter(b => b.name.toLowerCase().includes(q) || b.specialty.toLowerCase().includes(q))
+    ? barbers.filter(b => b.name.toLowerCase().includes(q) || (lang === "de" ? b.specialty_de : b.specialty_en).toLowerCase().includes(q))
     : barbers;
 
   const filteredServices = q
