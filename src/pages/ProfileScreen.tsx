@@ -84,7 +84,7 @@ const ProfileScreen = () => {
     navigate("/home");
   };
 
-  if (loading || !user) return null;
+  if (authLoading || !user) return null;
 
   return (
     <div className="min-h-screen bg-background pb-24">
