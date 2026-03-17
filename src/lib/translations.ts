@@ -464,7 +464,7 @@ const de: Translations = {
     referTitle: "Freund einladen",
     referSub: "€10 verschenken, €10 erhalten. Teile deinen Code",
     copy: "Kopieren",
-    adminDashboard: "Admin Dashboard",
+    adminDashboard: "Admin-Bereich",
     reviews: "Bewertungen",
     contact: "Kontakt",
     about: "Über The Sharp Cut",

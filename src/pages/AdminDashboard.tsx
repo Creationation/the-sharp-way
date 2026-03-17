@@ -376,8 +376,8 @@ const AdminDashboard = () => {
               <ChevronLeft size={16} className="text-foreground" />
             </button>
             <div className="text-center">
-              <p className="text-foreground font-semibold text-sm">{format(avDate, "EEEE")}</p>
-              <p className="text-muted-foreground text-xs">{format(avDate, "dd MMMM yyyy")}</p>
+              <p className="text-foreground font-semibold text-sm">{format(avDate, "EEEE", { locale: dateLocale })}</p>
+              <p className="text-muted-foreground text-xs">{format(avDate, "dd MMMM yyyy", { locale: dateLocale })}</p>
             </div>
             <button
               onClick={() => setAvDate(d => addDays(d, 1))}
