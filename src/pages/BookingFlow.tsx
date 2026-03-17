@@ -87,6 +87,44 @@ const BookingFlow = () => {
   };
 
   const totalPrice = selectedServices.reduce((sum, s) => sum + parseInt(s.price.replace("€", "")), 0);
+
+  // Promo code state
+  const [promoInput, setPromoInput] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount_type: string; discount_value: number } | null>(null);
+  const [promoLoading, setPromoLoading] = useState(false);
+
+  const discountAmount = appliedPromo
+    ? appliedPromo.discount_type === "percentage"
+      ? Math.round(totalPrice * appliedPromo.discount_value / 100)
+      : Math.min(appliedPromo.discount_value, totalPrice)
+    : 0;
+  const finalPrice = totalPrice - discountAmount;
+
+  const applyPromo = async () => {
+    if (!promoInput.trim()) return;
+    setPromoLoading(true);
+    const { data, error } = await supabase
+      .from("promo_codes")
+      .select("code, discount_type, discount_value, max_uses, current_uses, active, expires_at")
+      .eq("code", promoInput.toUpperCase().trim())
+      .eq("active", true)
+      .maybeSingle();
+    setPromoLoading(false);
+    if (error || !data) {
+      toast.error(t.booking.promoInvalid);
+      return;
+    }
+    if (data.expires_at && new Date(data.expires_at) < new Date()) {
+      toast.error(t.booking.promoExpired);
+      return;
+    }
+    if (data.max_uses && data.current_uses >= data.max_uses) {
+      toast.error(t.booking.promoInvalid);
+      return;
+    }
+    setAppliedPromo({ code: data.code, discount_type: data.discount_type, discount_value: Number(data.discount_value) });
+    toast.success(t.booking.promoApplied);
+  };
   const totalDuration = selectedServices.reduce((sum, s) => sum + parseInt(s.duration), 0);
 
   const [takenSlots, setTakenSlots] = useState<string[]>([]);
