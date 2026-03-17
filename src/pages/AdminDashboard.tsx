@@ -286,6 +286,14 @@ const AdminDashboard = () => {
           {t.admin.loyaltyTab.title}
         </button>
         <button
+          onClick={() => setTab("rewards")}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+            tab === "rewards" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+          }`}
+        >
+          🎁 {t.admin.rewardsTab.title}
+        </button>
+        <button
           onClick={() => setTab("notifications")}
           className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
             tab === "notifications" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
