@@ -253,6 +253,8 @@ const en: Translations = {
     bookedWith: "with",
     backHome: "Back to Home",
     feb: "FEB",
+    moreDates: "More dates",
+    closedDay: "Closed on this day",
   },
   gallery: {
     title: "The Art of the Cut",
