@@ -36,20 +36,37 @@ const HomeDashboard = () => {
   const { user } = useAuth();
 
   const [query, setQuery] = useState("");
-  const [lastBooking, setLastBooking] = useState<LastBooking | null>(null);
+  const [lastBooking, setLastBooking] = useState<BookingInfo | null>(null);
+  const [nextBooking, setNextBooking] = useState<BookingInfo | null>(null);
 
   useEffect(() => {
     if (!user) return;
+    const today = new Date().toISOString().split("T")[0];
+
+    // Fetch next upcoming booking
     supabase
       .from("bookings")
       .select("service_name, barber_name, booking_date, booking_time")
       .eq("user_id", user.id)
       .eq("status", "confirmed")
-      .lt("booking_date", new Date().toISOString().split("T")[0])
+      .gte("booking_date", today)
+      .order("booking_date", { ascending: true })
+      .limit(1)
+      .then(({ data }) => {
+        if (data && data.length > 0) setNextBooking(data[0] as BookingInfo);
+      });
+
+    // Fetch last past booking
+    supabase
+      .from("bookings")
+      .select("service_name, barber_name, booking_date, booking_time")
+      .eq("user_id", user.id)
+      .eq("status", "confirmed")
+      .lt("booking_date", today)
       .order("booking_date", { ascending: false })
       .limit(1)
       .then(({ data }) => {
-        if (data && data.length > 0) setLastBooking(data[0] as LastBooking);
+        if (data && data.length > 0) setLastBooking(data[0] as BookingInfo);
       });
   }, [user]);
 

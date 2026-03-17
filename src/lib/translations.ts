@@ -385,6 +385,7 @@ const de: Translations = {
     promoSub: "Erstbesuch? 20% Rabatt — Code: SHARP20",
     bookNow: "Jetzt buchen",
     lastAppointment: "Dein letzter Termin",
+    nextAppointment: "Dein nächster Termin",
     lastService: "Fade & Taper mit Marco",
     rebook: "Erneut buchen",
     ourBarbers: "Unsere Barbiere",
