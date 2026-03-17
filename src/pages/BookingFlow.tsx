@@ -351,7 +351,7 @@ const BookingFlow = () => {
       </div>
 
       {/* CTA */}
-      <div className="fixed bottom-16 left-0 right-0 z-40 px-5 py-3 bg-background/90 backdrop-blur-md border-t border-border">
+      <div className="fixed bottom-[4.5rem] left-0 right-0 z-40 px-5 py-3 bg-background/90 backdrop-blur-md border-t border-border">
         <button
           onClick={handleConfirm}
           disabled={saving || dayOff}
@@ -359,7 +359,7 @@ const BookingFlow = () => {
         >
           {saving ? t.booking.saving : t.booking.confirm}
         </button>
-        <p className="text-center text-muted-foreground text-[10px] mt-2">{t.booking.cancellation}</p>
+        <p className="text-center text-muted-foreground text-[10px] mt-1">{t.booking.cancellation}</p>
       </div>
     </div>
   );
