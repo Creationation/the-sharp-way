@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 const AuthScreen = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
