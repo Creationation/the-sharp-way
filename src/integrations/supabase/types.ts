@@ -44,6 +44,51 @@ export type Database = {
         }
         Relationships: []
       }
+      barbers: {
+        Row: {
+          available: boolean
+          created_at: string
+          cuts: number
+          id: string
+          image_url: string
+          name: string
+          rating: number
+          sort_order: number
+          specialty_de: string
+          specialty_en: string
+          updated_at: string
+          years: number
+        }
+        Insert: {
+          available?: boolean
+          created_at?: string
+          cuts?: number
+          id?: string
+          image_url?: string
+          name: string
+          rating?: number
+          sort_order?: number
+          specialty_de?: string
+          specialty_en?: string
+          updated_at?: string
+          years?: number
+        }
+        Update: {
+          available?: boolean
+          created_at?: string
+          cuts?: number
+          id?: string
+          image_url?: string
+          name?: string
+          rating?: number
+          sort_order?: number
+          specialty_de?: string
+          specialty_en?: string
+          updated_at?: string
+          years?: number
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           barber_name: string
