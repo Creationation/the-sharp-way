@@ -367,7 +367,7 @@ const AdminDashboard = () => {
         <div className="px-5">
           {/* Barber selector */}
           <div className="flex gap-2 mb-5">
-            {BARBERS.map(b => (
+            {barberNames.map(b => (
               <button
                 key={b}
                 onClick={() => setAvBarber(b)}
