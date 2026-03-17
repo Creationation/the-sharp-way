@@ -325,6 +325,12 @@ const en: Translations = {
     feb: "FEB",
     moreDates: "More dates",
     closedDay: "Closed on this day",
+    promoCode: "Promo Code",
+    applyCode: "Apply",
+    promoApplied: "Promo code applied!",
+    promoInvalid: "Invalid promo code",
+    promoExpired: "This promo code has expired",
+    discount: "Discount",
   },
   gallery: {
     title: "The Art of the Cut",
