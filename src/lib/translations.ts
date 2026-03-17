@@ -376,7 +376,7 @@ const de: Translations = {
     profile: "Profil",
   },
   home: {
-    announcement: "Neu: Hot Towel Rasur jetzt verfügbar —",
+    announcement: "Neu: Hot Towel Rasur jetzt verfügbar",
     announcementLink: "Heute buchen",
     greeting: "Hallo, Sharp Client",
     location: "Wien, AT",
