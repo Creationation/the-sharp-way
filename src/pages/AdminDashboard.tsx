@@ -47,7 +47,9 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { isAdmin, loading: authLoading } = useAuth();
 
-  const [tab, setTab] = useState<"bookings" | "availability">("bookings");
+  const { lang } = useLanguage();
+  const t = translations[lang];
+  const [tab, setTab] = useState<"bookings" | "availability" | "users">("bookings");
 
   // — Bookings tab state —
   const [bookings, setBookings] = useState<Booking[]>([]);
