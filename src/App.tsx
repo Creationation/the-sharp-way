@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import BottomNav from "@/components/BottomNav";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import SplashScreen from "@/pages/SplashScreen";
 import HomeDashboard from "@/pages/HomeDashboard";
 import BarberProfile from "@/pages/BarberProfile";
@@ -21,7 +23,21 @@ import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+// Request notification permission on app start
+async function requestNotificationPermission() {
+  try {
+    const { display } = await LocalNotifications.checkPermissions();
+    if (display !== "granted") {
+      await LocalNotifications.requestPermissions();
+    }
+  } catch {
+    // Not on native device — silently ignore in browser
+  }
+}
+
+const App = () => {
+  useEffect(() => { requestNotificationPermission(); }, []);
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <LanguageProvider>
@@ -50,6 +66,7 @@ const App = () => (
       </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;

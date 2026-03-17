@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import { ArrowLeft, Star, Check, CalendarDays, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -54,6 +55,74 @@ const allTimeSlots: string[] = [];
 for (let h = 10; h <= 19; h++) {
   allTimeSlots.push(`${h.toString().padStart(2, "0")}:00`);
   allTimeSlots.push(`${h.toString().padStart(2, "0")}:30`);
+}
+
+async function scheduleReminders(
+  barberName: string,
+  serviceName: string,
+  bookingDate: Date,
+  bookingTime: string,
+  lang: string
+) {
+  try {
+    const [hours, minutes] = bookingTime.split(":").map(Number);
+    const apptTime = new Date(bookingDate);
+    apptTime.setHours(hours, minutes, 0, 0);
+
+    const minus24h = new Date(apptTime.getTime() - 24 * 60 * 60 * 1000);
+    const minus5h  = new Date(apptTime.getTime() -  5 * 60 * 60 * 1000);
+    const minus2h  = new Date(apptTime.getTime() -  2 * 60 * 60 * 1000);
+    const now = Date.now();
+
+    const isDE = lang === "de";
+    const dateStr = apptTime.toLocaleDateString(isDE ? "de-AT" : "en-GB", { day: "numeric", month: "long" });
+
+    const notifications = [];
+    const baseId = Math.floor(Math.random() * 100000);
+
+    if (minus24h.getTime() > now) {
+      notifications.push({
+        id: baseId,
+        title: isDE ? "Termin morgen ✂️" : "Appointment tomorrow ✂️",
+        body: isDE
+          ? `Dein Termin mit ${barberName} ist morgen um ${bookingTime} Uhr — ${serviceName}`
+          : `Your appointment with ${barberName} is tomorrow at ${bookingTime} — ${serviceName}`,
+        schedule: { at: minus24h },
+        sound: "default",
+        smallIcon: "ic_launcher",
+      });
+    }
+    if (minus5h.getTime() > now) {
+      notifications.push({
+        id: baseId + 1,
+        title: isDE ? "Termin heute ✂️" : "Appointment today ✂️",
+        body: isDE
+          ? `Dein Termin mit ${barberName} ist heute um ${bookingTime} Uhr (in 5 Stunden)`
+          : `Your appointment with ${barberName} is today at ${bookingTime} (in 5 hours)`,
+        schedule: { at: minus5h },
+        sound: "default",
+        smallIcon: "ic_launcher",
+      });
+    }
+    if (minus2h.getTime() > now) {
+      notifications.push({
+        id: baseId + 2,
+        title: isDE ? "In 2 Stunden ✂️" : "In 2 hours ✂️",
+        body: isDE
+          ? `Vergiss deinen Termin nicht! ${barberName} erwartet dich um ${bookingTime} Uhr`
+          : `Don't forget! ${barberName} is expecting you at ${bookingTime}`,
+        schedule: { at: minus2h },
+        sound: "default",
+        smallIcon: "ic_launcher",
+      });
+    }
+
+    if (notifications.length > 0) {
+      await LocalNotifications.schedule({ notifications });
+    }
+  } catch {
+    // Silently ignore — notifications are a bonus, not critical
+  }
 }
 
 const BookingFlow = () => {
@@ -227,6 +296,9 @@ const BookingFlow = () => {
         },
       }).catch(() => {}); // silent fail
     }
+
+    // Schedule local push notifications (24h, 5h, 2h before appointment)
+    scheduleReminders(selectedBarber.name, serviceNames, selectedDate, selectedTime, lang);
 
     setConfirmed(true);
   };
