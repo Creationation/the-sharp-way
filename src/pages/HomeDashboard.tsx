@@ -347,7 +347,7 @@ const HomeDashboard = () => {
                     </div>
                     <div className="p-3">
                       <p className="text-foreground font-semibold text-sm">{b.name}</p>
-                      <p className="text-muted-foreground text-[11px] mb-2">{b.specialty}</p>
+                      <p className="text-muted-foreground text-[11px] mb-2">{lang === "de" ? b.specialty_de : b.specialty_en}</p>
                       <div className="flex items-center gap-1 mb-3">
                         <Star size={12} className="text-copper fill-copper" />
                         <span className="text-foreground text-xs font-medium">{b.rating}</span>
