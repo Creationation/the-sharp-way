@@ -178,7 +178,7 @@ const en: Translations = {
   },
   gallery: {
     title: "The Art of the Cut",
-    filters: ["All", "Fades", "Beards", "Classic", "Women"],
+    filters: ["All", "Fades", "Beards", "Classic", "Women", "Design"],
   },
   reviews: {
     title: "Reviews",
