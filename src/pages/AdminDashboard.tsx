@@ -294,7 +294,7 @@ const AdminDashboard = () => {
                         <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${
                           b.status === "confirmed" ? "bg-mint/20 text-mint" : "bg-destructive/20 text-destructive"
                         }`}>
-                          {b.status === "confirmed" ? "Confirmed" : "Cancelled"}
+                          {b.status === "confirmed" ? t.admin.confirmed : t.admin.cancelled}
                         </span>
                       </div>
 
