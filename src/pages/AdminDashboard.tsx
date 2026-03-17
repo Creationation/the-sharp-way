@@ -452,6 +452,9 @@ const AdminDashboard = () => {
           </p>
         </div>
       )}
+
+      {/* ═══════════════════ USERS TAB ═══════════════════ */}
+      {tab === "users" && <UsersTab t={t.admin.usersTab} />}
     </div>
   );
 };
