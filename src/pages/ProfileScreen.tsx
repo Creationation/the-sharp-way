@@ -65,6 +65,18 @@ const ProfileScreen = () => {
   const upcoming = bookings.filter(b => b.booking_date >= today && b.status === "confirmed");
   const past = bookings.filter(b => b.booking_date < today || b.status === "cancelled");
 
+  const fetchLoyalty = async () => {
+    const { data } = await supabase
+      .from("user_loyalty")
+      .select("stamps, total_points")
+      .eq("user_id", user!.id)
+      .maybeSingle();
+    if (data) {
+      setStamps((data as any).stamps ?? 0);
+      setTotalPoints((data as any).total_points ?? 0);
+    }
+  };
+
   // Real loyalty stamps — total confirmed bookings ever
   const totalConfirmed = bookings.filter(b => b.status === "confirmed").length;
   const stamps = totalConfirmed % 10;
