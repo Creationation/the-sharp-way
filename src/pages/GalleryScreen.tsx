@@ -10,8 +10,14 @@ import gallery3 from "@/assets/gallery-3.jpg";
 import gallery4 from "@/assets/gallery-4.jpg";
 import gallery5 from "@/assets/gallery-5.jpg";
 import gallery6 from "@/assets/gallery-6.jpg";
+import woman1 from "@/assets/woman-1.jpg";
+import woman2 from "@/assets/woman-2.jpg";
+import woman3 from "@/assets/woman-3.jpg";
+import woman4 from "@/assets/woman-4.jpg";
+import woman5 from "@/assets/woman-5.jpg";
+import woman6 from "@/assets/woman-6.jpg";
 
-// tagIndex maps to filters array: 1=Fades, 2=Beards, 3=Classic
+// tagIndex maps to filters array: 1=Fades, 2=Beards, 3=Classic, 4=Women
 const galleryImages = [
   { src: fade1, tagIndex: 1, saved: false },
   { src: fade2, tagIndex: 1, saved: false },
@@ -21,6 +27,12 @@ const galleryImages = [
   { src: gallery4, tagIndex: 2, saved: true },
   { src: gallery5, tagIndex: 3, saved: false },
   { src: gallery6, tagIndex: 3, saved: false },
+  { src: woman1, tagIndex: 4, saved: false },
+  { src: woman2, tagIndex: 4, saved: false },
+  { src: woman3, tagIndex: 4, saved: true },
+  { src: woman4, tagIndex: 4, saved: false },
+  { src: woman5, tagIndex: 4, saved: false },
+  { src: woman6, tagIndex: 4, saved: true },
 ];
 
 const GalleryScreen = () => {
