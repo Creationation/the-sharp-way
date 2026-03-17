@@ -240,6 +240,14 @@ const AdminDashboard = () => {
         >
           {t.admin.users}
         </button>
+        <button
+          onClick={() => setTab("promotions")}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+            tab === "promotions" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+          }`}
+        >
+          {t.admin.promotions}
+        </button>
       </div>
 
       {/* ═══════════════════ BOOKINGS TAB ═══════════════════ */}
