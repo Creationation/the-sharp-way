@@ -34,6 +34,7 @@ const ProfileScreen = () => {
       return;
     }
     fetchBookings();
+    fetchLoyalty();
   }, [user]);
 
   const fetchBookings = async () => {
