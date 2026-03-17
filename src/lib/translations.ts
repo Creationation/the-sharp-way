@@ -492,7 +492,7 @@ const de: Translations = {
     blocked: "Gesperrt",
     saving: "Speichern...",
     saveAvailability: "Verfügbarkeit speichern",
-    slotHint: "Klicke auf einen Slot um ihn zu sperren/entsperren. Kundenbuchungen (amber) können hier nicht geändert werden.",
+    slotHint: "Klicke auf einen Slot, um ihn zu sperren oder freizugeben. Kundenbuchungen (gelb markiert) können hier nicht geändert werden.",
     savedSuccess: "Verfügbarkeit gespeichert",
     saveFailed: "Fehler beim Speichern der Verfügbarkeit",
     loadFailed: "Fehler beim Laden der Buchungen",
