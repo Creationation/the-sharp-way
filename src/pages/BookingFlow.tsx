@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { ArrowLeft, Star, Check } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ArrowLeft, Star, Check, CalendarDays, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
