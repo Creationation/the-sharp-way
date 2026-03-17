@@ -69,7 +69,10 @@ const BookingFlow = () => {
   const { user } = useAuth();
   const { t, lang } = useLanguage();
 
-  const availableDates = getAvailableDates();
+  const [customDate, setCustomDate] = useState<Date | null>(null);
+  const [showCalendar, setShowCalendar] = useState(false);
+
+  const availableDates = customDate ? getAvailableDates(customDate) : getAvailableDates();
 
   const [selectedBarber, setSelectedBarber] = useState(barbers[0]);
   const [selectedServices, setSelectedServices] = useState<typeof services>([services[0]]);
