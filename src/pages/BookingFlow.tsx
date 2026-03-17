@@ -192,7 +192,7 @@ const BookingFlow = () => {
           </div>
           <h2 className="font-heading text-4xl text-copper mb-2 animate-fade-up" style={{ animationDelay: "100ms", animationFillMode: "forwards", opacity: 0 }}>{t.booking.booked}</h2>
           <p className="text-muted-foreground mb-2 animate-fade-up" style={{ animationDelay: "200ms", animationFillMode: "forwards", opacity: 0 }}>
-            {selectedService.name} {t.booking.bookedWith} {selectedBarber.name}
+            {selectedServices.map(s => s.name).join(", ")} {t.booking.bookedWith} {selectedBarber.name}
           </p>
           <p className="text-foreground font-medium mb-1 animate-fade-up" style={{ animationDelay: "300ms", animationFillMode: "forwards", opacity: 0 }}>
             {dayAbbr[selectedDate.getDay()]}, {selectedDate.getDate()} {monthAbbr[selectedDate.getMonth()]} · {selectedTime}
