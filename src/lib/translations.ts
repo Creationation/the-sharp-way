@@ -27,6 +27,7 @@ export interface Translations {
     promoSub: string;
     bookNow: string;
     lastAppointment: string;
+    nextAppointment: string;
     lastService: string;
     rebook: string;
     ourBarbers: string;
@@ -205,6 +206,7 @@ const en: Translations = {
     promoSub: "First visit? Get 20% OFF — code: SHARP20",
     bookNow: "Book Now",
     lastAppointment: "Your Last Appointment",
+    nextAppointment: "Your Next Appointment",
     lastService: "Fade & Taper with Marco",
     rebook: "Rebook",
     ourBarbers: "Our Barbers",
@@ -383,6 +385,7 @@ const de: Translations = {
     promoSub: "Erstbesuch? 20% Rabatt — Code: SHARP20",
     bookNow: "Jetzt buchen",
     lastAppointment: "Dein letzter Termin",
+    nextAppointment: "Dein nächster Termin",
     lastService: "Fade & Taper mit Marco",
     rebook: "Erneut buchen",
     ourBarbers: "Unsere Barbiere",
