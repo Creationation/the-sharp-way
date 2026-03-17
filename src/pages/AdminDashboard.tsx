@@ -266,7 +266,7 @@ const AdminDashboard = () => {
                   filter === f ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
                 }`}
               >
-                {f === "all" ? "All" : f === "confirmed" ? "Confirmed" : "Cancelled"}
+                {f === "all" ? t.admin.all : f === "confirmed" ? t.admin.confirmed : t.admin.cancelled}
               </button>
             ))}
           </div>
