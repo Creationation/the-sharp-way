@@ -27,6 +27,8 @@ const ProfileScreen = () => {
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [stamps, setStamps] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);
+  const [rewardPending, setRewardPending] = useState(false);
+  const [claimingReward, setClaimingReward] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
