@@ -185,7 +185,7 @@ const BookingFlow = () => {
     const dateStr = toDateStr(selectedDate);
 
     const serviceNames = selectedServices.map(s => s.name).join(", ");
-    const servicePrices = `€${totalPrice}`;
+    const servicePrices = appliedPromo ? `€${finalPrice} (was €${totalPrice})` : `€${totalPrice}`;
     const serviceDurations = `${totalDuration}min`;
 
     const { error } = await supabase.from("bookings").insert({
