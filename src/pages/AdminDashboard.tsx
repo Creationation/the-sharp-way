@@ -257,6 +257,14 @@ const AdminDashboard = () => {
         >
           {t.admin.promotions}
         </button>
+        <button
+          onClick={() => setTab("barbers")}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+            tab === "barbers" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+          }`}
+        >
+          {t.admin.barbersTab.title}
+        </button>
       </div>
 
       {/* ═══════════════════ BOOKINGS TAB ═══════════════════ */}
