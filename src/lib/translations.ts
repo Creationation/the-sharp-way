@@ -403,6 +403,10 @@ const en: Translations = {
     about: "About The Sharp Cut",
     language: "Language",
     gold: "Gold",
+    claimReward: "🎁 Claim your FREE cut!",
+    rewardPending: "⏳ Reward request pending...",
+    rewardClaimed: "Reward requested!",
+    freeCutReady: "You've earned a FREE cut! Tap to claim.",
   },
   admin: {
     title: "Admin Dashboard",
