@@ -141,12 +141,16 @@ const BookingFlow = () => {
     setSaving(true);
     const dateStr = toDateStr(selectedDate);
 
+    const serviceNames = selectedServices.map(s => s.name).join(", ");
+    const servicePrices = `€${totalPrice}`;
+    const serviceDurations = `${totalDuration}min`;
+
     const { error } = await supabase.from("bookings").insert({
       user_id: user.id,
       barber_name: selectedBarber.name,
-      service_name: selectedService.name,
-      service_price: selectedService.price,
-      service_duration: selectedService.duration,
+      service_name: serviceNames,
+      service_price: servicePrices,
+      service_duration: serviceDurations,
       booking_date: dateStr,
       booking_time: selectedTime,
       status: "confirmed",
