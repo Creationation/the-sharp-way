@@ -90,7 +90,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "The Sharp Cut <bookings@thesharpcut.at>",
+        from: "The Sharp Cut <info@ugcpanel.app>",
         to: [email],
         subject,
         html,
