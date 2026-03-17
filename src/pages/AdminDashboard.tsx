@@ -81,7 +81,7 @@ const AdminDashboard = () => {
       .order("booking_time", { ascending: true });
 
     if (error) {
-      toast.error("Failed to load bookings");
+      toast.error(t.admin.loadFailed);
       setLoadingBookings(false);
       return;
     }
