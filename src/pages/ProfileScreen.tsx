@@ -20,7 +20,6 @@ interface Booking {
 const ProfileScreen = () => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut, loading: authLoading } = useAuth();
-  const loading2 = authLoading;
   const { t, lang, setLang } = useLanguage();
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
   const [bookings, setBookings] = useState<Booking[]>([]);
