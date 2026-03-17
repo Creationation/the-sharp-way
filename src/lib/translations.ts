@@ -197,7 +197,7 @@ const en: Translations = {
     profile: "Profile",
   },
   home: {
-    announcement: "New: Hot Towel Shave now available —",
+    announcement: "New: Hot Towel Shave now available",
     announcementLink: "Book Today",
     greeting: "Hi, Sharp Client",
     location: "Vienna, AT",
@@ -376,7 +376,7 @@ const de: Translations = {
     profile: "Profil",
   },
   home: {
-    announcement: "Neu: Hot Towel Rasur jetzt verfügbar —",
+    announcement: "Neu: Hot Towel Rasur jetzt verfügbar",
     announcementLink: "Heute buchen",
     greeting: "Hallo, Sharp Client",
     location: "Wien, AT",
