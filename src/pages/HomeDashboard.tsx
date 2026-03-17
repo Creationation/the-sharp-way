@@ -40,6 +40,11 @@ const HomeDashboard = () => {
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
   const { user } = useAuth();
+  const { barbers } = useBarbers();
+
+  const getBarberImage = (name: string) => {
+    return barbers.find(b => b.name === name)?.image || barber1;
+  };
 
   const [query, setQuery] = useState("");
   const [lastBooking, setLastBooking] = useState<BookingInfo | null>(null);
