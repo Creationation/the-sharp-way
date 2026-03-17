@@ -67,11 +67,22 @@ const BookingFlow = () => {
   const availableDates = getAvailableDates();
 
   const [selectedBarber, setSelectedBarber] = useState(barbers[0]);
-  const [selectedServices, setSelectedServices] = useState([services[0]]);
+  const [selectedServices, setSelectedServices] = useState<typeof services>([services[0]]);
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
   const [selectedTime, setSelectedTime] = useState("12:00");
   const [confirmed, setConfirmed] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const toggleService = (s: typeof services[0]) => {
+    setSelectedServices(prev => {
+      const exists = prev.some(p => p.name === s.name);
+      if (exists && prev.length === 1) return prev; // keep at least one
+      return exists ? prev.filter(p => p.name !== s.name) : [...prev, s];
+    });
+  };
+
+  const totalPrice = selectedServices.reduce((sum, s) => sum + parseInt(s.price.replace("€", "")), 0);
+  const totalDuration = selectedServices.reduce((sum, s) => sum + parseInt(s.duration), 0);
 
   const [takenSlots, setTakenSlots] = useState<string[]>([]);
   const [dayOff, setDayOff] = useState(false);
