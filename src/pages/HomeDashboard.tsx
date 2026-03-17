@@ -30,6 +30,18 @@ interface BookingInfo {
   booking_time: string;
 }
 
+interface PromoData {
+  id: string;
+  type: string;
+  active: boolean;
+  title_en: string;
+  title_de: string;
+  subtitle_en: string;
+  subtitle_de: string;
+  link_text_en: string;
+  link_text_de: string;
+}
+
 const HomeDashboard = () => {
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
@@ -38,12 +50,28 @@ const HomeDashboard = () => {
   const [query, setQuery] = useState("");
   const [lastBooking, setLastBooking] = useState<BookingInfo | null>(null);
   const [nextBooking, setNextBooking] = useState<BookingInfo | null>(null);
+  const [bannerPromo, setBannerPromo] = useState<PromoData | null>(null);
+  const [cardPromo, setCardPromo] = useState<PromoData | null>(null);
+
+  // Fetch promotions
+  useEffect(() => {
+    supabase
+      .from("promotions")
+      .select("id, type, active, title_en, title_de, subtitle_en, subtitle_de, link_text_en, link_text_de")
+      .eq("active", true)
+      .then(({ data }) => {
+        if (data) {
+          const promos = data as PromoData[];
+          setBannerPromo(promos.find(p => p.type === "banner") || null);
+          setCardPromo(promos.find(p => p.type === "promo_card") || null);
+        }
+      });
+  }, []);
 
   useEffect(() => {
     if (!user) return;
     const today = new Date().toISOString().split("T")[0];
 
-    // Fetch next upcoming booking
     supabase
       .from("bookings")
       .select("service_name, barber_name, booking_date, booking_time")
@@ -56,7 +84,6 @@ const HomeDashboard = () => {
         if (data && data.length > 0) setNextBooking(data[0] as BookingInfo);
       });
 
-    // Fetch last past booking
     supabase
       .from("bookings")
       .select("service_name, barber_name, booking_date, booking_time")
@@ -91,15 +118,19 @@ const HomeDashboard = () => {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Announcement strip */}
-      <div className="bg-surface border-b border-border pt-[env(safe-area-inset-top)] overflow-hidden">
-        <div className="py-2.5 whitespace-nowrap animate-marquee">
-          <span className="inline-block text-xs text-muted-foreground">
-            ✂️ <span className="text-copper font-medium">{lang === "de" ? "Neu:" : "New:"}</span>{" "}
-            {t.home.announcement} &nbsp;·&nbsp;{" "}
-            <span className="text-copper font-semibold cursor-pointer underline underline-offset-2" onClick={() => navigate("/book")}>{t.home.announcementLink}</span>
-          </span>
+      {bannerPromo && (
+        <div className="bg-surface border-b border-border pt-[env(safe-area-inset-top)] overflow-hidden">
+          <div className="py-2.5 whitespace-nowrap animate-marquee">
+            <span className="inline-block text-xs text-muted-foreground">
+              ✂️ <span className="text-copper font-medium">{lang === "de" ? "Neu:" : "New:"}</span>{" "}
+              {lang === "de" ? bannerPromo.title_de : bannerPromo.title_en} &nbsp;·&nbsp;{" "}
+              <span className="text-copper font-semibold cursor-pointer underline underline-offset-2" onClick={() => navigate("/book")}>
+                {lang === "de" ? bannerPromo.link_text_de : bannerPromo.link_text_en}
+              </span>
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Top bar */}
       <div className="px-5 pt-5 pb-3 flex items-center justify-between">
@@ -201,26 +232,32 @@ const HomeDashboard = () => {
       {!q && (
         <>
           {/* Promo card */}
-          <div className="px-5 mb-6">
-            <div className="relative rounded-2xl overflow-hidden border border-copper/30">
-              <div className="absolute inset-0 gradient-copper opacity-10" />
-              <div className="relative flex items-center p-5">
-                <div className="flex-1">
-                  <p className="text-copper font-heading text-2xl mb-1">{t.home.promoTitle}</p>
-                  <p className="text-muted-foreground text-xs mb-3">{t.home.promoSub}</p>
-                  <button
-                    onClick={() => navigate("/book")}
-                    className="gradient-copper text-primary-foreground text-xs font-semibold px-4 py-2 rounded-full"
-                  >
-                    {t.home.bookNow}
-                  </button>
-                </div>
-                <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 ml-3">
-                  <img src={heroBg} alt="" className="w-full h-full object-cover" />
+          {cardPromo && (
+            <div className="px-5 mb-6">
+              <div className="relative rounded-2xl overflow-hidden border border-copper/30">
+                <div className="absolute inset-0 gradient-copper opacity-10" />
+                <div className="relative flex items-center p-5">
+                  <div className="flex-1">
+                    <p className="text-copper font-heading text-2xl mb-1">
+                      {lang === "de" ? cardPromo.title_de : cardPromo.title_en}
+                    </p>
+                    <p className="text-muted-foreground text-xs mb-3">
+                      {lang === "de" ? cardPromo.subtitle_de : cardPromo.subtitle_en}
+                    </p>
+                    <button
+                      onClick={() => navigate("/book")}
+                      className="gradient-copper text-primary-foreground text-xs font-semibold px-4 py-2 rounded-full"
+                    >
+                      {lang === "de" ? cardPromo.link_text_de : cardPromo.link_text_en}
+                    </button>
+                  </div>
+                  <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 ml-3">
+                    <img src={heroBg} alt="" className="w-full h-full object-cover" />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Next Appointment */}
           {user && (

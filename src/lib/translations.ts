@@ -127,6 +127,7 @@ export interface Translations {
     bookings: string;
     availability: string;
     users: string;
+    promotions: string;
     total: string;
     confirmed: string;
     cancelled: string;
@@ -163,6 +164,22 @@ export interface Translations {
       noUsers: string;
       noPhone: string;
       noName: string;
+      loadError: string;
+    };
+    promosTab: {
+      banner: string;
+      promoCard: string;
+      active: string;
+      inactive: string;
+      titleEn: string;
+      titleDe: string;
+      subtitleEn: string;
+      subtitleDe: string;
+      linkTextEn: string;
+      linkTextDe: string;
+      save: string;
+      saved: string;
+      saveError: string;
       loadError: string;
     };
   };
@@ -306,6 +323,7 @@ const en: Translations = {
     bookings: "Bookings",
     availability: "Availability",
     users: "Users",
+    promotions: "Promotions",
     total: "Total",
     confirmed: "Confirmed",
     cancelled: "Cancelled",
@@ -343,6 +361,22 @@ const en: Translations = {
       noPhone: "No phone",
       noName: "No name",
       loadError: "Failed to load users",
+    },
+    promosTab: {
+      banner: "Announcement Banner",
+      promoCard: "Promo Card",
+      active: "Active",
+      inactive: "Inactive",
+      titleEn: "Title (EN)",
+      titleDe: "Title (DE)",
+      subtitleEn: "Subtitle (EN)",
+      subtitleDe: "Subtitle (DE)",
+      linkTextEn: "Button Text (EN)",
+      linkTextDe: "Button Text (DE)",
+      save: "Save",
+      saved: "Saved successfully",
+      saveError: "Error saving",
+      loadError: "Failed to load promotions",
     },
   },
   barber: {
@@ -485,6 +519,7 @@ const de: Translations = {
     bookings: "Buchungen",
     availability: "Verfügbarkeit",
     users: "Kunden",
+    promotions: "Aktionen",
     total: "Gesamt",
     confirmed: "Bestätigt",
     cancelled: "Storniert",
@@ -522,6 +557,22 @@ const de: Translations = {
       noPhone: "Kein Telefon",
       noName: "Kein Name",
       loadError: "Fehler beim Laden der Kunden",
+    },
+    promosTab: {
+      banner: "Ankündigungsbanner",
+      promoCard: "Promo-Karte",
+      active: "Aktiv",
+      inactive: "Inaktiv",
+      titleEn: "Titel (EN)",
+      titleDe: "Titel (DE)",
+      subtitleEn: "Untertitel (EN)",
+      subtitleDe: "Untertitel (DE)",
+      linkTextEn: "Button-Text (EN)",
+      linkTextDe: "Button-Text (DE)",
+      save: "Speichern",
+      saved: "Erfolgreich gespeichert",
+      saveError: "Fehler beim Speichern",
+      loadError: "Fehler beim Laden der Aktionen",
     },
   },
   barber: {

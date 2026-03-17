@@ -12,6 +12,7 @@ import { de as deLocale, enUS } from "date-fns/locale";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/lib/translations";
 import UsersTab from "@/components/admin/UsersTab";
+import PromotionsTab from "@/components/admin/PromotionsTab";
 
 interface Booking {
   id: string;
@@ -51,7 +52,7 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  const [tab, setTab] = useState<"bookings" | "availability" | "users">("bookings");
+  const [tab, setTab] = useState<"bookings" | "availability" | "users" | "promotions">("bookings");
 
   // — Bookings tab state —
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -214,7 +215,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Tab switcher */}
-      <div className="px-5 mb-5 flex gap-2">
+      <div className="px-5 mb-5 flex gap-2 overflow-x-auto scrollbar-hide">
         <button
           onClick={() => setTab("bookings")}
           className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
@@ -238,6 +239,14 @@ const AdminDashboard = () => {
           }`}
         >
           {t.admin.users}
+        </button>
+        <button
+          onClick={() => setTab("promotions")}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+            tab === "promotions" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+          }`}
+        >
+          {t.admin.promotions}
         </button>
       </div>
 
@@ -458,6 +467,9 @@ const AdminDashboard = () => {
 
       {/* ═══════════════════ USERS TAB ═══════════════════ */}
       {tab === "users" && <UsersTab t={t.admin.usersTab} />}
+
+      {/* ═══════════════════ PROMOTIONS TAB ═══════════════════ */}
+      {tab === "promotions" && <PromotionsTab t={t.admin.promosTab} />}
     </div>
   );
 };
