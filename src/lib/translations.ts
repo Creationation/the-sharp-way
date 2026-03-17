@@ -182,6 +182,26 @@ export interface Translations {
       saveError: string;
       loadError: string;
     };
+    barbersTab: {
+      title: string;
+      name: string;
+      specialtyEn: string;
+      specialtyDe: string;
+      rating: string;
+      cuts: string;
+      years: string;
+      imageKey: string;
+      available: string;
+      unavailable: string;
+      addBarber: string;
+      save: string;
+      saved: string;
+      saveError: string;
+      deleted: string;
+      deleteError: string;
+      loadError: string;
+      confirmDelete: string;
+    };
   };
   barber: {
     cuts: string;
