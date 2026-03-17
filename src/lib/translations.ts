@@ -267,6 +267,22 @@ const en: Translations = {
     language: "Language",
     gold: "Gold",
   },
+  admin: {
+    users: "Users",
+    usersTab: {
+      title: "Users",
+      search: "Search by name, email, phone...",
+      totalUsers: "Total Users",
+      name: "Name",
+      email: "Email",
+      phone: "Phone",
+      joined: "Joined",
+      noUsers: "No users found",
+      noPhone: "No phone",
+      noName: "No name",
+      loadError: "Failed to load users",
+    },
+  },
   barber: {
     cuts: "Cuts",
     experience: "Experience",
