@@ -97,6 +97,9 @@ export type Database = {
           created_at: string
           id: string
           notes: string | null
+          reminder_sent_24h: boolean
+          reminder_sent_2h: boolean
+          reminder_sent_5h: boolean
           service_duration: string
           service_name: string
           service_price: string
@@ -111,6 +114,9 @@ export type Database = {
           created_at?: string
           id?: string
           notes?: string | null
+          reminder_sent_24h?: boolean
+          reminder_sent_2h?: boolean
+          reminder_sent_5h?: boolean
           service_duration: string
           service_name: string
           service_price: string
@@ -125,12 +131,45 @@ export type Database = {
           created_at?: string
           id?: string
           notes?: string | null
+          reminder_sent_24h?: boolean
+          reminder_sent_2h?: boolean
+          reminder_sent_5h?: boolean
           service_duration?: string
           service_name?: string
           service_price?: string
           status?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      notification_settings: {
+        Row: {
+          created_at: string
+          email_reminders: boolean
+          id: number
+          reminder_24h: boolean
+          reminder_2h: boolean
+          reminder_5h: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email_reminders?: boolean
+          id?: number
+          reminder_24h?: boolean
+          reminder_2h?: boolean
+          reminder_5h?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email_reminders?: boolean
+          id?: number
+          reminder_24h?: boolean
+          reminder_2h?: boolean
+          reminder_5h?: boolean
+          updated_at?: string
         }
         Relationships: []
       }
