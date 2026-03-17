@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { ArrowLeft, Star, Check } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ArrowLeft, Star, Check, CalendarDays, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,22 +36,27 @@ const MONTH_ABBR: Record<string, string[]> = {
   de: ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"],
 };
 
-// Generate next 6 open days (Tue–Sat, skip Monday=1)
-function getAvailableDates(): Date[] {
+// Generate next 6 open days from a start date (Tue–Sat, skip Monday=1 and Sunday=0)
+function getAvailableDates(from?: Date): Date[] {
   const result: Date[] = [];
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
+  const d = from ? new Date(from) : new Date();
+  if (!from) d.setDate(d.getDate() + 1);
   d.setHours(0, 0, 0, 0);
   while (result.length < 6) {
-    if (d.getDay() !== 1) result.push(new Date(d));
+    if (d.getDay() !== 1 && d.getDay() !== 0) result.push(new Date(d));
     d.setDate(d.getDate() + 1);
   }
   return result;
 }
 
 function toDateStr(d: Date): string {
-  return d.toISOString().split("T")[0];
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
+
+const MONTH_NAMES: Record<string, string[]> = {
+  en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  de: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+};
 
 const allTimeSlots: string[] = [];
 for (let h = 10; h <= 19; h++) {
@@ -64,7 +69,10 @@ const BookingFlow = () => {
   const { user } = useAuth();
   const { t, lang } = useLanguage();
 
-  const availableDates = getAvailableDates();
+  const [customDate, setCustomDate] = useState<Date | null>(null);
+  const [showCalendar, setShowCalendar] = useState(false);
+
+  const availableDates = customDate ? getAvailableDates(customDate) : getAvailableDates();
 
   const [selectedBarber, setSelectedBarber] = useState(barbers[0]);
   const [selectedServices, setSelectedServices] = useState<typeof services>([services[0]]);
@@ -257,11 +265,20 @@ const BookingFlow = () => {
 
       {/* Day strip */}
       <div className="px-5 mb-5">
-        <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">{t.booking.availableSlots}</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-heading text-sm text-muted-foreground tracking-widest">{t.booking.availableSlots}</h3>
+          <button
+            onClick={() => setShowCalendar(true)}
+            className="flex items-center gap-1.5 text-copper text-xs font-medium px-3 py-1.5 rounded-full bg-copper/10 hover:bg-copper/20 transition-all"
+          >
+            <CalendarDays size={13} />
+            {t.booking.moreDates}
+          </button>
+        </div>
         <div className="flex gap-2 mb-4">
           {availableDates.map((d, i) => (
             <button
-              key={i}
+              key={toDateStr(d)}
               onClick={() => setSelectedDayIdx(i)}
               className={`flex-1 py-3 rounded-xl text-center transition-all ${
                 selectedDayIdx === i ? "gradient-copper shadow-copper" : "bg-surface border border-border"
@@ -279,7 +296,28 @@ const BookingFlow = () => {
             </button>
           ))}
         </div>
+        {customDate && (
+          <button
+            onClick={() => { setCustomDate(null); setSelectedDayIdx(0); }}
+            className="text-xs text-muted-foreground underline"
+          >
+            ← {lang === "de" ? "Zurück zu den nächsten Tagen" : "Back to upcoming days"}
+          </button>
+        )}
       </div>
+
+      {/* Calendar Modal */}
+      {showCalendar && (
+        <CalendarModal
+          lang={lang}
+          onSelect={(d) => {
+            setCustomDate(d);
+            setSelectedDayIdx(0);
+            setShowCalendar(false);
+          }}
+          onClose={() => setShowCalendar(false)}
+        />
+      )}
 
       {/* Time slots */}
       <div className="px-5 mb-5">
@@ -404,5 +442,119 @@ const BookingFlow = () => {
     </div>
   );
 };
+
+/* ═══════════════════ CALENDAR MODAL ═══════════════════ */
+interface CalendarModalProps {
+  lang: string;
+  onSelect: (d: Date) => void;
+  onClose: () => void;
+}
+
+function CalendarModal({ lang, onSelect, onClose }: CalendarModalProps) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const maxDate = new Date(today);
+  maxDate.setFullYear(maxDate.getFullYear() + 1);
+
+  const [viewYear, setViewYear] = useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(today.getMonth());
+
+  const monthNames = MONTH_NAMES[lang] ?? MONTH_NAMES.en;
+  const dayHeaders = lang === "de"
+    ? ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
+    : ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+
+  const firstDay = new Date(viewYear, viewMonth, 1);
+  // Monday-based offset
+  let startOffset = firstDay.getDay() - 1;
+  if (startOffset < 0) startOffset = 6;
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+  const cells: (Date | null)[] = [];
+  for (let i = 0; i < startOffset; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(viewYear, viewMonth, d));
+
+  const canPrev = viewYear > today.getFullYear() || viewMonth > today.getMonth();
+  const canNext = viewYear < maxDate.getFullYear() || (viewYear === maxDate.getFullYear() && viewMonth < maxDate.getMonth());
+
+  const prevMonth = () => {
+    if (!canPrev) return;
+    if (viewMonth === 0) { setViewYear(y => y - 1); setViewMonth(11); }
+    else setViewMonth(m => m - 1);
+  };
+  const nextMonth = () => {
+    if (!canNext) return;
+    if (viewMonth === 11) { setViewYear(y => y + 1); setViewMonth(0); }
+    else setViewMonth(m => m + 1);
+  };
+
+  const isDisabled = (d: Date) => {
+    const day = d.getDay();
+    // Monday (1) and Sunday (0) are closed
+    if (day === 0 || day === 1) return true;
+    if (d < today) return true;
+    if (d > maxDate) return true;
+    return false;
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60" onClick={onClose}>
+      <div
+        className="w-full max-w-md bg-background rounded-t-3xl p-5 pb-8 animate-fade-up"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-5">
+          <button onClick={prevMonth} disabled={!canPrev} className="w-8 h-8 rounded-full bg-surface flex items-center justify-center disabled:opacity-30">
+            <ArrowLeft size={16} className="text-foreground" />
+          </button>
+          <p className="text-foreground font-heading text-lg">
+            {monthNames[viewMonth]} {viewYear}
+          </p>
+          <button onClick={nextMonth} disabled={!canNext} className="w-8 h-8 rounded-full bg-surface flex items-center justify-center disabled:opacity-30 rotate-180">
+            <ArrowLeft size={16} className="text-foreground" />
+          </button>
+        </div>
+
+        {/* Day headers */}
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {dayHeaders.map(dh => (
+            <div key={dh} className="text-center text-muted-foreground text-[10px] font-medium">{dh}</div>
+          ))}
+        </div>
+
+        {/* Days grid */}
+        <div className="grid grid-cols-7 gap-1">
+          {cells.map((cell, i) => {
+            if (!cell) return <div key={`e-${i}`} />;
+            const disabled = isDisabled(cell);
+            const isToday = cell.getTime() === today.getTime();
+            return (
+              <button
+                key={cell.getTime()}
+                disabled={disabled}
+                onClick={() => onSelect(cell)}
+                className={`h-10 rounded-xl text-sm font-medium transition-all ${
+                  disabled
+                    ? "text-muted-foreground/30 cursor-not-allowed"
+                    : isToday
+                    ? "bg-copper/20 text-copper font-semibold hover:bg-copper/30"
+                    : "text-foreground hover:bg-surface"
+                }`}
+              >
+                {cell.getDate()}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Close */}
+        <button onClick={onClose} className="mt-5 w-full py-3 rounded-full bg-surface text-muted-foreground text-sm font-medium">
+          {lang === "de" ? "Abbrechen" : "Cancel"}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default BookingFlow;
