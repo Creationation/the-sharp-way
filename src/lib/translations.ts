@@ -519,6 +519,7 @@ const de: Translations = {
     bookings: "Buchungen",
     availability: "Verfügbarkeit",
     users: "Kunden",
+    promotions: "Aktionen",
     total: "Gesamt",
     confirmed: "Bestätigt",
     cancelled: "Storniert",
