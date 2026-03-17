@@ -215,7 +215,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Tab switcher */}
-      <div className="px-5 mb-5 flex gap-2">
+      <div className="px-5 mb-5 flex gap-2 overflow-x-auto scrollbar-hide">
         <button
           onClick={() => setTab("bookings")}
           className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
