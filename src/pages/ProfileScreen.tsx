@@ -36,7 +36,7 @@ const ProfileScreen = () => {
     }
     fetchBookings();
     fetchLoyalty();
-  }, [user, loading]);
+  }, [user, authLoading]);
 
   const fetchBookings = async () => {
     const { data } = await supabase
