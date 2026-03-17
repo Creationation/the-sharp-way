@@ -82,7 +82,6 @@ const ProfileScreen = () => {
         .eq("status", "pending")
         .limit(1),
     ]);
-
     if (loyaltyRes.data) {
       setStamps((loyaltyRes.data as any).stamps ?? 0);
       setTotalPoints((loyaltyRes.data as any).total_points ?? 0);
@@ -95,7 +94,6 @@ const ProfileScreen = () => {
     const { error } = await supabase
       .from("reward_requests")
       .insert({ user_id: user!.id, stamps_at_request: stamps });
-
     setClaimingReward(false);
     if (error) {
       toast.error("Error submitting request");
@@ -167,7 +165,6 @@ const ProfileScreen = () => {
               {t.profile.stampsLabel(stamps)}
             </p>
 
-            {/* Claim reward button */}
             {stamps >= 10 && !rewardPending && (
               <button
                 onClick={claimReward}

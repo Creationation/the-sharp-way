@@ -1,7 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   ArrowLeft, Calendar, Clock, User, Trash2, XCircle,
   CheckCircle, ChevronLeft, ChevronRight, ToggleLeft, ToggleRight, Save,
+  Menu, X, Tag, Scissors, Trophy, Gift, Bell,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -58,9 +59,24 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  const [tab, setTab] = useState<"bookings" | "availability" | "users" | "promotions" | "barbers" | "codes" | "loyalty" | "rewards" | "notifications">("bookings");
+  type TabId = "bookings" | "availability" | "users" | "promotions" | "barbers" | "codes" | "loyalty" | "rewards" | "notifications";
+  const [tab, setTab] = useState<TabId>("bookings");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [pendingRewards, setPendingRewards] = useState(0);
   const { barbers: dbBarbers } = useBarbers();
   const barberNames = dbBarbers.map(b => b.name);
+
+  const ADMIN_TABS: { id: TabId; label: string; Icon: React.ElementType }[] = [
+    { id: "bookings",      label: t.admin.bookings,                                 Icon: Calendar  },
+    { id: "availability",  label: t.admin.availability,                             Icon: Clock     },
+    { id: "users",         label: t.admin.users,                                    Icon: User      },
+    { id: "promotions",    label: t.admin.promotions,                               Icon: Tag       },
+    { id: "barbers",       label: t.admin.barbersTab.title,                         Icon: Scissors  },
+    { id: "codes",         label: t.admin.promoCodesTab.title,                      Icon: Tag       },
+    { id: "loyalty",       label: t.admin.loyaltyTab.title,                         Icon: Trophy    },
+    { id: "rewards",       label: t.admin.rewardsTab.title,                         Icon: Gift      },
+    { id: "notifications", label: "Notifications",                                  Icon: Bell      },
+  ];
 
   // — Bookings tab state —
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -86,8 +102,19 @@ const AdminDashboard = () => {
       navigate("/home");
       return;
     }
-    if (isAdmin) fetchBookings();
+    if (isAdmin) {
+      fetchBookings();
+      fetchPendingRewardsCount();
+    }
   }, [isAdmin, authLoading]);
+
+  const fetchPendingRewardsCount = async () => {
+    const { count } = await supabase
+      .from("reward_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending");
+    setPendingRewards(count ?? 0);
+  };
 
   const fetchBookings = async () => {
     const { data, error } = await supabase
@@ -224,83 +251,52 @@ const AdminDashboard = () => {
         <button onClick={() => navigate("/home")} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
           <ArrowLeft size={18} className="text-foreground" />
         </button>
-        <h1 className="font-heading text-2xl text-foreground">{t.admin.title}</h1>
-      </div>
+        <h1 className="font-heading text-2xl text-foreground flex-1">{t.admin.title}</h1>
 
-      {/* Tab switcher */}
-      <div className="px-5 mb-5 flex gap-2 overflow-x-auto scrollbar-hide">
-        <button
-          onClick={() => setTab("bookings")}
-          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
-            tab === "bookings" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
-          }`}
-        >
-          {t.admin.bookings}
-        </button>
-        <button
-          onClick={() => setTab("availability")}
-          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
-            tab === "availability" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
-          }`}
-        >
-          {t.admin.availability}
-        </button>
-        <button
-          onClick={() => setTab("users")}
-          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
-            tab === "users" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
-          }`}
-        >
-          {t.admin.users}
-        </button>
-        <button
-          onClick={() => setTab("promotions")}
-          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
-            tab === "promotions" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
-          }`}
-        >
-          {t.admin.promotions}
-        </button>
-        <button
-          onClick={() => setTab("barbers")}
-          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-            tab === "barbers" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
-          }`}
-        >
-          {t.admin.barbersTab.title}
-        </button>
-        <button
-          onClick={() => setTab("codes")}
-          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-            tab === "codes" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
-          }`}
-        >
-          {t.admin.promoCodesTab.title}
-        </button>
-        <button
-          onClick={() => setTab("loyalty")}
-          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-            tab === "loyalty" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
-          }`}
-        >
-          {t.admin.loyaltyTab.title}
-        </button>
-        <button
-          onClick={() => setTab("rewards")}
-          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-            tab === "rewards" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
-          }`}
-        >
-          🎁 {t.admin.rewardsTab.title}
-        </button>
-        <button
-          onClick={() => setTab("notifications")}
-          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-            tab === "notifications" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
-          }`}
-        >
-          🔔 Notifications
-        </button>
+        {/* Burger menu */}
+        <div className="relative">
+          <button
+            onClick={() => setMenuOpen(v => !v)}
+            className="flex items-center gap-2 bg-surface border border-border px-3 py-2 rounded-full relative"
+          >
+            <span className="text-foreground text-xs font-medium max-w-[90px] truncate">
+              {ADMIN_TABS.find(x => x.id === tab)?.label}
+            </span>
+            {menuOpen ? <X size={14} className="text-muted-foreground" /> : <Menu size={14} className="text-muted-foreground" />}
+            {pendingRewards > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-copper rounded-full text-[9px] text-primary-foreground flex items-center justify-center font-bold">
+                {pendingRewards}
+              </span>
+            )}
+          </button>
+
+          {menuOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+              <div className="absolute right-0 top-11 w-52 bg-[#111] border border-border rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
+                {ADMIN_TABS.map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => { setTab(item.id); setMenuOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
+                      tab === item.id
+                        ? "bg-copper/15 text-copper font-semibold"
+                        : "text-foreground hover:bg-white/5"
+                    }`}
+                  >
+                    <item.Icon size={14} className={tab === item.id ? "text-copper" : "text-muted-foreground"} />
+                    <span className="flex-1 text-left">{item.label}</span>
+                    {item.id === "rewards" && pendingRewards > 0 && (
+                      <span className="bg-copper text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+                        {pendingRewards}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* ═══════════════════ BOOKINGS TAB ═══════════════════ */}

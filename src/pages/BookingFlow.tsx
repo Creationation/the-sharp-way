@@ -57,6 +57,8 @@ for (let h = 10; h <= 19; h++) {
   allTimeSlots.push(`${h.toString().padStart(2, "0")}:30`);
 }
 
+const DRAFT_KEY = "booking_draft";
+
 async function scheduleReminders(
   barberName: string,
   serviceName: string,
@@ -142,11 +144,79 @@ const BookingFlow = () => {
   const [selectedTime, setSelectedTime] = useState("12:00");
   const [confirmed, setConfirmed] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
+  const [hasRestoredDraft, setHasRestoredDraft] = useState(false);
 
-  // Set initial barber when loaded
+  // Restore draft from localStorage (or set default barber) when barbers load
   useEffect(() => {
-    if (barbers.length > 0 && !selectedBarber) setSelectedBarber(barbers[0]);
-  }, [barbers]);
+    if (!barbers.length || draftRestored) return;
+    setDraftRestored(true);
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (raw) {
+      try {
+        const draft = JSON.parse(raw);
+        const barber = barbers.find((b: Barber) => b.id === draft.barberId);
+        if (barber) setSelectedBarber(barber);
+        const restoredSvcs = (draft.serviceNames as string[])
+          .map((name: string) => services.find(s => s.name === name))
+          .filter(Boolean) as typeof services;
+        if (restoredSvcs.length > 0) setSelectedServices(restoredSvcs);
+        if (draft.customDateISO) setCustomDate(new Date(draft.customDateISO));
+        if (typeof draft.selectedDayIdx === "number") setSelectedDayIdx(draft.selectedDayIdx);
+        if (draft.selectedTime) setSelectedTime(draft.selectedTime);
+        if (draft.promoCode) setPromoInput(draft.promoCode);
+        setHasRestoredDraft(true);
+        return;
+      } catch {
+        localStorage.removeItem(DRAFT_KEY);
+      }
+    }
+    // No draft — just set default barber
+    setSelectedBarber(barbers[0]);
+  }, [barbers, draftRestored]);
+
+  // Save draft on every change (only after restoration attempt to avoid overwriting)
+  useEffect(() => {
+    if (!draftRestored || confirmed) return;
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      barberId: selectedBarber?.id ?? "",
+      serviceNames: selectedServices.map(s => s.name),
+      customDateISO: customDate?.toISOString() ?? null,
+      selectedDayIdx,
+      selectedTime,
+      promoCode: promoInput,
+    }));
+  }, [draftRestored, selectedBarber, selectedServices, customDate, selectedDayIdx, selectedTime, promoInput, confirmed]);
+
+  // Schedule a "you didn't finish your booking" local notification when app goes to background
+  useEffect(() => {
+    if (confirmed) return;
+    const onVisibilityChange = () => {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (document.hidden && raw) {
+        const isDE = lang === "de";
+        LocalNotifications.schedule({
+          notifications: [{
+            id: 77777,
+            title: isDE ? "Reservierung nicht abgeschlossen ✂️" : "Booking not completed ✂️",
+            body: isDE
+              ? "Du hast eine Reservierung begonnen — schließe sie jetzt ab!"
+              : "You started a booking — complete it now!",
+            schedule: { at: new Date(Date.now() + 20 * 60 * 1000) },
+            smallIcon: "ic_launcher",
+          }],
+        }).catch(() => {});
+      } else {
+        LocalNotifications.cancel({ notifications: [{ id: 77777 }] }).catch(() => {});
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      LocalNotifications.cancel({ notifications: [{ id: 77777 }] }).catch(() => {});
+    };
+  }, [confirmed, lang]);
+
   const toggleService = (s: typeof services[0]) => {
     setSelectedServices(prev => {
       const exists = prev.some(p => p.name === s.name);
@@ -244,7 +314,9 @@ const BookingFlow = () => {
 
   const handleConfirm = async () => {
     if (!user) {
-      toast.error(t.toasts.signInToBook);
+      toast.info(lang === "de"
+        ? "Bitte melde dich an — deine Auswahl wird gespeichert"
+        : "Please sign in — your selection will be saved");
       navigate("/auth");
       return;
     }
@@ -274,6 +346,9 @@ const BookingFlow = () => {
       toast.error(t.toasts.bookingFailed);
       return;
     }
+
+    // Clear draft — booking completed
+    localStorage.removeItem(DRAFT_KEY);
 
     // Increment promo code usage (non-blocking)
     if (appliedPromo) {
@@ -349,6 +424,21 @@ const BookingFlow = () => {
         <h1 className="font-heading text-2xl text-foreground flex-1">{t.booking.title}</h1>
         <img src={selectedBarber.image} alt="" className="w-8 h-8 rounded-full object-cover border-2 border-copper" />
       </div>
+
+      {/* Draft restored banner */}
+      {hasRestoredDraft && (
+        <div className="mx-5 mb-4 px-4 py-3 rounded-xl bg-copper/10 border border-copper/30 flex items-center justify-between">
+          <p className="text-copper text-xs font-medium">
+            {lang === "de" ? "Deine letzte Auswahl wurde wiederhergestellt ✓" : "Your previous selection has been restored ✓"}
+          </p>
+          <button
+            onClick={() => { localStorage.removeItem(DRAFT_KEY); setHasRestoredDraft(false); }}
+            className="text-muted-foreground ml-3 flex-shrink-0"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
 
       {/* Select Barber */}
       <div className="px-5 mb-5">
