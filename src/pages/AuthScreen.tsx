@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 
 const AuthScreen = () => {
