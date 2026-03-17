@@ -250,6 +250,18 @@ export interface Translations {
       noUsers: string;
       stampsOf10: string;
     };
+    rewardsTab: {
+      title: string;
+      pending: string;
+      approved: string;
+      rejected: string;
+      noRequests: string;
+      approve: string;
+      reject: string;
+      requestedOn: string;
+      stampsAtRequest: string;
+      loadError: string;
+    };
   };
   barber: {
     cuts: string;
