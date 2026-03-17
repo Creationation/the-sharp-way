@@ -526,6 +526,18 @@ const en: Translations = {
       noUsers: "No users found",
       stampsOf10: "every 10th cut free",
     },
+    rewardsTab: {
+      title: "Rewards",
+      pending: "Pending",
+      approved: "Approved",
+      rejected: "Rejected",
+      noRequests: "No reward requests",
+      approve: "Approve",
+      reject: "Reject",
+      requestedOn: "Requested on",
+      stampsAtRequest: "Stamps at request",
+      loadError: "Failed to load reward requests",
+    },
   },
   barber: {
     cuts: "Cuts",
