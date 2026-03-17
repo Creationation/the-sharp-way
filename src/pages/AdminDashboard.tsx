@@ -180,8 +180,8 @@ const AdminDashboard = () => {
 
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
-    if (error) { toast.error("Error updating booking"); return; }
-    toast.success(status === "cancelled" ? "Booking cancelled" : "Status updated");
+    if (error) { toast.error(t.admin.updateError); return; }
+    toast.success(status === "cancelled" ? t.admin.bookingCancelled : t.admin.statusUpdated);
     fetchBookings();
   };
 
