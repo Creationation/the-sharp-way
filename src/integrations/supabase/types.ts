@@ -296,6 +296,33 @@ export type Database = {
         }
         Relationships: []
       }
+      reward_requests: {
+        Row: {
+          created_at: string
+          id: string
+          resolved_at: string | null
+          stamps_at_request: number
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          resolved_at?: string | null
+          stamps_at_request?: number
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          resolved_at?: string | null
+          stamps_at_request?: number
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_loyalty: {
         Row: {
           created_at: string
