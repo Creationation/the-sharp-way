@@ -206,6 +206,7 @@ const en: Translations = {
     promoSub: "First visit? Get 20% OFF — code: SHARP20",
     bookNow: "Book Now",
     lastAppointment: "Your Last Appointment",
+    nextAppointment: "Your Next Appointment",
     lastService: "Fade & Taper with Marco",
     rebook: "Rebook",
     ourBarbers: "Our Barbers",
