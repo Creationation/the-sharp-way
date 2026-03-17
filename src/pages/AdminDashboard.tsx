@@ -401,9 +401,9 @@ const AdminDashboard = () => {
 
           {/* Legend */}
           <div className="flex gap-4 mb-3 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-mint inline-block" /> Available</span>
-            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-copper inline-block" /> Client booked</span>
-            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-destructive inline-block" /> Blocked</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-mint inline-block" /> {t.admin.available}</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-copper inline-block" /> {t.admin.clientBooked}</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-destructive inline-block" /> {t.admin.blocked}</span>
           </div>
 
           {/* Slot grid */}
