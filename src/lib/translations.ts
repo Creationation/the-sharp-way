@@ -41,6 +41,22 @@ export interface Translations {
     allCat: string;
     bookBtn: string;
   };
+  toasts: {
+    signInToBook: string;
+    bookingFailed: string;
+    cancelError: string;
+    bookingCancelled: string;
+    cancelling: string;
+    copied: string;
+    accountCreated: string;
+    welcomeBack: string;
+  };
+  common: {
+    noAppointments: string;
+    cancelled: string;
+    cancelBooking: string;
+    barberUnavailable: string;
+  };
   booking: {
     title: string;
     selectBarber: string;
@@ -157,6 +173,22 @@ const en: Translations = {
     allCat: "All",
     bookBtn: "Book This Service",
   },
+  toasts: {
+    signInToBook: "Sign in to book an appointment",
+    bookingFailed: "Booking failed. Please try again.",
+    cancelError: "Failed to cancel booking",
+    bookingCancelled: "Booking cancelled",
+    cancelling: "Cancelling...",
+    copied: "Copied!",
+    accountCreated: "Account created!",
+    welcomeBack: "Welcome back!",
+  },
+  common: {
+    noAppointments: "No appointments yet",
+    cancelled: "Cancelled",
+    cancelBooking: "Cancel booking",
+    barberUnavailable: "This barber is not available on this day",
+  },
   booking: {
     title: "Book Now",
     selectBarber: "SELECT BARBER",
@@ -272,6 +304,22 @@ const de: Translations = {
     title: "Leistungen",
     allCat: "Alle",
     bookBtn: "Service buchen",
+  },
+  toasts: {
+    signInToBook: "Melde dich an, um einen Termin zu buchen",
+    bookingFailed: "Buchung fehlgeschlagen. Bitte versuche es erneut.",
+    cancelError: "Fehler beim Stornieren",
+    bookingCancelled: "Termin storniert",
+    cancelling: "Wird storniert...",
+    copied: "Kopiert!",
+    accountCreated: "Konto erstellt!",
+    welcomeBack: "Willkommen zurück!",
+  },
+  common: {
+    noAppointments: "Noch keine Termine",
+    cancelled: "Storniert",
+    cancelBooking: "Termin stornieren",
+    barberUnavailable: "Dieser Barbier ist heute nicht verfügbar",
   },
   booking: {
     title: "Jetzt buchen",

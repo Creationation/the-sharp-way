@@ -132,7 +132,7 @@ const BookingFlow = () => {
 
   const handleConfirm = async () => {
     if (!user) {
-      toast.error("Sign in to book an appointment");
+      toast.error(t.toasts.signInToBook);
       navigate("/auth");
       return;
     }
@@ -159,7 +159,7 @@ const BookingFlow = () => {
     setSaving(false);
 
     if (error) {
-      toast.error("Booking failed. Please try again.");
+      toast.error(t.toasts.bookingFailed);
       return;
     }
 
@@ -288,7 +288,7 @@ const BookingFlow = () => {
         {dayOff ? (
           <div className="card-app p-4 text-center">
             <p className="text-muted-foreground text-sm">
-              {lang === "de" ? "Dieser Barbier ist heute nicht verfügbar" : "This barber is not available on this day"}
+              {t.common.barberUnavailable}
             </p>
           </div>
         ) : loadingSlots ? (

@@ -231,7 +231,7 @@ const HomeDashboard = () => {
                 </div>
               ) : (
                 <div className="card-app p-4 text-center">
-                  <p className="text-muted-foreground text-sm mb-2">No appointments yet</p>
+                  <p className="text-muted-foreground text-sm mb-2">{t.common.noAppointments}</p>
                   <button onClick={() => navigate("/book")} className="text-copper text-xs font-semibold">
                     {t.home.bookNow} →
                   </button>

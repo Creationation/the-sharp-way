@@ -51,9 +51,9 @@ const ProfileScreen = () => {
       .eq("id", id);
     setCancelling(null);
     if (error) {
-      toast.error(lang === "de" ? "Fehler beim Stornieren" : "Failed to cancel booking");
+      toast.error(t.toasts.cancelError);
     } else {
-      toast.success(lang === "de" ? "Termin storniert" : "Booking cancelled");
+      toast.success(t.toasts.bookingCancelled);
       fetchBookings();
     }
   };
@@ -190,7 +190,7 @@ const ProfileScreen = () => {
                   </div>
                   {b.status === "cancelled" && (
                     <span className="text-[10px] bg-destructive/20 text-destructive px-2 py-0.5 rounded-full flex-shrink-0">
-                      {lang === "de" ? "Storniert" : "Cancelled"}
+                      {t.common.cancelled}
                     </span>
                   )}
                 </div>
@@ -207,8 +207,8 @@ const ProfileScreen = () => {
                   >
                     <XCircle size={12} />
                     {cancelling === b.id
-                      ? (lang === "de" ? "Wird storniert..." : "Cancelling...")
-                      : (lang === "de" ? "Termin stornieren" : "Cancel booking")}
+                      ? t.toasts.cancelling
+                      : t.common.cancelBooking}
                   </button>
                 )}
               </div>
@@ -226,7 +226,7 @@ const ProfileScreen = () => {
           <div className="bg-surface rounded-xl px-4 py-2.5 flex items-center justify-between">
             <span className="text-copper font-mono font-semibold text-sm">SHARP-FR1END</span>
             <button
-              onClick={() => { navigator.clipboard.writeText("SHARP-FR1END"); toast.success("Copied!"); }}
+              onClick={() => { navigator.clipboard.writeText("SHARP-FR1END"); toast.success(t.toasts.copied); }}
               className="text-foreground text-xs"
             >
               {t.profile.copy}

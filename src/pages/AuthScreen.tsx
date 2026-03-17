@@ -2,10 +2,12 @@ import { useState } from "react";
 import { ArrowLeft, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 
 const AuthScreen = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,7 +32,7 @@ const AuthScreen = () => {
           },
         });
         if (error) throw error;
-        toast.success("Account created!");
+        toast.success(t.toasts.accountCreated);
         navigate("/home");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -38,7 +40,7 @@ const AuthScreen = () => {
           password: form.password,
         });
         if (error) throw error;
-        toast.success("Welcome back!");
+        toast.success(t.toasts.welcomeBack);
         navigate("/home");
       }
     } catch (error: any) {
