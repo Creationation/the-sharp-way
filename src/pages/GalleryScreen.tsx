@@ -2,8 +2,10 @@ import { useState } from "react";
 import { ArrowLeft, Bookmark, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-import gallery1 from "@/assets/gallery-1.jpg";
-import gallery2 from "@/assets/gallery-2.jpg";
+import fade1 from "@/assets/fade-1.jpg";
+import fade2 from "@/assets/fade-2.jpg";
+import fade3 from "@/assets/fade-3.jpg";
+import fade4 from "@/assets/fade-4.jpg";
 import gallery3 from "@/assets/gallery-3.jpg";
 import gallery4 from "@/assets/gallery-4.jpg";
 import gallery5 from "@/assets/gallery-5.jpg";
@@ -11,12 +13,14 @@ import gallery6 from "@/assets/gallery-6.jpg";
 
 // tagIndex maps to filters array: 1=Fades, 2=Beards, 3=Classic
 const galleryImages = [
-  { src: gallery1, tagIndex: 1, saved: false },  // Fades — tattooed barber doing a fade
-  { src: gallery2, tagIndex: 1, saved: true },   // Fades — curly fade in progress
-  { src: gallery3, tagIndex: 2, saved: false },  // Beards — styled man with trimmed beard
-  { src: gallery4, tagIndex: 2, saved: true },   // Beards — scissor beard trim, moody
-  { src: gallery5, tagIndex: 3, saved: false },  // Classic — suited man, clean cut
-  { src: gallery6, tagIndex: 3, saved: false },  // Classic — full service blow-dry
+  { src: fade1, tagIndex: 1, saved: false },
+  { src: fade2, tagIndex: 1, saved: false },
+  { src: fade3, tagIndex: 1, saved: false },
+  { src: fade4, tagIndex: 1, saved: true },
+  { src: gallery3, tagIndex: 2, saved: false },
+  { src: gallery4, tagIndex: 2, saved: true },
+  { src: gallery5, tagIndex: 3, saved: false },
+  { src: gallery6, tagIndex: 3, saved: false },
 ];
 
 const GalleryScreen = () => {
