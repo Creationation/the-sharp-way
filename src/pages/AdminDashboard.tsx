@@ -172,9 +172,9 @@ const AdminDashboard = () => {
 
     setSavingAv(false);
     if (error) {
-      toast.error("Failed to save availability");
+      toast.error(t.admin.saveFailed);
     } else {
-      toast.success("Availability saved");
+      toast.success(t.admin.savedSuccess);
     }
   };
 
