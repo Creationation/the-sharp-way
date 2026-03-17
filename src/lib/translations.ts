@@ -323,6 +323,7 @@ const en: Translations = {
     bookings: "Bookings",
     availability: "Availability",
     users: "Users",
+    promotions: "Promotions",
     total: "Total",
     confirmed: "Confirmed",
     cancelled: "Cancelled",
