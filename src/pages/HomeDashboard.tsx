@@ -297,7 +297,7 @@ const HomeDashboard = () => {
               <h3 className="font-heading text-lg text-foreground mb-3">{t.home.lastAppointment}</h3>
               <div className="card-app p-4 flex items-center gap-4">
                 <img
-                  src={lastBooking.barber_name === "Marco" ? barber1 : lastBooking.barber_name === "Lukas" ? barber2 : barber3}
+                  src={getBarberImage(lastBooking.barber_name)}
                   alt={lastBooking.barber_name}
                   className="w-12 h-12 rounded-full object-cover"
                 />
