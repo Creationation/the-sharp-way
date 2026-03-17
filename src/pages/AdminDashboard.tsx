@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { format, addDays, subDays } from "date-fns";
+import { de as deLocale, enUS } from "date-fns/locale";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/lib/translations";
 import UsersTab from "@/components/admin/UsersTab";
@@ -49,6 +50,7 @@ const AdminDashboard = () => {
 
   const { lang } = useLanguage();
   const t = translations[lang];
+  const dateLocale = lang === "de" ? deLocale : enUS;
   const [tab, setTab] = useState<"bookings" | "availability" | "users">("bookings");
 
   // — Bookings tab state —
@@ -374,8 +376,8 @@ const AdminDashboard = () => {
               <ChevronLeft size={16} className="text-foreground" />
             </button>
             <div className="text-center">
-              <p className="text-foreground font-semibold text-sm">{format(avDate, "EEEE")}</p>
-              <p className="text-muted-foreground text-xs">{format(avDate, "dd MMMM yyyy")}</p>
+              <p className="text-foreground font-semibold text-sm">{format(avDate, "EEEE", { locale: dateLocale })}</p>
+              <p className="text-muted-foreground text-xs">{format(avDate, "dd MMMM yyyy", { locale: dateLocale })}</p>
             </div>
             <button
               onClick={() => setAvDate(d => addDays(d, 1))}
