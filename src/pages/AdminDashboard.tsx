@@ -289,7 +289,7 @@ const AdminDashboard = () => {
                       <div className="flex items-start justify-between mb-2">
                         <div>
                           <p className="text-foreground font-medium text-sm">{b.service_name}</p>
-                          <p className="text-muted-foreground text-xs">with {b.barber_name}</p>
+                          <p className="text-muted-foreground text-xs">{t.admin.with} {b.barber_name}</p>
                         </div>
                         <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${
                           b.status === "confirmed" ? "bg-mint/20 text-mint" : "bg-destructive/20 text-destructive"
