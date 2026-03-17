@@ -265,11 +265,20 @@ const BookingFlow = () => {
 
       {/* Day strip */}
       <div className="px-5 mb-5">
-        <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">{t.booking.availableSlots}</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-heading text-sm text-muted-foreground tracking-widest">{t.booking.availableSlots}</h3>
+          <button
+            onClick={() => setShowCalendar(true)}
+            className="flex items-center gap-1.5 text-copper text-xs font-medium px-3 py-1.5 rounded-full bg-copper/10 hover:bg-copper/20 transition-all"
+          >
+            <CalendarDays size={13} />
+            {t.booking.moreDates}
+          </button>
+        </div>
         <div className="flex gap-2 mb-4">
           {availableDates.map((d, i) => (
             <button
-              key={i}
+              key={toDateStr(d)}
               onClick={() => setSelectedDayIdx(i)}
               className={`flex-1 py-3 rounded-xl text-center transition-all ${
                 selectedDayIdx === i ? "gradient-copper shadow-copper" : "bg-surface border border-border"
@@ -287,7 +296,28 @@ const BookingFlow = () => {
             </button>
           ))}
         </div>
+        {customDate && (
+          <button
+            onClick={() => { setCustomDate(null); setSelectedDayIdx(0); }}
+            className="text-xs text-muted-foreground underline"
+          >
+            ← {lang === "de" ? "Zurück zu den nächsten Tagen" : "Back to upcoming days"}
+          </button>
+        )}
       </div>
+
+      {/* Calendar Modal */}
+      {showCalendar && (
+        <CalendarModal
+          lang={lang}
+          onSelect={(d) => {
+            setCustomDate(d);
+            setSelectedDayIdx(0);
+            setShowCalendar(false);
+          }}
+          onClose={() => setShowCalendar(false)}
+        />
+      )}
 
       {/* Time slots */}
       <div className="px-5 mb-5">
