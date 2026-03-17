@@ -51,9 +51,9 @@ const ProfileScreen = () => {
       .eq("id", id);
     setCancelling(null);
     if (error) {
-      toast.error(lang === "de" ? "Fehler beim Stornieren" : "Failed to cancel booking");
+      toast.error(t.toasts.cancelError);
     } else {
-      toast.success(lang === "de" ? "Termin storniert" : "Booking cancelled");
+      toast.success(t.toasts.bookingCancelled);
       fetchBookings();
     }
   };
