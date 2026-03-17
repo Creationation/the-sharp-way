@@ -445,7 +445,7 @@ const AdminDashboard = () => {
             className="w-full gradient-copper text-primary-foreground font-semibold py-3.5 rounded-full shadow-copper flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <Save size={16} />
-            {savingAv ? "Saving..." : "Save Availability"}
+            {savingAv ? t.admin.saving : t.admin.saveAvailability}
           </button>
 
           <p className="text-center text-muted-foreground text-[10px] mt-3">
