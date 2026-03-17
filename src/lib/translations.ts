@@ -233,6 +233,19 @@ export interface Translations {
       confirmDelete: string;
       stripeReady: string;
     };
+    loyaltyTab: {
+      title: string;
+      search: string;
+      stamps: string;
+      points: string;
+      freeCuts: string;
+      save: string;
+      saved: string;
+      saveError: string;
+      loadError: string;
+      noUsers: string;
+      stampsOf10: string;
+    };
   };
   barber: {
     cuts: string;
