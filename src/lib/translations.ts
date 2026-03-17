@@ -127,6 +127,7 @@ export interface Translations {
     bookings: string;
     availability: string;
     users: string;
+    promotions: string;
     total: string;
     confirmed: string;
     cancelled: string;
@@ -163,6 +164,22 @@ export interface Translations {
       noUsers: string;
       noPhone: string;
       noName: string;
+      loadError: string;
+    };
+    promosTab: {
+      banner: string;
+      promoCard: string;
+      active: string;
+      inactive: string;
+      titleEn: string;
+      titleDe: string;
+      subtitleEn: string;
+      subtitleDe: string;
+      linkTextEn: string;
+      linkTextDe: string;
+      save: string;
+      saved: string;
+      saveError: string;
       loadError: string;
     };
   };
