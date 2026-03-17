@@ -228,6 +228,7 @@ const AdminDashboard = () => {
           }`}
         >
           Availability
+        </button>
         <button
           onClick={() => setTab("users")}
           className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
