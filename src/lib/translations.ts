@@ -802,6 +802,18 @@ const de: Translations = {
       noUsers: "Keine Benutzer gefunden",
       stampsOf10: "jeder 10. Schnitt gratis",
     },
+    rewardsTab: {
+      title: "Belohnungen",
+      pending: "Ausstehend",
+      approved: "Genehmigt",
+      rejected: "Abgelehnt",
+      noRequests: "Keine Belohnungsanfragen",
+      approve: "Genehmigen",
+      reject: "Ablehnen",
+      requestedOn: "Angefragt am",
+      stampsAtRequest: "Stempel bei Anfrage",
+      loadError: "Fehler beim Laden der Anfragen",
+    },
   },
   barber: {
     cuts: "Schnitte",
