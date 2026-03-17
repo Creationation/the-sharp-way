@@ -217,24 +217,6 @@ const ProfileScreen = () => {
         )}
       </div>
 
-      {/* Refer a Friend */}
-      <div className="px-5 mb-5">
-        <div className="card-app p-5 border-copper/30">
-          <Gift size={24} className="text-copper mb-3" />
-          <h3 className="text-foreground font-semibold text-sm mb-1">{t.profile.referTitle}</h3>
-          <p className="text-muted-foreground text-xs mb-3">{t.profile.referSub}</p>
-          <div className="bg-surface rounded-xl px-4 py-2.5 flex items-center justify-between">
-            <span className="text-copper font-mono font-semibold text-sm">SHARP-FR1END</span>
-            <button
-              onClick={() => { navigator.clipboard.writeText("SHARP-FR1END"); toast.success(t.toasts.copied); }}
-              className="text-foreground text-xs"
-            >
-              {t.profile.copy}
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Language selector */}
       <div className="px-5 mb-5">
         <div className="card-app p-4">
