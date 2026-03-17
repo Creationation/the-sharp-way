@@ -53,11 +53,25 @@ const HomeDashboard = () => {
   const [bannerPromo, setBannerPromo] = useState<PromoData | null>(null);
   const [cardPromo, setCardPromo] = useState<PromoData | null>(null);
 
+  // Fetch promotions
+  useEffect(() => {
+    supabase
+      .from("promotions")
+      .select("id, type, active, title_en, title_de, subtitle_en, subtitle_de, link_text_en, link_text_de")
+      .eq("active", true)
+      .then(({ data }) => {
+        if (data) {
+          const promos = data as PromoData[];
+          setBannerPromo(promos.find(p => p.type === "banner") || null);
+          setCardPromo(promos.find(p => p.type === "promo_card") || null);
+        }
+      });
+  }, []);
+
   useEffect(() => {
     if (!user) return;
     const today = new Date().toISOString().split("T")[0];
 
-    // Fetch next upcoming booking
     supabase
       .from("bookings")
       .select("service_name, barber_name, booking_date, booking_time")
@@ -70,7 +84,6 @@ const HomeDashboard = () => {
         if (data && data.length > 0) setNextBooking(data[0] as BookingInfo);
       });
 
-    // Fetch last past booking
     supabase
       .from("bookings")
       .select("service_name, barber_name, booking_date, booking_time")
