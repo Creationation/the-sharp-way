@@ -219,7 +219,7 @@ const AdminDashboard = () => {
             tab === "bookings" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
           }`}
         >
-          Bookings
+          {t.admin.bookings}
         </button>
         <button
           onClick={() => setTab("availability")}
