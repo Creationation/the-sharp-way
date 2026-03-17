@@ -431,6 +431,8 @@ const de: Translations = {
     bookedWith: "mit",
     backHome: "Zurück zur Startseite",
     feb: "FEB",
+    moreDates: "Weitere Termine",
+    closedDay: "An diesem Tag geschlossen",
   },
   gallery: {
     title: "Die Kunst des Schnitts",
