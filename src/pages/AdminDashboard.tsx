@@ -8,6 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { format, addDays, subDays } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/lib/translations";
+import UsersTab from "@/components/admin/UsersTab";
 
 interface Booking {
   id: string;
@@ -44,7 +47,9 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { isAdmin, loading: authLoading } = useAuth();
 
-  const [tab, setTab] = useState<"bookings" | "availability">("bookings");
+  const { lang } = useLanguage();
+  const t = translations[lang];
+  const [tab, setTab] = useState<"bookings" | "availability" | "users">("bookings");
 
   // — Bookings tab state —
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -223,6 +228,14 @@ const AdminDashboard = () => {
           }`}
         >
           Availability
+        </button>
+        <button
+          onClick={() => setTab("users")}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+            tab === "users" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+          }`}
+        >
+          {t.admin.users}
         </button>
       </div>
 
@@ -440,6 +453,9 @@ const AdminDashboard = () => {
           </p>
         </div>
       )}
+
+      {/* ═══════════════════ USERS TAB ═══════════════════ */}
+      {tab === "users" && <UsersTab t={t.admin.usersTab} />}
     </div>
   );
 };

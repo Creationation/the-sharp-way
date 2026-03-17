@@ -119,6 +119,22 @@ export interface Translations {
     language: string;
     gold: string;
   };
+  admin: {
+    users: string;
+    usersTab: {
+      title: string;
+      search: string;
+      totalUsers: string;
+      name: string;
+      email: string;
+      phone: string;
+      joined: string;
+      noUsers: string;
+      noPhone: string;
+      noName: string;
+      loadError: string;
+    };
+  };
   barber: {
     cuts: string;
     experience: string;
@@ -251,6 +267,22 @@ const en: Translations = {
     language: "Language",
     gold: "Gold",
   },
+  admin: {
+    users: "Users",
+    usersTab: {
+      title: "Users",
+      search: "Search by name, email, phone...",
+      totalUsers: "Total Users",
+      name: "Name",
+      email: "Email",
+      phone: "Phone",
+      joined: "Joined",
+      noUsers: "No users found",
+      noPhone: "No phone",
+      noName: "No name",
+      loadError: "Failed to load users",
+    },
+  },
   barber: {
     cuts: "Cuts",
     experience: "Experience",
@@ -382,6 +414,22 @@ const de: Translations = {
     about: "Über The Sharp Cut",
     language: "Sprache",
     gold: "Gold",
+  },
+  admin: {
+    users: "Kunden",
+    usersTab: {
+      title: "Kunden",
+      search: "Nach Name, E-Mail, Telefon suchen...",
+      totalUsers: "Kunden gesamt",
+      name: "Name",
+      email: "E-Mail",
+      phone: "Telefon",
+      joined: "Beigetreten",
+      noUsers: "Keine Kunden gefunden",
+      noPhone: "Kein Telefon",
+      noName: "Kein Name",
+      loadError: "Fehler beim Laden der Kunden",
+    },
   },
   barber: {
     cuts: "Schnitte",
