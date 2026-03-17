@@ -13,6 +13,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/lib/translations";
 import UsersTab from "@/components/admin/UsersTab";
 import PromotionsTab from "@/components/admin/PromotionsTab";
+import BarbersTab from "@/components/admin/BarbersTab";
+import { useBarbers } from "@/hooks/useBarbers";
 
 interface Booking {
   id: string;
