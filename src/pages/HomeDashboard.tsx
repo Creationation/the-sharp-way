@@ -191,7 +191,7 @@ const HomeDashboard = () => {
                         <img src={b.image} alt={b.name} className="w-10 h-10 rounded-full object-cover" />
                         <div className="flex-1 text-left">
                           <p className="text-foreground text-sm font-medium">{b.name}</p>
-                          <p className="text-muted-foreground text-xs">{b.specialty}</p>
+                          <p className="text-muted-foreground text-xs">{lang === "de" ? b.specialty_de : b.specialty_en}</p>
                         </div>
                         <div className="flex items-center gap-1">
                           <Star size={11} className="text-copper fill-copper" />
