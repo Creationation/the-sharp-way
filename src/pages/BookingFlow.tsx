@@ -4,16 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useBarbers, type Barber } from "@/hooks/useBarbers";
 import { toast } from "sonner";
-import barber1 from "@/assets/barber-1.jpg";
-import barber2 from "@/assets/barber-2.jpg";
-import barber3 from "@/assets/barber-3.jpg";
-
-const barbers = [
-  { id: 1, name: "Marco", rating: 4.9, image: barber1 },
-  { id: 2, name: "Lukas", rating: 4.8, image: barber2 },
-  { id: 3, name: "Daniel", rating: 4.7, image: barber3 },
-];
 
 const services = [
   { name: "Haarschnitt", price: "€20", duration: "30min" },
