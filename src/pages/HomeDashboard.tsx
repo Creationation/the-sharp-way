@@ -265,7 +265,7 @@ const HomeDashboard = () => {
               {nextBooking ? (
                 <div className="card-app p-4 flex items-center gap-4">
                   <img
-                    src={nextBooking.barber_name === "Marco" ? barber1 : nextBooking.barber_name === "Lukas" ? barber2 : barber3}
+                    src={getBarberImage(nextBooking.barber_name)}
                     alt={nextBooking.barber_name}
                     className="w-12 h-12 rounded-full object-cover"
                   />
