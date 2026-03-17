@@ -52,7 +52,7 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  const [tab, setTab] = useState<"bookings" | "availability" | "users">("bookings");
+  const [tab, setTab] = useState<"bookings" | "availability" | "users" | "promotions">("bookings");
 
   // — Bookings tab state —
   const [bookings, setBookings] = useState<Booking[]>([]);
