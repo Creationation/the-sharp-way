@@ -146,6 +146,7 @@ const BookingFlow = () => {
   const [saving, setSaving] = useState(false);
   const [draftRestored, setDraftRestored] = useState(false);
   const [hasRestoredDraft, setHasRestoredDraft] = useState(false);
+  const [promoInput, setPromoInput] = useState("");
 
   // Restore draft from localStorage (or set default barber) when barbers load
   useEffect(() => {
