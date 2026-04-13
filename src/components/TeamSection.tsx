@@ -23,7 +23,7 @@ const TeamSection = () => {
               <div className="relative overflow-hidden rounded-lg mb-6 aspect-[3/4]">
                 <img
                   src={barber.image}
-                  alt={`${barber.name} - barber at The Sharp Cut`}
+                  alt={`${barber.name} - barber at Sitdown Wien`}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />

@@ -63,7 +63,7 @@ const AuthScreen = () => {
 
       <div className="px-5 mt-4">
         <div className="text-center mb-8">
-          <h2 className="font-heading text-3xl text-copper mb-2">The Sharp Cut</h2>
+          <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-16 mx-auto mb-2" />
           <p className="text-muted-foreground text-sm">
             {mode === "login" ? "Welcome back." : "Join the community."}
           </p>

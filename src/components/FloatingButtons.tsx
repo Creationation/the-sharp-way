@@ -1,7 +1,7 @@
 import { MessageCircle } from "lucide-react";
 
 const FloatingButtons = () => {
-  const whatsappUrl = `https://wa.me/4312345678?text=${encodeURIComponent("Hi, I'd like to book an appointment at The Sharp Cut")}`;
+  const whatsappUrl = `https://wa.me/4312345678?text=${encodeURIComponent("Hi, I'd like to book an appointment at Sitdown Wien")}`;
 
   return (
     <>

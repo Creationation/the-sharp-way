@@ -133,9 +133,7 @@ const ContactScreen = () => {
 
       {/* Footer */}
       <div className="px-5 text-center">
-        <p className="font-heading text-lg text-foreground tracking-widest">
-          THE SHARP <span className="text-copper">CUT</span>
-        </p>
+        <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-12 mx-auto" />
         <p className="text-muted-foreground text-xs mt-1">{t.contact.copyright}</p>
       </div>
     </div>

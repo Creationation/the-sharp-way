@@ -1,6 +1,6 @@
 {
-  "name": "The Sharp Cut",
-  "short_name": "Sharp Cut",
+  "name": "Sitdown Wien",
+  "short_name": "Sitdown",
   "description": "Vienna's premium barbershop — book your appointment",
   "start_url": "/",
   "scope": "/",
@@ -11,13 +11,13 @@
   "lang": "de",
   "icons": [
     {
-      "src": "/sitdown1220.png",
+      "src": "/sitdown-logo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/sitdown1220.png",
+      "src": "/sitdown-logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

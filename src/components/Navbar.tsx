@@ -27,8 +27,8 @@ const Navbar = () => {
       }`}
     >
       <div className="container flex items-center justify-between h-16 md:h-20">
-        <a href="#" className="font-heading text-2xl md:text-3xl text-foreground tracking-widest">
-          THE SHARP <span className="text-copper">CUT</span>
+        <a href="#" className="flex items-center">
+          <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-10 md:h-12" />
         </a>
 
         {/* Desktop */}
