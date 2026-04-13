@@ -14,13 +14,13 @@ export default function PaymentExplanation() {
     ? [
         "Bei der Buchung: Ihre Karte wird nur verifiziert, es wird nichts abgebucht",
         "Am Tag Ihres Termins: Die Reservierungsgebühr von 5€ wird automatisch abgebucht",
-        "Bei rechtzeitiger Stornierung (mehr als 2 Stunden vorher): Es wird nichts abgebucht",
-        "Bei Stornierung weniger als 2 Stunden vorher oder bei Nichterscheinen: Die 5€ Reservierungsgebühr wird einbehalten",
+        "Bei rechtzeitiger Stornierung (mehr als 24 Stunden vorher): Es wird nichts abgebucht",
+        "Bei Stornierung weniger als 24 Stunden vorher oder bei Nichterscheinen: Die 5€ Reservierungsgebühr wird einbehalten",
       ]
     : [
         "At booking: Your card is only verified, nothing is charged",
         "On appointment day: The €5 reservation fee is automatically charged",
-        "Free cancellation up to 2 hours before: Nothing is charged",
+        "Free cancellation up to 24 hours before: Nothing is charged",
         "Late cancellation or no-show: The €5 reservation fee is kept",
       ];
   const secure = isDE

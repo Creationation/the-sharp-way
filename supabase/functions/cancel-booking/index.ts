@@ -56,8 +56,8 @@ serve(async (req) => {
 
     let charged = false;
 
-    if (hoursUntil < 2) {
-      // Less than 2h: charge 5€ deposit
+    if (hoursUntil < 24) {
+      // Less than 24h: charge 5€ deposit
       if (booking.stripe_customer_id && booking.stripe_payment_method_id && booking.payment_status === "verified") {
         try {
           const paymentIntent = await stripe.paymentIntents.create({
@@ -78,7 +78,7 @@ serve(async (req) => {
         }
       }
     } else {
-      // More than 2h: detach payment method, no charge
+      // More than 24h: detach payment method, no charge
       if (booking.stripe_payment_method_id) {
         try {
           await stripe.paymentMethods.detach(booking.stripe_payment_method_id);
@@ -88,7 +88,7 @@ serve(async (req) => {
       }
     }
 
-    const newPaymentStatus = charged ? "charged" : hoursUntil >= 2 ? "released" : booking.payment_status;
+    const newPaymentStatus = charged ? "charged" : hoursUntil >= 24 ? "released" : booking.payment_status;
 
     await sb.from("bookings")
       .update({ status: "cancelled", payment_status: newPaymentStatus })
