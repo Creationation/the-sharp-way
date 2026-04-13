@@ -39,7 +39,7 @@ export function useBarbers() {
         data.map((b: any) => ({
           ...b,
           rating: Number(b.rating),
-          image: IMAGE_MAP[b.image_url] || barber1,
+          image: b.image_url?.startsWith("http") ? b.image_url : (IMAGE_MAP[b.image_url] || barber1),
         }))
       );
     }
