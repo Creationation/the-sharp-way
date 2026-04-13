@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { ArrowLeft, Star, Check, CalendarDays, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useBarbers, type Barber } from "@/hooks/useBarbers";
 import { toast } from "sonner";
+import PaymentExplanation from "@/components/PaymentExplanation";
 
 const services = [
   { name: "Haarschnitt", price: "€20", duration: "30min" },
