@@ -1,0 +1,9 @@
+UPDATE barbers SET name = 'Ibo' WHERE id = '55b4087b-d9fb-4b9a-bf11-922cdf8c35a1';
+UPDATE barbers SET name = 'Ahmed' WHERE id = 'd8499def-55bc-44ba-b19d-0eac383809a7';
+UPDATE barbers SET name = 'Cetin' WHERE id = 'd9187e97-db59-452d-be7a-94b4ad5dd3ce';
+UPDATE bookings SET barber_name = 'Ibo' WHERE barber_name = 'Marco';
+UPDATE bookings SET barber_name = 'Ahmed' WHERE barber_name = 'Lukas';
+UPDATE bookings SET barber_name = 'Cetin' WHERE barber_name = 'Daniel';
+UPDATE barber_availability SET barber_name = 'Ibo' WHERE barber_name = 'Marco';
+UPDATE barber_availability SET barber_name = 'Ahmed' WHERE barber_name = 'Lukas';
+UPDATE barber_availability SET barber_name = 'Cetin' WHERE barber_name = 'Daniel';
