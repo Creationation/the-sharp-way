@@ -338,7 +338,7 @@ const HomeDashboard = () => {
                     className="w-44 flex-shrink-0 card-app overflow-hidden cursor-pointer group"
                   >
                     <div className="relative h-36">
-                      <img src={b.image} alt={b.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <img src={b.image} alt={b.name} className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
                       <div className="absolute top-3 right-3 flex items-center gap-1 bg-background/70 backdrop-blur-sm rounded-full px-2 py-0.5">
                         <div className={`w-2 h-2 rounded-full ${b.available ? "bg-mint animate-pulse-dot" : "bg-muted-foreground"}`} />
