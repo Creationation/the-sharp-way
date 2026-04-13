@@ -477,7 +477,7 @@ const AdminDashboard = () => {
                       </div>
 
                       <div className="flex items-center gap-4 mb-2 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1"><Calendar size={12} /> {format(new Date(b.booking_date), "dd/MM/yyyy")}</span>
+                        <span className="flex items-center gap-1"><CalendarIcon size={12} /> {format(new Date(b.booking_date), "dd/MM/yyyy")}</span>
                         <span className="flex items-center gap-1"><Clock size={12} /> {b.booking_time}</span>
                         <span className="text-copper font-semibold">{b.service_price}</span>
                       </div>
