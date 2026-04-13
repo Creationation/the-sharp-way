@@ -24,20 +24,19 @@ const SplashScreen = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background" />
       </div>
 
-      {/* Logo top left */}
-      <div className="relative z-10 px-6 pt-14 opacity-0 animate-fade-in" style={{ animationDelay: "0.3s", animationFillMode: "forwards" }}>
-        <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-14" />
-      </div>
+      {/* Spacer for top */}
+      <div className="relative z-10 px-6 pt-14" />
 
       {/* Center content */}
       <div className="relative z-10 flex-1 flex flex-col justify-center px-6">
         {phase === "logo" ? (
           <div className="text-center animate-logo-reveal">
-            <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-28 md:h-40 mx-auto" />
+            <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-40 md:h-56 mx-auto" />
             <div className="mt-4 w-20 h-0.5 gradient-copper mx-auto animate-shimmer" />
           </div>
         ) : (
           <div className="space-y-6">
+            <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-20 md:h-28 mb-4 opacity-0 animate-fade-up" style={{ animationFillMode: "forwards" }} />
             <h1 className="font-heading text-5xl sm:text-6xl md:text-8xl leading-[0.95] opacity-0 animate-fade-up" style={{ animationFillMode: "forwards" }}>
               {t.splash.line1}<br />
               {t.splash.line2}<br />
