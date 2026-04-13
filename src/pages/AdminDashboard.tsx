@@ -34,6 +34,7 @@ interface Booking {
   notes: string | null;
   created_at: string;
   attendance_status: string | null;
+  payment_status: string | null;
 }
 
 interface Profile {
