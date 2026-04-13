@@ -91,53 +91,68 @@ export type Database = {
       }
       bookings: {
         Row: {
+          attendance_status: string | null
           barber_name: string
           booking_date: string
           booking_time: string
           created_at: string
           id: string
           notes: string | null
+          payment_status: string | null
           reminder_sent_24h: boolean
           reminder_sent_2h: boolean
           reminder_sent_5h: boolean
           service_duration: string
           service_name: string
           service_price: string
+          setup_intent_id: string | null
           status: string
+          stripe_customer_id: string | null
+          stripe_payment_method_id: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          attendance_status?: string | null
           barber_name: string
           booking_date: string
           booking_time: string
           created_at?: string
           id?: string
           notes?: string | null
+          payment_status?: string | null
           reminder_sent_24h?: boolean
           reminder_sent_2h?: boolean
           reminder_sent_5h?: boolean
           service_duration: string
           service_name: string
           service_price: string
+          setup_intent_id?: string | null
           status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_method_id?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          attendance_status?: string | null
           barber_name?: string
           booking_date?: string
           booking_time?: string
           created_at?: string
           id?: string
           notes?: string | null
+          payment_status?: string | null
           reminder_sent_24h?: boolean
           reminder_sent_2h?: boolean
           reminder_sent_5h?: boolean
           service_duration?: string
           service_name?: string
           service_price?: string
+          setup_intent_id?: string | null
           status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_method_id?: string | null
           updated_at?: string
           user_id?: string
         }

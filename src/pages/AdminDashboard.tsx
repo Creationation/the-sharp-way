@@ -130,7 +130,7 @@ const AdminDashboard = () => {
       return;
     }
 
-    const bookingsData = (data as Booking[]) || [];
+    const bookingsData = (data as unknown as Booking[]) || [];
     setBookings(bookingsData);
 
     const userIds = [...new Set(bookingsData.map(b => b.user_id))];

@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { ArrowLeft, Star, Check, CalendarDays, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useBarbers, type Barber } from "@/hooks/useBarbers";
 import { toast } from "sonner";
+import PaymentExplanation from "@/components/PaymentExplanation";
 
 const services = [
   { name: "Haarschnitt", price: "€20", duration: "30min" },
@@ -129,6 +130,7 @@ async function scheduleReminders(
 
 const BookingFlow = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { t, lang } = useLanguage();
   const { barbers, loading: barbersLoading } = useBarbers();
@@ -147,6 +149,141 @@ const BookingFlow = () => {
   const [draftRestored, setDraftRestored] = useState(false);
   const [hasRestoredDraft, setHasRestoredDraft] = useState(false);
   const [promoInput, setPromoInput] = useState("");
+  const [stripeOpened, setStripeOpened] = useState(false);
+  const redirectHandledRef = useRef(false);
+
+  // Stripe pending booking tracking
+  const STRIPE_PENDING_KEY = "stripe_pending_booking_sc";
+  const STRIPE_PENDING_MAX_AGE = 30 * 60 * 1000;
+
+  type PendingStripeBooking = {
+    barberName: string;
+    bookingDate: string;
+    bookingTime: string;
+    clientEmail: string;
+    createdAt: number;
+  };
+
+  const [pendingStripeBooking, setPendingStripeBooking] = useState<PendingStripeBooking | null>(null);
+
+  const clearStripeSignals = useCallback(() => {
+    localStorage.removeItem("stripe_booking_confirmed");
+    localStorage.removeItem("stripe_confirmation");
+  }, []);
+
+  const clearPendingStripeBooking = useCallback(() => {
+    localStorage.removeItem(STRIPE_PENDING_KEY);
+    setPendingStripeBooking(null);
+  }, []);
+
+  const resetStripeFlow = useCallback(() => {
+    clearStripeSignals();
+    clearPendingStripeBooking();
+    setStripeOpened(false);
+    redirectHandledRef.current = false;
+  }, [clearPendingStripeBooking, clearStripeSignals]);
+
+  const redirectToProfile = useCallback(() => {
+    if (redirectHandledRef.current) return;
+    redirectHandledRef.current = true;
+    clearStripeSignals();
+    clearPendingStripeBooking();
+    localStorage.removeItem(DRAFT_KEY);
+    setConfirmed(true);
+  }, [clearPendingStripeBooking, clearStripeSignals]);
+
+  const checkConfirmedBooking = useCallback(async () => {
+    if (!pendingStripeBooking) return false;
+    const isExpired = Date.now() - pendingStripeBooking.createdAt > STRIPE_PENDING_MAX_AGE;
+    if (isExpired) { resetStripeFlow(); return false; }
+
+    const { data } = await supabase
+      .from("bookings")
+      .select("id, status, payment_status")
+      .eq("barber_name", pendingStripeBooking.barberName)
+      .eq("booking_date", pendingStripeBooking.bookingDate)
+      .eq("booking_time", pendingStripeBooking.bookingTime)
+      .eq("status", "confirmed")
+      .eq("payment_status", "verified")
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    if (data && data.length > 0) {
+      setStripeOpened(false);
+      redirectToProfile();
+      return true;
+    }
+    return false;
+  }, [pendingStripeBooking, redirectToProfile, resetStripeFlow]);
+
+  const syncStripeConfirmation = useCallback(() => {
+    const confirmed = localStorage.getItem("stripe_booking_confirmed") === "1";
+    if (confirmed) {
+      void checkConfirmedBooking();
+    }
+  }, [checkConfirmedBooking]);
+
+  // Restore pending stripe booking on mount
+  useEffect(() => {
+    const raw = localStorage.getItem(STRIPE_PENDING_KEY);
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw) as PendingStripeBooking;
+      if (Date.now() - parsed.createdAt > STRIPE_PENDING_MAX_AGE) {
+        clearPendingStripeBooking();
+        return;
+      }
+      setPendingStripeBooking(parsed);
+      setStripeOpened(true);
+    } catch { clearPendingStripeBooking(); }
+  }, [clearPendingStripeBooking]);
+
+  // Handle ?payment=cancelled
+  useEffect(() => {
+    if (searchParams.get("payment") === "cancelled") {
+      resetStripeFlow();
+      toast.error(lang === "de" ? "Zahlung abgebrochen" : "Payment cancelled");
+    }
+  }, [searchParams, resetStripeFlow, lang]);
+
+  // Listen for stripe confirmation
+  useEffect(() => { syncStripeConfirmation(); }, [syncStripeConfirmation]);
+
+  useEffect(() => {
+    if (!stripeOpened && !pendingStripeBooking) return;
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "stripe_confirmation" || e.key === "stripe_booking_confirmed") syncStripeConfirmation();
+    };
+    const handleMessage = (e: MessageEvent) => {
+      if (e.origin !== window.location.origin) return;
+      if (e.data?.type === "STRIPE_BOOKING_CONFIRMED") syncStripeConfirmation();
+    };
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [pendingStripeBooking, stripeOpened, syncStripeConfirmation]);
+
+  // Poll for confirmation
+  useEffect(() => {
+    if (!stripeOpened || !pendingStripeBooking) return;
+    let cancelled = false;
+    const runCheck = async () => { if (!cancelled) await checkConfirmedBooking(); };
+    void runCheck();
+    const intervalId = window.setInterval(() => void runCheck(), 2000);
+    const handleFocus = () => void runCheck();
+    const handleVisibility = () => { if (!document.hidden) void runCheck(); };
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [checkConfirmedBooking, pendingStripeBooking, stripeOpened]);
 
   // Restore draft from localStorage (or set default barber) when barbers load
   useEffect(() => {
@@ -329,53 +466,65 @@ const BookingFlow = () => {
     const servicePrices = appliedPromo ? `€${finalPrice} (was €${totalPrice})` : `€${totalPrice}`;
     const serviceDurations = `${totalDuration}min`;
 
-    const { error } = await supabase.from("bookings").insert({
-      user_id: user.id,
-      barber_name: selectedBarber.name,
-      service_name: serviceNames,
-      service_price: servicePrices,
-      service_duration: serviceDurations,
-      booking_date: dateStr,
-      booking_time: selectedTime,
-      status: "confirmed",
-    });
+    try {
+      redirectHandledRef.current = false;
+      clearStripeSignals();
 
-    setSaving(false);
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("full_name, phone, email")
+        .eq("user_id", user.id)
+        .maybeSingle();
 
-    if (error) {
-      toast.error(t.toasts.bookingFailed);
-      return;
-    }
-
-    // Clear draft — booking completed
-    localStorage.removeItem(DRAFT_KEY);
-
-    // Increment promo code usage (non-blocking)
-    if (appliedPromo) {
-      supabase.rpc("use_promo_code" as any, { _code: appliedPromo.code }).then(() => {});
-    }
-
-    // Send confirmation email (non-blocking — failure doesn't affect booking)
-    if (user.email) {
-      const displayName = user.user_metadata?.full_name || user.email.split("@")[0];
-      supabase.functions.invoke("send-booking-confirmation", {
-        body: {
-          email: user.email,
-          name: displayName,
-          service: serviceNames,
-          barber: selectedBarber.name,
-          date: `${dayAbbr[selectedDate.getDay()]} ${selectedDate.getDate()} ${monthAbbr[selectedDate.getMonth()]}`,
-          time: selectedTime,
-          price: servicePrices,
-          lang,
+      const payload = {
+        bookingData: {
+          barberName: selectedBarber.name,
+          serviceName: serviceNames,
+          servicePrice: servicePrices,
+          serviceDuration: serviceDurations,
+          bookingDate: dateStr,
+          bookingTime: selectedTime,
+          clientName: profileData?.full_name || user.user_metadata?.full_name || "",
+          clientPhone: profileData?.phone || "",
+          clientEmail: user.email || "",
+          notes: "",
+          promoCode: appliedPromo?.code || "",
         },
-      }).catch(() => {}); // silent fail
+      };
+
+      const { data, error } = await supabase.functions.invoke("create-setup-intent", {
+        body: payload,
+      });
+
+      if (error) throw error;
+      if (data?.url && /^https:\/\/checkout\.stripe\.com\//.test(data.url)) {
+        const pending: PendingStripeBooking = {
+          barberName: selectedBarber.name,
+          bookingDate: dateStr,
+          bookingTime: selectedTime,
+          clientEmail: user.email || "",
+          createdAt: Date.now(),
+        };
+        localStorage.setItem(STRIPE_PENDING_KEY, JSON.stringify(pending));
+        setPendingStripeBooking(pending);
+        localStorage.removeItem(DRAFT_KEY);
+        setStripeOpened(true);
+
+        const stripeWindow = window.open(data.url, "_blank");
+        if (!stripeWindow) {
+          setSaving(false);
+          window.location.href = data.url;
+          return;
+        }
+        setSaving(false);
+      } else {
+        throw new Error("No valid checkout URL received");
+      }
+    } catch (err) {
+      console.error("[checkout] error:", err);
+      toast.error(lang === "de" ? "Fehler bei der Karteverifizierung. Bitte versuche es erneut." : "Card verification error. Please try again.");
+      setSaving(false);
     }
-
-    // Schedule local push notifications (24h, 5h, 2h before appointment)
-    scheduleReminders(selectedBarber.name, serviceNames, selectedDate, selectedTime, lang);
-
-    setConfirmed(true);
   };
 
   if (barbersLoading || !selectedBarber) {
@@ -678,16 +827,43 @@ const BookingFlow = () => {
         </div>
       </div>
 
+      {/* Payment Explanation */}
+      <div className="px-5 mb-6">
+        <PaymentExplanation />
+      </div>
+
+      {/* Stripe waiting state */}
+      {stripeOpened && (
+        <div className="px-5 mb-6">
+          <div className="card-app p-4 border-copper/30 text-center">
+            <div className="w-6 h-6 border-2 border-copper border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-foreground text-sm font-medium mb-1">
+              {lang === "de" ? "Sobald Stripe bestätigt ist, wirst du automatisch weitergeleitet." : "Once Stripe confirms, you'll be redirected automatically."}
+            </p>
+            <button
+              onClick={resetStripeFlow}
+              className="text-copper text-xs underline mt-2"
+            >
+              {lang === "de" ? "Abbrechen" : "Cancel"}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* CTA */}
       <div className="fixed bottom-16 left-0 right-0 z-40 px-5 pt-3 pb-8 bg-background border-t border-border">
         <button
           onClick={handleConfirm}
-          disabled={saving || dayOff}
+          disabled={saving || dayOff || stripeOpened}
           className="w-full gradient-copper text-primary-foreground font-semibold text-base py-3.5 rounded-full shadow-copper disabled:opacity-50"
         >
-          {saving ? t.booking.saving : t.booking.confirm}
+          {saving
+            ? (lang === "de" ? "Weiterleitung zu Stripe..." : "Redirecting to Stripe...")
+            : (lang === "de" ? "💳 Karte verifizieren & buchen" : "💳 Verify card & book")}
         </button>
-        <p className="text-center text-muted-foreground text-[10px] mt-1">{t.booking.cancellation}</p>
+        <p className="text-center text-muted-foreground text-[10px] mt-1">
+          {lang === "de" ? "Sichere Zahlung über Stripe 🔒 · Kostenlose Stornierung bis 2h vorher" : "Secure payment via Stripe 🔒 · Free cancellation up to 2h before"}
+        </p>
       </div>
     </div>
   );
