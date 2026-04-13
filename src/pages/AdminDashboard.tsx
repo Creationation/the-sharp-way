@@ -86,6 +86,8 @@ const AdminDashboard = () => {
   const [profiles, setProfiles] = useState<Map<string, Profile>>(new Map());
   const [loadingBookings, setLoadingBookings] = useState(true);
   const [filter, setFilter] = useState<"all" | "confirmed" | "cancelled">("all");
+  const [barberFilter, setBarberFilter] = useState<string>("all");
+  const [calendarDate, setCalendarDate] = useState<Date | undefined>(undefined);
 
   // — Availability tab state —
   const [avBarber, setAvBarber] = useState("");
