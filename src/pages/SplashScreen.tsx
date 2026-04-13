@@ -14,15 +14,8 @@ const SplashScreen = () => {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden flex flex-col">
-      {/* Background image */}
-      <div className="absolute inset-0">
-        <img
-          src="/placeholder.svg"
-          alt=""
-          className="w-full h-full object-cover opacity-30"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background" />
-      </div>
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
       {/* Spacer for top */}
       <div className="relative z-10 px-6 pt-14" />
