@@ -332,17 +332,88 @@ const AdminDashboard = () => {
       {/* ═══════════════════ BOOKINGS TAB ═══════════════════ */}
       {tab === "bookings" && (
         <>
+          {/* Barber filter */}
+          <div className="px-5 mb-4 overflow-x-auto scrollbar-hide">
+            <div className="flex gap-2" style={{ width: "max-content" }}>
+              <button
+                onClick={() => { setBarberFilter("all"); setCalendarDate(undefined); }}
+                className={`px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+                  barberFilter === "all" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+                }`}
+              >
+                {t.admin.allBarbers}
+              </button>
+              {barberNames.map(name => (
+                <button
+                  key={name}
+                  onClick={() => { setBarberFilter(name); setCalendarDate(undefined); }}
+                  className={`px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+                    barberFilter === name ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+                  }`}
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Calendar with booking density */}
+          <div className="px-5 mb-5">
+            <div className="card-app p-3">
+              <Calendar
+                mode="single"
+                selected={calendarDate}
+                onSelect={(d) => setCalendarDate(d === calendarDate ? undefined : d)}
+                locale={dateLocale}
+                className="pointer-events-auto mx-auto"
+                modifiers={{
+                  light: (date) => { const c = bookingCountsByDate[format(date, "yyyy-MM-dd")] || 0; return c >= 1 && c <= 5; },
+                  medium: (date) => { const c = bookingCountsByDate[format(date, "yyyy-MM-dd")] || 0; return c >= 6 && c <= 10; },
+                  hot: (date) => { const c = bookingCountsByDate[format(date, "yyyy-MM-dd")] || 0; return c > 10; },
+                }}
+                modifiersStyles={{
+                  light: { backgroundColor: "hsl(142 71% 45% / 0.25)", color: "hsl(142 71% 45%)", fontWeight: 600 },
+                  medium: { backgroundColor: "hsl(38 92% 50% / 0.25)", color: "hsl(38 92% 50%)", fontWeight: 600 },
+                  hot: { backgroundColor: "hsl(0 84% 60% / 0.25)", color: "hsl(0 84% 60%)", fontWeight: 700 },
+                }}
+              />
+              {/* Legend */}
+              <div className="flex flex-wrap gap-3 justify-center mt-3 pt-3 border-t border-border">
+                <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                  <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: "hsl(142 71% 45% / 0.4)" }} />
+                  {t.admin.bookings1to5}
+                </span>
+                <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                  <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: "hsl(38 92% 50% / 0.4)" }} />
+                  {t.admin.bookings6to10}
+                </span>
+                <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                  <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: "hsl(0 84% 60% / 0.4)" }} />
+                  {t.admin.bookingsOver10}
+                </span>
+              </div>
+              {calendarDate && (
+                <button
+                  onClick={() => setCalendarDate(undefined)}
+                  className="w-full mt-2 text-copper text-xs font-medium underline underline-offset-2"
+                >
+                  {t.admin.all} {t.admin.bookings.toLowerCase()}
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="px-5 mb-5 grid grid-cols-3 gap-3">
             <div className="card-app p-3 text-center">
-              <p className="text-copper font-heading text-2xl">{bookings.length}</p>
+              <p className="text-copper font-heading text-2xl">{filtered.length}</p>
               <p className="text-muted-foreground text-[10px]">{t.admin.total}</p>
             </div>
             <div className="card-app p-3 text-center">
-              <p className="text-mint font-heading text-2xl">{bookings.filter(b => b.status === "confirmed").length}</p>
+              <p className="text-mint font-heading text-2xl">{filtered.filter(b => b.status === "confirmed").length}</p>
               <p className="text-muted-foreground text-[10px]">{t.admin.confirmed}</p>
             </div>
             <div className="card-app p-3 text-center">
-              <p className="text-destructive font-heading text-2xl">{bookings.filter(b => b.status === "cancelled").length}</p>
+              <p className="text-destructive font-heading text-2xl">{filtered.filter(b => b.status === "cancelled").length}</p>
               <p className="text-muted-foreground text-[10px]">{t.admin.cancelled}</p>
             </div>
           </div>
