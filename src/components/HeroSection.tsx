@@ -23,7 +23,7 @@ const HeroSection = () => {
           <span className="text-gradient-copper">Bold Style.</span>
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-10 opacity-0 animate-fade-up animation-delay-200">
-          Vienna's Premium Barbershop Experience
+          Sitdown Wien — Gentlemen's Barber
         </p>
         <a
           href="#booking"

@@ -68,7 +68,7 @@ function buildReminderEmail(
           ? "Kostenlose Stornierung bis 2 Stunden vorher · +43 664 4686073"
           : "Free cancellation up to 2 hours before · +43 664 4686073"
       }</p>
-      <p style="color:#333;font-size:11px;margin-top:16px;">© 2026 The Sharp Cut</p>
+      <p style="color:#333;font-size:11px;margin-top:16px;">© 2026 Sitdown Wien</p>
     </div>
   </body></html>`;
 
@@ -120,7 +120,7 @@ serve(async (req) => {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${RESEND_API_KEY}` },
-      body: JSON.stringify({ from: "The Sharp Cut <info@ugcpanel.app>", to: [email], subject, html }),
+      body: JSON.stringify({ from: "Sitdown Wien <info@ugcpanel.app>", to: [email], subject, html }),
     });
     return res.ok;
   }

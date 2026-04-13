@@ -26,18 +26,14 @@ const SplashScreen = () => {
 
       {/* Logo top left */}
       <div className="relative z-10 px-6 pt-14 opacity-0 animate-fade-in" style={{ animationDelay: "0.3s", animationFillMode: "forwards" }}>
-        <p className="font-heading text-xl tracking-widest text-foreground">
-          THE SHARP <span className="text-copper">CUT</span>
-        </p>
+        <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-10" />
       </div>
 
       {/* Center content */}
       <div className="relative z-10 flex-1 flex flex-col justify-center px-6">
         {phase === "logo" ? (
           <div className="text-center animate-logo-reveal">
-            <h1 className="font-heading text-6xl md:text-8xl text-foreground tracking-widest">
-              THE SHARP <span className="text-copper">CUT</span>
-            </h1>
+            <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-28 md:h-40 mx-auto" />
             <div className="mt-4 w-20 h-0.5 gradient-copper mx-auto animate-shimmer" />
           </div>
         ) : (

@@ -49,7 +49,7 @@ serve(async (req) => {
         </div>
         <p style="color: #888; font-size: 12px;">Kostenlose Stornierung bis 2 Stunden vor dem Termin.</p>
         <p style="color: #888; font-size: 12px; margin-top: 8px;">Lavaterstrasse 2, 1220 Wien · +43 664 4686073</p>
-        <p style="color: #444; font-size: 11px; margin-top: 24px;">© 2026 The Sharp Cut</p>
+        <p style="color: #444; font-size: 11px; margin-top: 24px;">© 2026 Sitdown Wien</p>
       </div>
     </body></html>` : `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
       <div style="font-family: sans-serif; max-width: 480px; margin: auto; background: #0f0f0f; color: #f5f0e8; padding: 32px; border-radius: 16px;">
@@ -69,7 +69,7 @@ serve(async (req) => {
         </div>
         <p style="color: #888; font-size: 12px;">Free cancellation up to 2 hours before your appointment.</p>
         <p style="color: #888; font-size: 12px; margin-top: 8px;">Lavaterstrasse 2, 1220 Wien · +43 664 4686073</p>
-        <p style="color: #444; font-size: 11px; margin-top: 24px;">© 2026 The Sharp Cut</p>
+        <p style="color: #444; font-size: 11px; margin-top: 24px;">© 2026 Sitdown Wien</p>
       </div>
     </body></html>`;
 
@@ -90,7 +90,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "The Sharp Cut <info@ugcpanel.app>",
+        from: "Sitdown Wien <info@ugcpanel.app>",
         to: [email],
         subject,
         html,

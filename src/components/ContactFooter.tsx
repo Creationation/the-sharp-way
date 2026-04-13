@@ -15,7 +15,7 @@ const ContactFooter = () => {
               <MapPin className="text-copper mt-1 flex-shrink-0" size={20} />
               <div>
                 <p className="text-foreground font-semibold">Address</p>
-                <p className="text-muted-foreground">Mariahilfer Straße 45, 1060 Vienna, Austria</p>
+                <p className="text-muted-foreground">Lavaterstraße 2, 1220 Wien</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -29,7 +29,7 @@ const ContactFooter = () => {
               <Mail className="text-copper mt-1 flex-shrink-0" size={20} />
               <div>
                 <p className="text-foreground font-semibold">Email</p>
-                <p className="text-muted-foreground">hello@thesharpcut.at</p>
+                <p className="text-muted-foreground">hello@sitdown.wien</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -47,7 +47,7 @@ const ContactFooter = () => {
             <div className="text-center text-muted-foreground">
               <MapPin className="mx-auto mb-2 text-copper" size={32} />
               <p className="font-heading text-lg">Google Maps</p>
-              <p className="text-sm">Mariahilfer Straße 45, Vienna</p>
+              <p className="text-sm">Lavaterstraße 2, 1220 Wien</p>
             </div>
           </div>
         </div>
@@ -56,9 +56,7 @@ const ContactFooter = () => {
       {/* Footer */}
       <footer className="border-t border-border">
         <div className="container py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="font-heading text-xl text-foreground tracking-widest">
-            THE SHARP <span className="text-copper">CUT</span>
-          </p>
+          <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-10" />
           <div className="flex items-center gap-4">
             <a href="#" aria-label="Instagram" className="text-muted-foreground hover:text-copper transition-colors">
               <Instagram size={20} />
@@ -70,7 +68,7 @@ const ContactFooter = () => {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1 0-5.78 2.92 2.92 0 0 1 .88.13v-3.5a6.37 6.37 0 0 0-.88-.07 6.37 6.37 0 0 0 0 12.74 6.37 6.37 0 0 0 6.38-6.38V8.72a8.19 8.19 0 0 0 3.72.89V6.69Z"/></svg>
             </a>
           </div>
-          <p className="text-muted-foreground text-sm">© 2025 The Sharp Cut. All rights reserved.</p>
+          <p className="text-muted-foreground text-sm">© 2025 Sitdown Wien. All rights reserved.</p>
         </div>
       </footer>
     </section>
