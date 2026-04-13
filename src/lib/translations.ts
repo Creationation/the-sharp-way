@@ -287,9 +287,6 @@ export interface Translations {
       pending: string;
       functionError: string;
       remindersSent: (n: number) => string;
-      changePhoto: string;
-      photoUploaded: string;
-      stripeCouponId: string;
     };
     rewardsTab: {
       title: string;
