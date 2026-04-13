@@ -26,7 +26,7 @@ const SplashScreen = () => {
 
       {/* Logo top left */}
       <div className="relative z-10 px-6 pt-14 opacity-0 animate-fade-in" style={{ animationDelay: "0.3s", animationFillMode: "forwards" }}>
-        <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-10" />
+        <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-14" />
       </div>
 
       {/* Center content */}

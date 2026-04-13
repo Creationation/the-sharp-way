@@ -56,7 +56,7 @@ const ContactFooter = () => {
       {/* Footer */}
       <footer className="border-t border-border">
         <div className="container py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-10" />
+          <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-14" />
           <div className="flex items-center gap-4">
             <a href="#" aria-label="Instagram" className="text-muted-foreground hover:text-copper transition-colors">
               <Instagram size={20} />
