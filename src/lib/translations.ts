@@ -622,9 +622,6 @@ const en: Translations = {
       pending: "pending",
       functionError: "Function error",
       remindersSent: (n) => `${n} reminder(s) sent`,
-      changePhoto: "Change Photo",
-      photoUploaded: "Photo uploaded!",
-      stripeCouponId: "Stripe Coupon ID",
     },
     rewardsTab: {
       title: "Rewards",
@@ -960,9 +957,6 @@ const de: Translations = {
       pending: "ausstehend",
       functionError: "Funktionsfehler",
       remindersSent: (n) => `${n} Erinnerung(en) gesendet`,
-      changePhoto: "Foto ändern",
-      photoUploaded: "Foto hochgeladen!",
-      stripeCouponId: "Stripe-Coupon-ID",
     },
     rewardsTab: {
       title: "Belohnungen",
