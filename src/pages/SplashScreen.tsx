@@ -37,7 +37,7 @@ const SplashScreen = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-40 md:h-56 mx-auto mb-4 opacity-0 animate-fade-up" style={{ animationFillMode: "forwards" }} />
+            <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-72 md:h-96 mx-auto mb-4 opacity-0 animate-fade-up" style={{ animationFillMode: "forwards" }} />
             <h1 className="font-heading text-5xl sm:text-6xl md:text-8xl leading-[0.95] opacity-0 animate-fade-up" style={{ animationFillMode: "forwards" }}>
               {t.splash.line1}<br />
               {t.splash.line2}<br />
