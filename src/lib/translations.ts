@@ -47,6 +47,8 @@ export interface Translations {
     bookingFailed: string;
     cancelError: string;
     bookingCancelled: string;
+    cancelledFree: string;
+    cancelledCharged: string;
     cancelling: string;
     copied: string;
     accountCreated: string;
