@@ -3,9 +3,9 @@ import barber2 from "@/assets/barber-2.jpg";
 import barber3 from "@/assets/barber-3.jpg";
 
 const barbers = [
-  { name: "Marco", specialty: "Classic Cuts & Hot Towel Shaves", years: 12, image: barber1 },
-  { name: "Lukas", specialty: "Fades, Tapers & Modern Styles", years: 7, image: barber2 },
-  { name: "Daniel", specialty: "Beard Sculpting & Design", years: 9, image: barber3 },
+  { name: "Ibo", specialty: "Classic Cuts & Hot Towel Shaves", years: 12, image: barber1 },
+  { name: "Ahmed", specialty: "Fades, Tapers & Modern Styles", years: 7, image: barber2 },
+  { name: "Cetin", specialty: "Beard Sculpting & Design", years: 9, image: barber3 },
 ];
 
 const TeamSection = () => {

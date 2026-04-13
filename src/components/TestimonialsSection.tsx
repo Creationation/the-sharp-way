@@ -2,10 +2,10 @@ import { Star, Quote } from "lucide-react";
 import { useRef } from "react";
 
 const reviews = [
-  { name: "Alex", service: "Fade & Taper", stars: 5, text: "Best barbershop in Vienna. Marco nailed the fade — absolutely clean." },
+  { name: "Alex", service: "Fade & Taper", stars: 5, text: "Best barbershop in Vienna. Ibo nailed the fade — absolutely clean." },
   { name: "Thomas", service: "Haircut + Beard Combo", stars: 5, text: "These guys know their craft. I walked in scruffy and walked out looking like a different person." },
   { name: "Stefan", service: "Hot Towel Shave", stars: 5, text: "The hot towel shave is an experience. Smooth, relaxing, and flawless." },
-  { name: "Michael", service: "Classic Haircut", stars: 4, text: "Lukas took his time to get the cut exactly right. Professional and friendly." },
+  { name: "Michael", service: "Classic Haircut", stars: 4, text: "Ahmed took his time to get the cut exactly right. Professional and friendly." },
 ];
 
 const TestimonialsSection = () => {
