@@ -59,6 +59,17 @@ export interface Translations {
     cancelled: string;
     cancelBooking: string;
     barberUnavailable: string;
+    confirmCancelTitle: string;
+    confirmCancelFree: string;
+    confirmCancelCharged: string;
+    confirmCancelBtn: string;
+    cancelBtn: string;
+    paymentStatus: string;
+    paymentVerified: string;
+    paymentCharged: string;
+    paymentReleased: string;
+    paymentPending: string;
+    paymentFailed: string;
   };
   booking: {
     title: string;
@@ -364,6 +375,17 @@ const en: Translations = {
     cancelled: "Cancelled",
     cancelBooking: "Cancel booking",
     barberUnavailable: "This barber is not available on this day",
+    confirmCancelTitle: "Cancel booking?",
+    confirmCancelFree: "This booking can be cancelled free of charge (more than 24h before the appointment).",
+    confirmCancelCharged: "Less than 24 hours before the appointment — the €5 deposit will be charged.",
+    confirmCancelBtn: "Yes, cancel",
+    cancelBtn: "Back",
+    paymentStatus: "Payment",
+    paymentVerified: "Verified",
+    paymentCharged: "Charged",
+    paymentReleased: "Released",
+    paymentPending: "Pending",
+    paymentFailed: "Failed",
   },
   booking: {
     title: "Book Now",
@@ -669,6 +691,17 @@ const de: Translations = {
     cancelled: "Storniert",
     cancelBooking: "Termin stornieren",
     barberUnavailable: "Dieser Barbier ist heute nicht verfügbar",
+    confirmCancelTitle: "Termin stornieren?",
+    confirmCancelFree: "Dieser Termin kann kostenlos storniert werden (mehr als 24 Std. vor dem Termin).",
+    confirmCancelCharged: "Weniger als 24 Stunden vor dem Termin — die 5 € Kaution wird abgebucht.",
+    confirmCancelBtn: "Ja, stornieren",
+    cancelBtn: "Zurück",
+    paymentStatus: "Zahlung",
+    paymentVerified: "Verifiziert",
+    paymentCharged: "Abgebucht",
+    paymentReleased: "Freigegeben",
+    paymentPending: "Ausstehend",
+    paymentFailed: "Fehlgeschlagen",
   },
   booking: {
     title: "Jetzt buchen",

@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Trophy, Gift, ChevronRight, Calendar, Clock, LogOut, Shield, XCircle } from "lucide-react";
+import { ArrowLeft, Trophy, Gift, ChevronRight, Calendar, Clock, LogOut, Shield, XCircle, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -29,6 +39,9 @@ const ProfileScreen = () => {
   const [totalPoints, setTotalPoints] = useState(0);
   const [rewardPending, setRewardPending] = useState(false);
   const [claimingReward, setClaimingReward] = useState(false);
+  const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null);
+  const [confirmCancelDate, setConfirmCancelDate] = useState<string>("");
+  const [confirmCancelTime, setConfirmCancelTime] = useState<string>("");
 
   useEffect(() => {
     if (authLoading) return;
@@ -246,7 +259,11 @@ const ProfileScreen = () => {
                 </div>
                 {activeTab === "upcoming" && b.status === "confirmed" && (
                   <button
-                    onClick={() => cancelBooking(b.id)}
+                    onClick={() => {
+                      setConfirmCancelId(b.id);
+                      setConfirmCancelDate(b.booking_date);
+                      setConfirmCancelTime(b.booking_time);
+                    }}
                     disabled={cancelling === b.id}
                     className="flex items-center gap-1.5 text-xs text-destructive bg-destructive/10 px-3 py-1.5 rounded-full disabled:opacity-50"
                   >
@@ -319,6 +336,39 @@ const ProfileScreen = () => {
           </button>
         ))}
       </div>
+
+      {/* Cancel confirmation dialog */}
+      <AlertDialog open={!!confirmCancelId} onOpenChange={(open) => { if (!open) setConfirmCancelId(null); }}>
+        <AlertDialogContent className="bg-surface border-border">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-foreground">
+              <AlertTriangle size={18} className="text-copper" />
+              {t.common.confirmCancelTitle}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              {(() => {
+                const appt = new Date(`${confirmCancelDate}T${confirmCancelTime || "10:00"}:00`);
+                const hoursUntil = (appt.getTime() - Date.now()) / (1000 * 60 * 60);
+                return hoursUntil >= 24 ? t.common.confirmCancelFree : t.common.confirmCancelCharged;
+              })()}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-surface border-border text-foreground">
+              {t.common.cancelBtn}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (confirmCancelId) cancelBooking(confirmCancelId);
+                setConfirmCancelId(null);
+              }}
+              className="bg-destructive text-destructive-foreground"
+            >
+              {t.common.confirmCancelBtn}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
