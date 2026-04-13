@@ -41,6 +41,7 @@ interface Props {
     loadError: string;
     confirmDelete: string;
     stripeReady: string;
+    stripeCouponId: string;
   };
 }
 
@@ -240,7 +241,7 @@ const PromoCodesTab = ({ t }: Props) => {
                 {!code.expires_at && <span className="text-muted-foreground text-[10px]">{t.noExpiry}</span>}
               </div>
               <div>
-                <label className="text-muted-foreground text-xs mb-1 block">Stripe Coupon ID</label>
+                <label className="text-muted-foreground text-xs mb-1 block">{t.stripeCouponId}</label>
                 <input
                   value={code.stripe_coupon_id ?? ""}
                   onChange={e => updateField(code.id, "stripe_coupon_id", e.target.value || null)}
