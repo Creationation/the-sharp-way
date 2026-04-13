@@ -48,6 +48,7 @@ interface Props {
     changePhoto: string;
     photoUploaded: string;
   };
+}
 
 const IMAGES = [
   { label: "Ibo", value: "/barber-1" },
