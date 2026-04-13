@@ -260,7 +260,20 @@ const AdminDashboard = () => {
     );
   }
 
-  const filtered = bookings.filter(b => filter === "all" || b.status === filter);
+  const filtered = bookings
+    .filter(b => filter === "all" || b.status === filter)
+    .filter(b => barberFilter === "all" || b.barber_name === barberFilter)
+    .filter(b => !calendarDate || b.booking_date === format(calendarDate, "yyyy-MM-dd"));
+
+  // Compute booking counts per date for the calendar
+  const bookingCountsByDate = useMemo(() => {
+    const counts: Record<string, number> = {};
+    const barberFiltered = bookings.filter(b => barberFilter === "all" || b.barber_name === barberFilter);
+    barberFiltered.forEach(b => {
+      counts[b.booking_date] = (counts[b.booking_date] || 0) + 1;
+    });
+    return counts;
+  }, [bookings, barberFilter]);
 
   return (
     <div className="min-h-screen bg-background pb-24">
