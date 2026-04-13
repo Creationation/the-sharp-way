@@ -130,6 +130,7 @@ async function scheduleReminders(
 
 const BookingFlow = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { t, lang } = useLanguage();
   const { barbers, loading: barbersLoading } = useBarbers();
@@ -148,6 +149,141 @@ const BookingFlow = () => {
   const [draftRestored, setDraftRestored] = useState(false);
   const [hasRestoredDraft, setHasRestoredDraft] = useState(false);
   const [promoInput, setPromoInput] = useState("");
+  const [stripeOpened, setStripeOpened] = useState(false);
+  const redirectHandledRef = useRef(false);
+
+  // Stripe pending booking tracking
+  const STRIPE_PENDING_KEY = "stripe_pending_booking_sc";
+  const STRIPE_PENDING_MAX_AGE = 30 * 60 * 1000;
+
+  type PendingStripeBooking = {
+    barberName: string;
+    bookingDate: string;
+    bookingTime: string;
+    clientEmail: string;
+    createdAt: number;
+  };
+
+  const [pendingStripeBooking, setPendingStripeBooking] = useState<PendingStripeBooking | null>(null);
+
+  const clearStripeSignals = useCallback(() => {
+    localStorage.removeItem("stripe_booking_confirmed");
+    localStorage.removeItem("stripe_confirmation");
+  }, []);
+
+  const clearPendingStripeBooking = useCallback(() => {
+    localStorage.removeItem(STRIPE_PENDING_KEY);
+    setPendingStripeBooking(null);
+  }, []);
+
+  const resetStripeFlow = useCallback(() => {
+    clearStripeSignals();
+    clearPendingStripeBooking();
+    setStripeOpened(false);
+    redirectHandledRef.current = false;
+  }, [clearPendingStripeBooking, clearStripeSignals]);
+
+  const redirectToProfile = useCallback(() => {
+    if (redirectHandledRef.current) return;
+    redirectHandledRef.current = true;
+    clearStripeSignals();
+    clearPendingStripeBooking();
+    localStorage.removeItem(DRAFT_KEY);
+    setConfirmed(true);
+  }, [clearPendingStripeBooking, clearStripeSignals]);
+
+  const checkConfirmedBooking = useCallback(async () => {
+    if (!pendingStripeBooking) return false;
+    const isExpired = Date.now() - pendingStripeBooking.createdAt > STRIPE_PENDING_MAX_AGE;
+    if (isExpired) { resetStripeFlow(); return false; }
+
+    const { data } = await supabase
+      .from("bookings")
+      .select("id, status, payment_status")
+      .eq("barber_name", pendingStripeBooking.barberName)
+      .eq("booking_date", pendingStripeBooking.bookingDate)
+      .eq("booking_time", pendingStripeBooking.bookingTime)
+      .eq("status", "confirmed")
+      .eq("payment_status", "verified")
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    if (data && data.length > 0) {
+      setStripeOpened(false);
+      redirectToProfile();
+      return true;
+    }
+    return false;
+  }, [pendingStripeBooking, redirectToProfile, resetStripeFlow]);
+
+  const syncStripeConfirmation = useCallback(() => {
+    const confirmed = localStorage.getItem("stripe_booking_confirmed") === "1";
+    if (confirmed) {
+      void checkConfirmedBooking();
+    }
+  }, [checkConfirmedBooking]);
+
+  // Restore pending stripe booking on mount
+  useEffect(() => {
+    const raw = localStorage.getItem(STRIPE_PENDING_KEY);
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw) as PendingStripeBooking;
+      if (Date.now() - parsed.createdAt > STRIPE_PENDING_MAX_AGE) {
+        clearPendingStripeBooking();
+        return;
+      }
+      setPendingStripeBooking(parsed);
+      setStripeOpened(true);
+    } catch { clearPendingStripeBooking(); }
+  }, [clearPendingStripeBooking]);
+
+  // Handle ?payment=cancelled
+  useEffect(() => {
+    if (searchParams.get("payment") === "cancelled") {
+      resetStripeFlow();
+      toast.error(lang === "de" ? "Zahlung abgebrochen" : "Payment cancelled");
+    }
+  }, [searchParams, resetStripeFlow, lang]);
+
+  // Listen for stripe confirmation
+  useEffect(() => { syncStripeConfirmation(); }, [syncStripeConfirmation]);
+
+  useEffect(() => {
+    if (!stripeOpened && !pendingStripeBooking) return;
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "stripe_confirmation" || e.key === "stripe_booking_confirmed") syncStripeConfirmation();
+    };
+    const handleMessage = (e: MessageEvent) => {
+      if (e.origin !== window.location.origin) return;
+      if (e.data?.type === "STRIPE_BOOKING_CONFIRMED") syncStripeConfirmation();
+    };
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [pendingStripeBooking, stripeOpened, syncStripeConfirmation]);
+
+  // Poll for confirmation
+  useEffect(() => {
+    if (!stripeOpened || !pendingStripeBooking) return;
+    let cancelled = false;
+    const runCheck = async () => { if (!cancelled) await checkConfirmedBooking(); };
+    void runCheck();
+    const intervalId = window.setInterval(() => void runCheck(), 2000);
+    const handleFocus = () => void runCheck();
+    const handleVisibility = () => { if (!document.hidden) void runCheck(); };
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [checkConfirmedBooking, pendingStripeBooking, stripeOpened]);
 
   // Restore draft from localStorage (or set default barber) when barbers load
   useEffect(() => {
