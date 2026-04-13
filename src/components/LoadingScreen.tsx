@@ -15,7 +15,7 @@ const LoadingScreen = () => {
       style={{ opacity: visible ? 1 : 0 }}
     >
       <div className="text-center animate-logo-reveal">
-        <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-24 md:h-32 mx-auto" />
+        <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-32 md:h-44 mx-auto" />
         <div className="mt-4 w-16 h-0.5 gradient-copper mx-auto animate-shimmer" />
       </div>
     </div>
