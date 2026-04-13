@@ -365,11 +365,28 @@ const AdminDashboard = () => {
                           <p className="text-foreground font-medium text-sm">{b.service_name}</p>
                           <p className="text-muted-foreground text-xs">{t.admin.with} {b.barber_name}</p>
                         </div>
-                        <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${
-                          b.status === "confirmed" ? "bg-mint/20 text-mint" : "bg-destructive/20 text-destructive"
-                        }`}>
-                          {b.status === "confirmed" ? t.admin.confirmed : t.admin.cancelled}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          {b.payment_status && b.payment_status !== "pending" && (
+                            <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${
+                              b.payment_status === "verified" ? "bg-blue-500/20 text-blue-400" :
+                              b.payment_status === "charged" ? "bg-copper/20 text-copper" :
+                              b.payment_status === "released" ? "bg-muted/20 text-muted-foreground" :
+                              b.payment_status === "failed" ? "bg-destructive/20 text-destructive" :
+                              "bg-muted/20 text-muted-foreground"
+                            }`}>
+                              {b.payment_status === "verified" ? t.common.paymentVerified :
+                               b.payment_status === "charged" ? t.common.paymentCharged :
+                               b.payment_status === "released" ? t.common.paymentReleased :
+                               b.payment_status === "failed" ? t.common.paymentFailed :
+                               b.payment_status}
+                            </span>
+                          )}
+                          <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${
+                            b.status === "confirmed" ? "bg-mint/20 text-mint" : "bg-destructive/20 text-destructive"
+                          }`}>
+                            {b.status === "confirmed" ? t.admin.confirmed : t.admin.cancelled}
+                          </span>
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-4 mb-2 text-xs text-muted-foreground">
