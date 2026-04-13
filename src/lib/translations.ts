@@ -230,6 +230,8 @@ export interface Translations {
       deleteError: string;
       loadError: string;
       confirmDelete: string;
+      changePhoto: string;
+      photoUploaded: string;
     };
     promoCodesTab: {
       title: string;
@@ -255,6 +257,7 @@ export interface Translations {
       loadError: string;
       confirmDelete: string;
       stripeReady: string;
+      stripeCouponId: string;
     };
     loyaltyTab: {
       title: string;
@@ -268,6 +271,23 @@ export interface Translations {
       loadError: string;
       noUsers: string;
       stampsOf10: string;
+    };
+    notificationsTab: {
+      title: string;
+      emailReminders: string;
+      emailRemindersDesc: string;
+      savingBtn: string;
+      saveSettings: string;
+      saved: string;
+      saveFailed: string;
+      runNow: string;
+      howItWorks: string;
+      howItWorksDesc: string;
+      upcomingTitle: string;
+      noUpcoming: string;
+      pending: string;
+      functionError: string;
+      remindersSent: (n: number) => string;
     };
     rewardsTab: {
       title: string;
@@ -546,6 +566,8 @@ const en: Translations = {
       deleteError: "Error deleting",
       loadError: "Failed to load barbers",
       confirmDelete: "Are you sure you want to delete this barber?",
+      changePhoto: "Change Photo",
+      photoUploaded: "Photo uploaded!",
     },
     promoCodesTab: {
       title: "Promo Codes",
@@ -571,6 +593,7 @@ const en: Translations = {
       loadError: "Failed to load promo codes",
       confirmDelete: "Are you sure you want to delete this promo code?",
       stripeReady: "Stripe-ready (coupon ID will sync when connected)",
+      stripeCouponId: "Stripe Coupon ID",
     },
     loyaltyTab: {
       title: "Loyalty",
@@ -584,6 +607,23 @@ const en: Translations = {
       loadError: "Failed to load loyalty data",
       noUsers: "No users found",
       stampsOf10: "every 10th cut free",
+    },
+    notificationsTab: {
+      title: "Notifications",
+      emailReminders: "Email Reminders",
+      emailRemindersDesc: "Send reminder emails to all clients",
+      savingBtn: "Saving...",
+      saveSettings: "Save Settings",
+      saved: "Settings saved",
+      saveFailed: "Failed to save settings",
+      runNow: "Run Now",
+      howItWorks: "How it works:",
+      howItWorksDesc: "The reminder engine runs automatically every 30 minutes via a cron job. Each email is sent once per booking and tracked to avoid duplicates. Emails are independent from phone notifications.",
+      upcomingTitle: "Upcoming — Reminder Status",
+      noUpcoming: "No upcoming confirmed bookings",
+      pending: "pending",
+      functionError: "Function error",
+      remindersSent: (n) => `${n} reminder(s) sent`,
     },
     rewardsTab: {
       title: "Rewards",
@@ -862,6 +902,8 @@ const de: Translations = {
       deleteError: "Fehler beim Löschen",
       loadError: "Fehler beim Laden der Barbiere",
       confirmDelete: "Möchtest du diesen Barbier wirklich löschen?",
+      changePhoto: "Foto ändern",
+      photoUploaded: "Foto hochgeladen!",
     },
     promoCodesTab: {
       title: "Promo-Codes",
@@ -887,6 +929,7 @@ const de: Translations = {
       loadError: "Fehler beim Laden der Promo-Codes",
       confirmDelete: "Möchtest du diesen Promo-Code wirklich löschen?",
       stripeReady: "Stripe-bereit (Coupon-ID wird bei Verbindung synchronisiert)",
+      stripeCouponId: "Stripe-Coupon-ID",
     },
     loyaltyTab: {
       title: "Treueprogramm",
@@ -900,6 +943,23 @@ const de: Translations = {
       loadError: "Fehler beim Laden der Treuedaten",
       noUsers: "Keine Benutzer gefunden",
       stampsOf10: "jeder 10. Schnitt gratis",
+    },
+    notificationsTab: {
+      title: "Benachrichtigungen",
+      emailReminders: "E-Mail-Erinnerungen",
+      emailRemindersDesc: "Erinnerungs-E-Mails an alle Kunden senden",
+      savingBtn: "Speichern...",
+      saveSettings: "Einstellungen speichern",
+      saved: "Einstellungen gespeichert",
+      saveFailed: "Fehler beim Speichern der Einstellungen",
+      runNow: "Jetzt ausführen",
+      howItWorks: "So funktioniert's:",
+      howItWorksDesc: "Die Erinnerungs-Engine läuft automatisch alle 30 Minuten über einen Cron-Job. Jede E-Mail wird einmalig pro Buchung gesendet und verfolgt, um Duplikate zu vermeiden. E-Mails sind unabhängig von Telefon-Benachrichtigungen.",
+      upcomingTitle: "Bevorstehend — Erinnerungsstatus",
+      noUpcoming: "Keine bevorstehenden bestätigten Buchungen",
+      pending: "ausstehend",
+      functionError: "Funktionsfehler",
+      remindersSent: (n) => `${n} Erinnerung(en) gesendet`,
     },
     rewardsTab: {
       title: "Belohnungen",
