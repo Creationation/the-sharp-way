@@ -1,7 +1,16 @@
-import { useEffect, useState } from "react";
-import { Plus, Trash2, Save, ToggleLeft, ToggleRight, User } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { Plus, Trash2, Save, ToggleLeft, ToggleRight, User, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import barber1 from "@/assets/barber-1.jpg";
+import barber2 from "@/assets/barber-2.jpg";
+import barber3 from "@/assets/barber-3.jpg";
+
+const IMAGE_MAP: Record<string, string> = {
+  "/barber-1": barber1,
+  "/barber-2": barber2,
+  "/barber-3": barber3,
+};
 
 interface BarberRow {
   id: string;
@@ -40,15 +49,17 @@ interface Props {
 }
 
 const IMAGES = [
-  { label: "Barber 1", value: "/barber-1" },
-  { label: "Barber 2", value: "/barber-2" },
-  { label: "Barber 3", value: "/barber-3" },
+  { label: "Ibo", value: "/barber-1" },
+  { label: "Ahmed", value: "/barber-2" },
+  { label: "Cetin", value: "/barber-3" },
 ];
 
 const BarbersTab = ({ t }: Props) => {
   const [barbers, setBarbers] = useState<BarberRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   useEffect(() => {
     fetchBarbers();
@@ -228,15 +239,30 @@ const BarbersTab = ({ t }: Props) => {
 
             <div>
               <label className="text-muted-foreground text-xs mb-1 block">{t.imageKey}</label>
-              <select
-                value={barber.image_url}
-                onChange={e => updateField(barber.id, "image_url", e.target.value)}
-                className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:border-copper/50 transition-colors"
-              >
-                {IMAGES.map(img => (
-                  <option key={img.value} value={img.value}>{img.label}</option>
-                ))}
-              </select>
+              <div className="flex items-center gap-3">
+                <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-surface border border-border">
+                  <img
+                    src={getBarberPreview(barber.image_url)}
+                    alt={barber.name}
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={el => { fileInputRefs.current[barber.id] = el; }}
+                  onChange={e => handlePhotoUpload(barber.id, e)}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRefs.current[barber.id]?.click()}
+                  disabled={uploadingId === barber.id}
+                  className="flex items-center gap-2 bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground hover:border-copper/50 transition-colors disabled:opacity-50"
+                >
+                  <Camera size={14} className="text-copper" />
+                  {uploadingId === barber.id ? "..." : "Changer la photo"}
+                </button>
+              </div>
             </div>
           </div>
 
