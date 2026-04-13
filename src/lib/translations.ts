@@ -230,6 +230,8 @@ export interface Translations {
       deleteError: string;
       loadError: string;
       confirmDelete: string;
+      changePhoto: string;
+      photoUploaded: string;
     };
     promoCodesTab: {
       title: string;
