@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
-  ArrowLeft, Calendar, Clock, User, Trash2, XCircle,
+  ArrowLeft, Calendar as CalendarIcon, Clock, User, Trash2, XCircle,
   CheckCircle, ChevronLeft, ChevronRight, ToggleLeft, ToggleRight, Save,
   Menu, X, Tag, Scissors, Trophy, Gift, Bell,
 } from "lucide-react";
@@ -8,8 +8,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { format, addDays, subDays } from "date-fns";
+import { format, addDays, subDays, isSameDay } from "date-fns";
 import { de as deLocale, enUS } from "date-fns/locale";
+import { Calendar } from "@/components/ui/calendar";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/lib/translations";
 import UsersTab from "@/components/admin/UsersTab";
@@ -69,7 +70,7 @@ const AdminDashboard = () => {
   const barberNames = dbBarbers.map(b => b.name);
 
   const ADMIN_TABS: { id: TabId; label: string; Icon: React.ElementType }[] = [
-    { id: "bookings",      label: t.admin.bookings,                                 Icon: Calendar  },
+    { id: "bookings",      label: t.admin.bookings,                                 Icon: CalendarIcon  },
     { id: "availability",  label: t.admin.availability,                             Icon: Clock     },
     { id: "users",         label: t.admin.users,                                    Icon: User      },
     { id: "promotions",    label: t.admin.promotions,                               Icon: Tag       },
@@ -85,6 +86,8 @@ const AdminDashboard = () => {
   const [profiles, setProfiles] = useState<Map<string, Profile>>(new Map());
   const [loadingBookings, setLoadingBookings] = useState(true);
   const [filter, setFilter] = useState<"all" | "confirmed" | "cancelled">("all");
+  const [barberFilter, setBarberFilter] = useState<string>("all");
+  const [calendarDate, setCalendarDate] = useState<Date | undefined>(undefined);
 
   // — Availability tab state —
   const [avBarber, setAvBarber] = useState("");
@@ -249,6 +252,16 @@ const AdminDashboard = () => {
     fetchBookings();
   };
 
+  // Compute booking counts per date for the calendar
+  const bookingCountsByDate = useMemo(() => {
+    const counts: Record<string, number> = {};
+    const barberFiltered = bookings.filter(b => barberFilter === "all" || b.barber_name === barberFilter);
+    barberFiltered.forEach(b => {
+      counts[b.booking_date] = (counts[b.booking_date] || 0) + 1;
+    });
+    return counts;
+  }, [bookings, barberFilter]);
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -257,7 +270,10 @@ const AdminDashboard = () => {
     );
   }
 
-  const filtered = bookings.filter(b => filter === "all" || b.status === filter);
+  const filtered = bookings
+    .filter(b => filter === "all" || b.status === filter)
+    .filter(b => barberFilter === "all" || b.barber_name === barberFilter)
+    .filter(b => !calendarDate || b.booking_date === format(calendarDate, "yyyy-MM-dd"));
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -316,17 +332,88 @@ const AdminDashboard = () => {
       {/* ═══════════════════ BOOKINGS TAB ═══════════════════ */}
       {tab === "bookings" && (
         <>
+          {/* Barber filter */}
+          <div className="px-5 mb-4 overflow-x-auto scrollbar-hide">
+            <div className="flex gap-2" style={{ width: "max-content" }}>
+              <button
+                onClick={() => { setBarberFilter("all"); setCalendarDate(undefined); }}
+                className={`px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+                  barberFilter === "all" ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+                }`}
+              >
+                {t.admin.allBarbers}
+              </button>
+              {barberNames.map(name => (
+                <button
+                  key={name}
+                  onClick={() => { setBarberFilter(name); setCalendarDate(undefined); }}
+                  className={`px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+                    barberFilter === name ? "gradient-copper text-primary-foreground" : "bg-surface border border-border text-muted-foreground"
+                  }`}
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Calendar with booking density */}
+          <div className="px-5 mb-5">
+            <div className="card-app p-3">
+              <Calendar
+                mode="single"
+                selected={calendarDate}
+                onSelect={(d) => setCalendarDate(d === calendarDate ? undefined : d)}
+                locale={dateLocale}
+                className="pointer-events-auto mx-auto"
+                modifiers={{
+                  light: (date) => { const c = bookingCountsByDate[format(date, "yyyy-MM-dd")] || 0; return c >= 1 && c <= 5; },
+                  medium: (date) => { const c = bookingCountsByDate[format(date, "yyyy-MM-dd")] || 0; return c >= 6 && c <= 10; },
+                  hot: (date) => { const c = bookingCountsByDate[format(date, "yyyy-MM-dd")] || 0; return c > 10; },
+                }}
+                modifiersStyles={{
+                  light: { backgroundColor: "hsl(142 71% 45% / 0.25)", color: "hsl(142 71% 45%)", fontWeight: 600 },
+                  medium: { backgroundColor: "hsl(38 92% 50% / 0.25)", color: "hsl(38 92% 50%)", fontWeight: 600 },
+                  hot: { backgroundColor: "hsl(0 84% 60% / 0.25)", color: "hsl(0 84% 60%)", fontWeight: 700 },
+                }}
+              />
+              {/* Legend */}
+              <div className="flex flex-wrap gap-3 justify-center mt-3 pt-3 border-t border-border">
+                <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                  <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: "hsl(142 71% 45% / 0.4)" }} />
+                  {t.admin.bookings1to5}
+                </span>
+                <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                  <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: "hsl(38 92% 50% / 0.4)" }} />
+                  {t.admin.bookings6to10}
+                </span>
+                <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                  <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: "hsl(0 84% 60% / 0.4)" }} />
+                  {t.admin.bookingsOver10}
+                </span>
+              </div>
+              {calendarDate && (
+                <button
+                  onClick={() => setCalendarDate(undefined)}
+                  className="w-full mt-2 text-copper text-xs font-medium underline underline-offset-2"
+                >
+                  {t.admin.all} {t.admin.bookings.toLowerCase()}
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="px-5 mb-5 grid grid-cols-3 gap-3">
             <div className="card-app p-3 text-center">
-              <p className="text-copper font-heading text-2xl">{bookings.length}</p>
+              <p className="text-copper font-heading text-2xl">{filtered.length}</p>
               <p className="text-muted-foreground text-[10px]">{t.admin.total}</p>
             </div>
             <div className="card-app p-3 text-center">
-              <p className="text-mint font-heading text-2xl">{bookings.filter(b => b.status === "confirmed").length}</p>
+              <p className="text-mint font-heading text-2xl">{filtered.filter(b => b.status === "confirmed").length}</p>
               <p className="text-muted-foreground text-[10px]">{t.admin.confirmed}</p>
             </div>
             <div className="card-app p-3 text-center">
-              <p className="text-destructive font-heading text-2xl">{bookings.filter(b => b.status === "cancelled").length}</p>
+              <p className="text-destructive font-heading text-2xl">{filtered.filter(b => b.status === "cancelled").length}</p>
               <p className="text-muted-foreground text-[10px]">{t.admin.cancelled}</p>
             </div>
           </div>
@@ -390,7 +477,7 @@ const AdminDashboard = () => {
                       </div>
 
                       <div className="flex items-center gap-4 mb-2 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1"><Calendar size={12} /> {format(new Date(b.booking_date), "dd/MM/yyyy")}</span>
+                        <span className="flex items-center gap-1"><CalendarIcon size={12} /> {format(new Date(b.booking_date), "dd/MM/yyyy")}</span>
                         <span className="flex items-center gap-1"><Clock size={12} /> {b.booking_time}</span>
                         <span className="text-copper font-semibold">{b.service_price}</span>
                       </div>

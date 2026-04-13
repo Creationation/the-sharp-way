@@ -182,6 +182,12 @@ export interface Translations {
     markNoShow: string;
     stampAwarded: string;
     noShow: string;
+    allBarbers: string;
+    calendarLegend: string;
+    bookings1to5: string;
+    bookings6to10: string;
+    bookingsOver10: string;
+    noBookingsDay: string;
     usersTab: {
       title: string;
       search: string;
@@ -518,6 +524,12 @@ const en: Translations = {
     markNoShow: "No-Show",
     stampAwarded: "Stamp awarded ✓",
     noShow: "No-Show",
+    allBarbers: "All Barbers",
+    calendarLegend: "Legend",
+    bookings1to5: "1–5 bookings",
+    bookings6to10: "6–10 bookings",
+    bookingsOver10: "10+ bookings",
+    noBookingsDay: "No bookings",
     usersTab: {
       title: "Users",
       search: "Search by name, email, phone...",
@@ -854,6 +866,12 @@ const de: Translations = {
     markNoShow: "Nicht erschienen",
     stampAwarded: "Stempel vergeben ✓",
     noShow: "Nicht erschienen",
+    allBarbers: "Alle Barbiere",
+    calendarLegend: "Legende",
+    bookings1to5: "1–5 Termine",
+    bookings6to10: "6–10 Termine",
+    bookingsOver10: "10+ Termine",
+    noBookingsDay: "Keine Termine",
     usersTab: {
       title: "Kunden",
       search: "Nach Name, E-Mail, Telefon suchen...",
