@@ -70,7 +70,7 @@ const AdminDashboard = () => {
   const barberNames = dbBarbers.map(b => b.name);
 
   const ADMIN_TABS: { id: TabId; label: string; Icon: React.ElementType }[] = [
-    { id: "bookings",      label: t.admin.bookings,                                 Icon: Calendar  },
+    { id: "bookings",      label: t.admin.bookings,                                 Icon: CalendarIcon  },
     { id: "availability",  label: t.admin.availability,                             Icon: Clock     },
     { id: "users",         label: t.admin.users,                                    Icon: User      },
     { id: "promotions",    label: t.admin.promotions,                               Icon: Tag       },
