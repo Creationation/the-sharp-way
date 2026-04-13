@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Bell, Mail, Clock, ToggleLeft, ToggleRight, Send, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { format, addHours, isAfter, isBefore } from "date-fns";
+import { format } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Settings {
@@ -45,7 +45,27 @@ const REMINDERS_DATA = [
   },
 ];
 
-export default function NotificationsTab() {
+interface Props {
+  t: {
+    title: string;
+    emailReminders: string;
+    emailRemindersDesc: string;
+    savingBtn: string;
+    saveSettings: string;
+    saved: string;
+    saveFailed: string;
+    runNow: string;
+    howItWorks: string;
+    howItWorksDesc: string;
+    upcomingTitle: string;
+    noUpcoming: string;
+    pending: string;
+    functionError: string;
+    remindersSent: (n: number) => string;
+  };
+}
+
+export default function NotificationsTab({ t }: Props) {
   const { lang } = useLanguage();
   const REMINDERS = REMINDERS_DATA.map(r => ({
     ...r,
@@ -91,8 +111,8 @@ export default function NotificationsTab() {
       .update(settings)
       .eq("id", 1);
     setSaving(false);
-    if (error) toast.error("Failed to save settings");
-    else toast.success("Settings saved");
+    if (error) toast.error(t.saveFailed);
+    else toast.success(t.saved);
   };
 
   const toggle = (key: keyof Settings) => {
@@ -104,11 +124,11 @@ export default function NotificationsTab() {
     const { data, error } = await supabase.functions.invoke("process-reminders");
     setTesting(false);
     if (error) {
-      toast.error("Function error: " + error.message);
+      toast.error(t.functionError + ": " + error.message);
     } else {
       const result = data as { sent: number; results: string[] };
-      toast.success(`${result.sent} reminder(s) sent`);
-      fetchData(); // refresh reminder status
+      toast.success(t.remindersSent(result.sent));
+      fetchData();
     }
   };
 
@@ -142,8 +162,8 @@ export default function NotificationsTab() {
         <div className="flex items-center gap-3">
           <Mail size={20} className="text-copper" />
           <div>
-            <p className="text-foreground text-sm font-semibold">Email Reminders</p>
-            <p className="text-muted-foreground text-xs">Send reminder emails to all clients</p>
+            <p className="text-foreground text-sm font-semibold">{t.emailReminders}</p>
+            <p className="text-muted-foreground text-xs">{t.emailRemindersDesc}</p>
           </div>
         </div>
         <button onClick={() => toggle("email_reminders")}>
@@ -180,7 +200,7 @@ export default function NotificationsTab() {
           disabled={saving}
           className="flex-1 gradient-copper text-primary-foreground font-semibold py-3 rounded-full shadow-copper disabled:opacity-50 text-sm"
         >
-          {saving ? "Saving..." : "Save Settings"}
+          {saving ? t.savingBtn : t.saveSettings}
         </button>
         <button
           onClick={triggerTest}
@@ -188,14 +208,14 @@ export default function NotificationsTab() {
           className="flex items-center gap-2 bg-surface border border-border text-foreground font-medium py-3 px-4 rounded-full text-sm disabled:opacity-50"
         >
           <Send size={14} />
-          {testing ? "..." : "Run Now"}
+          {testing ? "..." : t.runNow}
         </button>
       </div>
 
       {/* Info */}
       <div className="card-app p-4 border-copper/20">
         <p className="text-muted-foreground text-xs leading-relaxed">
-          <span className="text-copper font-medium">How it works:</span> The reminder engine runs automatically every 30 minutes via a Supabase cron job. Each email is sent once per booking and tracked to avoid duplicates. Emails are independent from phone notifications.
+          <span className="text-copper font-medium">{t.howItWorks}</span> {t.howItWorksDesc}
         </p>
       </div>
 
@@ -203,11 +223,11 @@ export default function NotificationsTab() {
       <div>
         <div className="flex items-center gap-2 mb-3">
           <Calendar size={16} className="text-copper" />
-          <h3 className="text-foreground font-semibold text-sm">Upcoming — Reminder Status</h3>
+          <h3 className="text-foreground font-semibold text-sm">{t.upcomingTitle}</h3>
         </div>
         {upcoming.length === 0 ? (
           <div className="card-app p-6 text-center">
-            <p className="text-muted-foreground text-sm">No upcoming confirmed bookings</p>
+            <p className="text-muted-foreground text-sm">{t.noUpcoming}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -239,7 +259,7 @@ export default function NotificationsTab() {
                               : "bg-surface text-muted-foreground"
                           }`}
                         >
-                          {key} {s.sent ? "✓" : s.upcoming ? "pending" : "—"}
+                          {key} {s.sent ? "✓" : s.upcoming ? t.pending : "—"}
                         </span>
                       );
                     })}

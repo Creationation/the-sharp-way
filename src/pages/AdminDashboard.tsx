@@ -77,7 +77,7 @@ const AdminDashboard = () => {
     { id: "codes",         label: t.admin.promoCodesTab.title,                      Icon: Tag       },
     { id: "loyalty",       label: t.admin.loyaltyTab.title,                         Icon: Trophy    },
     { id: "rewards",       label: t.admin.rewardsTab.title,                         Icon: Gift      },
-    { id: "notifications", label: "Notifications",                                  Icon: Bell      },
+    { id: "notifications", label: t.admin.notificationsTab.title,                      Icon: Bell      },
   ];
 
   // — Bookings tab state —
@@ -599,7 +599,7 @@ const AdminDashboard = () => {
       {/* ═══════════════════ NOTIFICATIONS TAB ═══════════════════ */}
       {tab === "notifications" && (
         <div className="px-5">
-          <NotificationsTab />
+          <NotificationsTab t={t.admin.notificationsTab} />
         </div>
       )}
     </div>

@@ -45,8 +45,9 @@ interface Props {
     deleteError: string;
     loadError: string;
     confirmDelete: string;
+    changePhoto: string;
+    photoUploaded: string;
   };
-}
 
 const IMAGES = [
   { label: "Ibo", value: "/barber-1" },
@@ -164,7 +165,7 @@ const BarbersTab = ({ t }: Props) => {
     const publicUrl = urlData.publicUrl + "?t=" + Date.now();
     updateField(barberId, "image_url", publicUrl);
     setUploadingId(null);
-    toast.success("Photo uploadée !");
+    toast.success(t.photoUploaded);
   };
 
   if (loading) {
@@ -286,7 +287,7 @@ const BarbersTab = ({ t }: Props) => {
                   className="flex items-center gap-2 bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground hover:border-copper/50 transition-colors disabled:opacity-50"
                 >
                   <Camera size={14} className="text-copper" />
-                  {uploadingId === barber.id ? "..." : "Changer la photo"}
+                  {uploadingId === barber.id ? "..." : t.changePhoto}
                 </button>
               </div>
             </div>
