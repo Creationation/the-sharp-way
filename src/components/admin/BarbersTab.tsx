@@ -167,7 +167,7 @@ const BarbersTab = ({ t }: Props) => {
     toast.success("Photo uploadée !");
   };
 
-
+  if (loading) {
     return (
       <div className="flex justify-center py-8">
         <div className="w-6 h-6 border-2 border-copper border-t-transparent rounded-full animate-spin" />
