@@ -12,6 +12,7 @@ import SplashScreen from "@/pages/SplashScreen";
 import HomeDashboard from "@/pages/HomeDashboard";
 import BarberProfile from "@/pages/BarberProfile";
 import BookingFlow from "@/pages/BookingFlow";
+import StripeReturn from "@/pages/StripeReturn";
 import ServicesScreen from "@/pages/ServicesScreen";
 import GalleryScreen from "@/pages/GalleryScreen";
 import ReviewsScreen from "@/pages/ReviewsScreen";
