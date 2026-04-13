@@ -59,6 +59,17 @@ export interface Translations {
     cancelled: string;
     cancelBooking: string;
     barberUnavailable: string;
+    confirmCancelTitle: string;
+    confirmCancelFree: string;
+    confirmCancelCharged: string;
+    confirmCancelBtn: string;
+    cancelBtn: string;
+    paymentStatus: string;
+    paymentVerified: string;
+    paymentCharged: string;
+    paymentReleased: string;
+    paymentPending: string;
+    paymentFailed: string;
   };
   booking: {
     title: string;
