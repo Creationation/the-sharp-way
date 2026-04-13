@@ -51,17 +51,21 @@ const ProfileScreen = () => {
 
   const cancelBooking = async (id: string) => {
     setCancelling(id);
-    const { error } = await supabase
-      .from("bookings")
-      .update({ status: "cancelled" })
-      .eq("id", id);
-    setCancelling(null);
-    if (error) {
-      toast.error(t.toasts.cancelError);
-    } else {
-      toast.success(t.toasts.bookingCancelled);
+    try {
+      const { data, error } = await supabase.functions.invoke("cancel-booking", {
+        body: { booking_id: id },
+      });
+      if (error) throw error;
+      if (data?.charged) {
+        toast.warning(t.toasts.cancelledCharged);
+      } else {
+        toast.success(t.toasts.cancelledFree);
+      }
       fetchBookings();
+    } catch {
+      toast.error(t.toasts.cancelError);
     }
+    setCancelling(null);
   };
 
   const today = new Date().toISOString().split("T")[0];
