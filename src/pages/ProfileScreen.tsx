@@ -336,6 +336,39 @@ const ProfileScreen = () => {
           </button>
         ))}
       </div>
+
+      {/* Cancel confirmation dialog */}
+      <AlertDialog open={!!confirmCancelId} onOpenChange={(open) => { if (!open) setConfirmCancelId(null); }}>
+        <AlertDialogContent className="bg-surface border-border">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-foreground">
+              <AlertTriangle size={18} className="text-copper" />
+              {t.common.confirmCancelTitle}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              {(() => {
+                const appt = new Date(`${confirmCancelDate}T${confirmCancelTime || "10:00"}:00`);
+                const hoursUntil = (appt.getTime() - Date.now()) / (1000 * 60 * 60);
+                return hoursUntil >= 24 ? t.common.confirmCancelFree : t.common.confirmCancelCharged;
+              })()}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-surface border-border text-foreground">
+              {t.common.cancelBtn}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (confirmCancelId) cancelBooking(confirmCancelId);
+                setConfirmCancelId(null);
+              }}
+              className="bg-destructive text-destructive-foreground"
+            >
+              {t.common.confirmCancelBtn}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
