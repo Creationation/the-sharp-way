@@ -593,6 +593,7 @@ const en: Translations = {
       loadError: "Failed to load promo codes",
       confirmDelete: "Are you sure you want to delete this promo code?",
       stripeReady: "Stripe-ready (coupon ID will sync when connected)",
+      stripeCouponId: "Stripe Coupon ID",
     },
     loyaltyTab: {
       title: "Loyalty",
@@ -928,6 +929,7 @@ const de: Translations = {
       loadError: "Fehler beim Laden der Promo-Codes",
       confirmDelete: "Möchtest du diesen Promo-Code wirklich löschen?",
       stripeReady: "Stripe-bereit (Coupon-ID wird bei Verbindung synchronisiert)",
+      stripeCouponId: "Stripe-Coupon-ID",
     },
     loyaltyTab: {
       title: "Treueprogramm",
