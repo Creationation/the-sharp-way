@@ -47,6 +47,8 @@ export interface Translations {
     bookingFailed: string;
     cancelError: string;
     bookingCancelled: string;
+    cancelledFree: string;
+    cancelledCharged: string;
     cancelling: string;
     copied: string;
     accountCreated: string;
@@ -350,6 +352,8 @@ const en: Translations = {
     bookingFailed: "Booking failed. Please try again.",
     cancelError: "Failed to cancel booking",
     bookingCancelled: "Booking cancelled",
+    cancelledFree: "Booking cancelled — no charge.",
+    cancelledCharged: "Booking cancelled — €5 deposit was charged.",
     cancelling: "Cancelling...",
     copied: "Copied!",
     accountCreated: "Account created!",
@@ -653,6 +657,8 @@ const de: Translations = {
     bookingFailed: "Buchung fehlgeschlagen. Bitte versuche es erneut.",
     cancelError: "Fehler beim Stornieren",
     bookingCancelled: "Termin storniert",
+    cancelledFree: "Termin storniert — keine Gebühr.",
+    cancelledCharged: "Termin storniert — 5 € Kaution wurde abgebucht.",
     cancelling: "Wird storniert...",
     copied: "Kopiert!",
     accountCreated: "Konto erstellt!",
