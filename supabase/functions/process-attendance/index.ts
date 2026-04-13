@@ -47,7 +47,7 @@ serve(async (req) => {
   const autoStamped: string[] = [];
   const errors: string[] = [];
 
-  for (const booking of (pendingBookings || []) as PendingBooking[]) {
+  for (const booking of (pendingBookings || []) as unknown as PendingBooking[]) {
     // Auto-mark as attended — benefit of the doubt (barber did not mark as no-show)
     const { error: updateErr } = await supabase
       .from("bookings")
