@@ -827,16 +827,43 @@ const BookingFlow = () => {
         </div>
       </div>
 
+      {/* Payment Explanation */}
+      <div className="px-5 mb-6">
+        <PaymentExplanation />
+      </div>
+
+      {/* Stripe waiting state */}
+      {stripeOpened && (
+        <div className="px-5 mb-6">
+          <div className="card-app p-4 border-copper/30 text-center">
+            <div className="w-6 h-6 border-2 border-copper border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-foreground text-sm font-medium mb-1">
+              {lang === "de" ? "Sobald Stripe bestätigt ist, wirst du automatisch weitergeleitet." : "Once Stripe confirms, you'll be redirected automatically."}
+            </p>
+            <button
+              onClick={resetStripeFlow}
+              className="text-copper text-xs underline mt-2"
+            >
+              {lang === "de" ? "Abbrechen" : "Cancel"}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* CTA */}
       <div className="fixed bottom-16 left-0 right-0 z-40 px-5 pt-3 pb-8 bg-background border-t border-border">
         <button
           onClick={handleConfirm}
-          disabled={saving || dayOff}
+          disabled={saving || dayOff || stripeOpened}
           className="w-full gradient-copper text-primary-foreground font-semibold text-base py-3.5 rounded-full shadow-copper disabled:opacity-50"
         >
-          {saving ? t.booking.saving : t.booking.confirm}
+          {saving
+            ? (lang === "de" ? "Weiterleitung zu Stripe..." : "Redirecting to Stripe...")
+            : (lang === "de" ? "💳 Karte verifizieren & buchen" : "💳 Verify card & book")}
         </button>
-        <p className="text-center text-muted-foreground text-[10px] mt-1">{t.booking.cancellation}</p>
+        <p className="text-center text-muted-foreground text-[10px] mt-1">
+          {lang === "de" ? "Sichere Zahlung über Stripe 🔒 · Kostenlose Stornierung bis 2h vorher" : "Secure payment via Stripe 🔒 · Free cancellation up to 2h before"}
+        </p>
       </div>
     </div>
   );
