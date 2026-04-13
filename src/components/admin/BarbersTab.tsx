@@ -141,7 +141,33 @@ const BarbersTab = ({ t }: Props) => {
     }
   };
 
-  if (loading) {
+  const getBarberPreview = (imageUrl: string): string => {
+    if (imageUrl.startsWith("http")) return imageUrl;
+    return IMAGE_MAP[imageUrl] || barber1;
+  };
+
+  const handlePhotoUpload = async (barberId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingId(barberId);
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `${barberId}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("barber-photos")
+      .upload(path, file, { upsert: true });
+    if (uploadError) {
+      toast.error(t.saveError);
+      setUploadingId(null);
+      return;
+    }
+    const { data: urlData } = supabase.storage.from("barber-photos").getPublicUrl(path);
+    const publicUrl = urlData.publicUrl + "?t=" + Date.now();
+    updateField(barberId, "image_url", publicUrl);
+    setUploadingId(null);
+    toast.success("Photo uploadée !");
+  };
+
+
     return (
       <div className="flex justify-center py-8">
         <div className="w-6 h-6 border-2 border-copper border-t-transparent rounded-full animate-spin" />
