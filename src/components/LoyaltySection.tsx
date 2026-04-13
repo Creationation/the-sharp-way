@@ -34,7 +34,7 @@ const LoyaltySection = () => {
               </div>
             ))}
           </div>
-          <p className="text-muted-foreground text-xs mt-4">{stamps}/10 — {10 - stamps} more to go!</p>
+          <p className="text-muted-foreground text-xs mt-4">{stamps}/10 · {10 - stamps} more to go!</p>
         </div>
 
         {/* Email CTA */}

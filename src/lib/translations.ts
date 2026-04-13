@@ -862,7 +862,7 @@ const de: Translations = {
     deleteError: "Fehler beim Löschen der Buchung",
     bookingCancelled: "Buchung storniert",
     attendanceQuestion: "Erschienen?",
-    markAttended: "Ja — Stempel",
+    markAttended: "Ja · Stempel",
     markNoShow: "Nicht erschienen",
     stampAwarded: "Stempel vergeben ✓",
     noShow: "Nicht erschienen",

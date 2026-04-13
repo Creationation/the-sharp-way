@@ -140,7 +140,7 @@ const LoyaltyTab = ({ t }: Props) => {
             {/* Stamps visual */}
             <div>
               <label className="text-muted-foreground text-xs mb-2 block">
-                {t.stamps} — {u.stamps}/10 ({t.stampsOf10})
+                {t.stamps} · {u.stamps}/10 ({t.stampsOf10})
               </label>
               <div className="grid grid-cols-5 gap-1.5 mb-2">
                 {Array.from({ length: 10 }).map((_, i) => (

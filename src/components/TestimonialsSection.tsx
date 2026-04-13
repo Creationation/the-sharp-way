@@ -2,7 +2,7 @@ import { Star, Quote } from "lucide-react";
 import { useRef } from "react";
 
 const reviews = [
-  { name: "Alex", service: "Fade & Taper", stars: 5, text: "Best barbershop in Vienna. Ibo nailed the fade — absolutely clean." },
+  { name: "Alex", service: "Fade & Taper", stars: 5, text: "Best barbershop in Vienna. Ibo nailed the fade · absolutely clean." },
   { name: "Thomas", service: "Haircut + Beard Combo", stars: 5, text: "These guys know their craft. I walked in scruffy and walked out looking like a different person." },
   { name: "Stefan", service: "Hot Towel Shave", stars: 5, text: "The hot towel shave is an experience. Smooth, relaxing, and flawless." },
   { name: "Michael", service: "Classic Haircut", stars: 4, text: "Ahmed took his time to get the cut exactly right. Professional and friendly." },
@@ -48,7 +48,7 @@ const ReviewCard = ({ review }: { review: typeof reviews[number] }) => (
     <p className="text-foreground text-sm leading-relaxed mb-4">"{review.text}"</p>
     <div>
       <span className="font-heading text-lg text-foreground">{review.name}</span>
-      <span className="text-muted-foreground text-xs ml-2">— {review.service}</span>
+      <span className="text-muted-foreground text-xs ml-2">· {review.service}</span>
     </div>
   </div>
 );
