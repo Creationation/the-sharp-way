@@ -973,7 +973,7 @@ const de: Translations = {
       runNow: "Jetzt ausführen",
       howItWorks: "So funktioniert's:",
       howItWorksDesc: "Die Erinnerungs-Engine läuft automatisch alle 30 Minuten über einen Cron-Job. Jede E-Mail wird einmalig pro Buchung gesendet und verfolgt, um Duplikate zu vermeiden. E-Mails sind unabhängig von Telefon-Benachrichtigungen.",
-      upcomingTitle: "Bevorstehend — Erinnerungsstatus",
+      upcomingTitle: "Bevorstehend · Erinnerungsstatus",
       noUpcoming: "Keine bevorstehenden bestätigten Buchungen",
       pending: "ausstehend",
       functionError: "Funktionsfehler",
