@@ -566,6 +566,8 @@ const en: Translations = {
       deleteError: "Error deleting",
       loadError: "Failed to load barbers",
       confirmDelete: "Are you sure you want to delete this barber?",
+      changePhoto: "Change Photo",
+      photoUploaded: "Photo uploaded!",
     },
     promoCodesTab: {
       title: "Promo Codes",
@@ -902,6 +904,8 @@ const de: Translations = {
       deleteError: "Fehler beim Löschen",
       loadError: "Fehler beim Laden der Barbiere",
       confirmDelete: "Möchtest du diesen Barbier wirklich löschen?",
+      changePhoto: "Foto ändern",
+      photoUploaded: "Foto hochgeladen!",
     },
     promoCodesTab: {
       title: "Promo-Codes",
