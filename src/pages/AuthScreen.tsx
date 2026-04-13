@@ -63,7 +63,7 @@ const AuthScreen = () => {
 
       <div className="px-5 mt-4">
         <div className="text-center mb-8">
-          <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-20 mx-auto mb-2" />
+          <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-32 mx-auto mb-2" />
           <p className="text-muted-foreground text-sm">
             {mode === "login" ? t.auth.welcomeBack : t.auth.joinCommunity}
           </p>

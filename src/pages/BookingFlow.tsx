@@ -88,8 +88,8 @@ async function scheduleReminders(
         id: baseId,
         title: isDE ? "Termin morgen ✂️" : "Appointment tomorrow ✂️",
         body: isDE
-          ? `Dein Termin mit ${barberName} ist morgen um ${bookingTime} Uhr — ${serviceName}`
-          : `Your appointment with ${barberName} is tomorrow at ${bookingTime} — ${serviceName}`,
+          ? `Dein Termin mit ${barberName} ist morgen um ${bookingTime} Uhr · ${serviceName}`
+          : `Your appointment with ${barberName} is tomorrow at ${bookingTime} · ${serviceName}`,
         schedule: { at: minus24h },
         sound: "default",
         smallIcon: "ic_launcher",
@@ -338,8 +338,8 @@ const BookingFlow = () => {
             id: 77777,
             title: isDE ? "Reservierung nicht abgeschlossen ✂️" : "Booking not completed ✂️",
             body: isDE
-              ? "Du hast eine Reservierung begonnen — schließe sie jetzt ab!"
-              : "You started a booking — complete it now!",
+              ? "Du hast eine Reservierung begonnen · schließe sie jetzt ab!"
+              : "You started a booking · complete it now!",
             schedule: { at: new Date(Date.now() + 20 * 60 * 1000) },
             smallIcon: "ic_launcher",
           }],
@@ -452,8 +452,8 @@ const BookingFlow = () => {
   const handleConfirm = async () => {
     if (!user) {
       toast.info(lang === "de"
-        ? "Bitte melde dich an — deine Auswahl wird gespeichert"
-        : "Please sign in — your selection will be saved");
+        ? "Bitte melde dich an · deine Auswahl wird gespeichert"
+        : "Please sign in · your selection will be saved");
       navigate("/auth");
       return;
     }
