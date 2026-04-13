@@ -862,7 +862,7 @@ const BookingFlow = () => {
             : (lang === "de" ? "💳 Karte verifizieren & buchen" : "💳 Verify card & book")}
         </button>
         <p className="text-center text-muted-foreground text-[10px] mt-1">
-          {lang === "de" ? "Sichere Zahlung über Stripe 🔒 · Kostenlose Stornierung bis 2h vorher" : "Secure payment via Stripe 🔒 · Free cancellation up to 2h before"}
+          {lang === "de" ? "Sichere Zahlung über Stripe 🔒 · Kostenlose Stornierung bis 24h vorher" : "Secure payment via Stripe 🔒 · Free cancellation up to 24h before"}
         </p>
       </div>
     </div>
