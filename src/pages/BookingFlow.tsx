@@ -466,53 +466,65 @@ const BookingFlow = () => {
     const servicePrices = appliedPromo ? `€${finalPrice} (was €${totalPrice})` : `€${totalPrice}`;
     const serviceDurations = `${totalDuration}min`;
 
-    const { error } = await supabase.from("bookings").insert({
-      user_id: user.id,
-      barber_name: selectedBarber.name,
-      service_name: serviceNames,
-      service_price: servicePrices,
-      service_duration: serviceDurations,
-      booking_date: dateStr,
-      booking_time: selectedTime,
-      status: "confirmed",
-    });
+    try {
+      redirectHandledRef.current = false;
+      clearStripeSignals();
 
-    setSaving(false);
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("full_name, phone, email")
+        .eq("user_id", user.id)
+        .maybeSingle();
 
-    if (error) {
-      toast.error(t.toasts.bookingFailed);
-      return;
-    }
-
-    // Clear draft — booking completed
-    localStorage.removeItem(DRAFT_KEY);
-
-    // Increment promo code usage (non-blocking)
-    if (appliedPromo) {
-      supabase.rpc("use_promo_code" as any, { _code: appliedPromo.code }).then(() => {});
-    }
-
-    // Send confirmation email (non-blocking — failure doesn't affect booking)
-    if (user.email) {
-      const displayName = user.user_metadata?.full_name || user.email.split("@")[0];
-      supabase.functions.invoke("send-booking-confirmation", {
-        body: {
-          email: user.email,
-          name: displayName,
-          service: serviceNames,
-          barber: selectedBarber.name,
-          date: `${dayAbbr[selectedDate.getDay()]} ${selectedDate.getDate()} ${monthAbbr[selectedDate.getMonth()]}`,
-          time: selectedTime,
-          price: servicePrices,
-          lang,
+      const payload = {
+        bookingData: {
+          barberName: selectedBarber.name,
+          serviceName: serviceNames,
+          servicePrice: servicePrices,
+          serviceDuration: serviceDurations,
+          bookingDate: dateStr,
+          bookingTime: selectedTime,
+          clientName: profileData?.full_name || user.user_metadata?.full_name || "",
+          clientPhone: profileData?.phone || "",
+          clientEmail: user.email || "",
+          notes: "",
+          promoCode: appliedPromo?.code || "",
         },
-      }).catch(() => {}); // silent fail
+      };
+
+      const { data, error } = await supabase.functions.invoke("create-setup-intent", {
+        body: payload,
+      });
+
+      if (error) throw error;
+      if (data?.url && /^https:\/\/checkout\.stripe\.com\//.test(data.url)) {
+        const pending: PendingStripeBooking = {
+          barberName: selectedBarber.name,
+          bookingDate: dateStr,
+          bookingTime: selectedTime,
+          clientEmail: user.email || "",
+          createdAt: Date.now(),
+        };
+        localStorage.setItem(STRIPE_PENDING_KEY, JSON.stringify(pending));
+        setPendingStripeBooking(pending);
+        localStorage.removeItem(DRAFT_KEY);
+        setStripeOpened(true);
+
+        const stripeWindow = window.open(data.url, "_blank");
+        if (!stripeWindow) {
+          setSaving(false);
+          window.location.href = data.url;
+          return;
+        }
+        setSaving(false);
+      } else {
+        throw new Error("No valid checkout URL received");
+      }
+    } catch (err) {
+      console.error("[checkout] error:", err);
+      toast.error(lang === "de" ? "Fehler bei der Karteverifizierung. Bitte versuche es erneut." : "Card verification error. Please try again.");
+      setSaving(false);
     }
-
-    // Schedule local push notifications (24h, 5h, 2h before appointment)
-    scheduleReminders(selectedBarber.name, serviceNames, selectedDate, selectedTime, lang);
-
-    setConfirmed(true);
   };
 
   if (barbersLoading || !selectedBarber) {
