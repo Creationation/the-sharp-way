@@ -3,6 +3,7 @@ import { Bell, Mail, Clock, ToggleLeft, ToggleRight, Send, Calendar } from "luci
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format, addHours, isAfter, isBefore } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Settings {
   email_reminders: boolean;
@@ -23,13 +24,35 @@ interface UpcomingBooking {
   profiles: { email: string | null; full_name: string | null } | null;
 }
 
-const REMINDERS = [
-  { key: "reminder_24h" as const, label: "24h avant", icon: "📅", desc: "La veille du rendez-vous" },
-  { key: "reminder_5h"  as const, label: "5h avant",  icon: "⏰", desc: "Le matin du rendez-vous" },
-  { key: "reminder_2h"  as const, label: "2h avant",  icon: "🔔", desc: "Rappel de dernière minute" },
+const REMINDERS_DATA = [
+  {
+    key: "reminder_24h" as const,
+    icon: "📅",
+    label: { en: "24h before", de: "24 Stunden vorher" },
+    desc:  { en: "The day before the appointment", de: "Am Abend vor dem Termin" },
+  },
+  {
+    key: "reminder_5h" as const,
+    icon: "⏰",
+    label: { en: "5h before", de: "5 Stunden vorher" },
+    desc:  { en: "Morning of the appointment", de: "Am Morgen des Termins" },
+  },
+  {
+    key: "reminder_2h" as const,
+    icon: "🔔",
+    label: { en: "2h before", de: "2 Stunden vorher" },
+    desc:  { en: "Last-minute reminder", de: "Kurzfristige Erinnerung" },
+  },
 ];
 
 export default function NotificationsTab() {
+  const { lang } = useLanguage();
+  const REMINDERS = REMINDERS_DATA.map(r => ({
+    ...r,
+    label: r.label[lang],
+    desc: r.desc[lang],
+  }));
+
   const [settings, setSettings] = useState<Settings>({
     email_reminders: true,
     reminder_24h: true,

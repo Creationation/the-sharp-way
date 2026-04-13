@@ -19,6 +19,7 @@ import ProfileScreen from "@/pages/ProfileScreen";
 import ContactScreen from "@/pages/ContactScreen";
 import AuthScreen from "@/pages/AuthScreen";
 import AdminDashboard from "@/pages/AdminDashboard";
+import ExploreBarbers from "@/pages/ExploreBarbers";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,7 @@ const App = () => {
             <Route path="/contact" element={<ContactScreen />} />
             <Route path="/auth" element={<AuthScreen />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/explore" element={<ExploreBarbers />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

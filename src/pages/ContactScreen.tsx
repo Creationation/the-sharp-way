@@ -3,18 +3,28 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const hoursData = [
-  { time: "Closed" },
-  { time: "10:00 – 20:00" },
-  { time: "10:00 – 20:00" },
-  { time: "10:00 – 20:00" },
-  { time: "10:00 – 20:00" },
-  { time: "10:00 – 20:00" },
-  { time: "Closed" },
+  { time: "Closed" },        // Montag
+  { time: "09:00 – 19:00" }, // Dienstag
+  { time: "09:00 – 19:00" }, // Mittwoch
+  { time: "09:00 – 19:00" }, // Donnerstag
+  { time: "09:00 – 19:00" }, // Freitag
+  { time: "09:00 – 19:00" }, // Samstag
+  { time: "Closed" },        // Sonntag
 ];
+
+function isOpenNow(): boolean {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun, 1=Mon, 2=Tue … 6=Sat
+  // Open Tue(2) to Sat(6)
+  if (day < 2 || day > 6) return false;
+  const minutes = now.getHours() * 60 + now.getMinutes();
+  return minutes >= 9 * 60 && minutes < 19 * 60;
+}
 
 const ContactScreen = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const open = isOpenNow();
   const whatsappUrl = `https://wa.me/436644686073?text=${encodeURIComponent("Hallo, ich möchte einen Termin bei Sitdown Barber vereinbaren.")}`;
 
   const hours = hoursData.map((h, i) => ({
@@ -86,9 +96,13 @@ const ContactScreen = () => {
       <div className="px-5 mb-5">
         <div className="card-app p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-2 h-2 rounded-full bg-mint animate-pulse-dot" />
-            <span className="text-mint text-xs font-medium">{t.contact.openNow}</span>
-            <span className="text-muted-foreground text-xs">{t.contact.closesAt}</span>
+            <div className={`w-2 h-2 rounded-full ${open ? "bg-mint animate-pulse-dot" : "bg-muted-foreground"}`} />
+            <span className={`text-xs font-medium ${open ? "text-mint" : "text-muted-foreground"}`}>
+              {open ? t.contact.openNow : t.contact.closedNow}
+            </span>
+            {open && (
+              <span className="text-muted-foreground text-xs">{t.contact.closesAt}</span>
+            )}
           </div>
           <div className="space-y-2">
             {hours.map(h => (

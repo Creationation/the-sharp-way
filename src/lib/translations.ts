@@ -97,6 +97,7 @@ export interface Translations {
     title: string;
     openNow: string;
     closesAt: string;
+    closedNow: string;
     directions: string;
     callUs: string;
     chatUs: string;
@@ -163,6 +164,11 @@ export interface Translations {
     bookingDeleted: string;
     deleteError: string;
     bookingCancelled: string;
+    attendanceQuestion: string;
+    markAttended: string;
+    markNoShow: string;
+    stampAwarded: string;
+    noShow: string;
     usersTab: {
       title: string;
       search: string;
@@ -274,6 +280,27 @@ export interface Translations {
     reviews: string;
     yrs: string;
   };
+  auth: {
+    signIn: string;
+    createAccount: string;
+    welcomeBack: string;
+    joinCommunity: string;
+    fullName: string;
+    email: string;
+    password: string;
+    loading: string;
+    noAccount: string;
+    hasAccount: string;
+    signUp: string;
+    errorDefault: string;
+  };
+  explore: {
+    title: string;
+    subtitle: string;
+    headBarber: string;
+    womenSpecialist: string;
+    book: string;
+  };
 }
 
 const en: Translations = {
@@ -283,7 +310,7 @@ const en: Translations = {
     line3: "YOUR LOOK INSTANTLY.",
     sub: "Vienna's premium barbershop. Walk in or book ahead.",
     cta: "Get Started",
-    walkin: "Or walk in anytime · Tue–Sat 10:00–20:00",
+    walkin: "Or walk in anytime · Tue–Sat 09:00–19:00",
     pickLanguage: "Choose your language",
   },
   nav: {
@@ -372,7 +399,8 @@ const en: Translations = {
   contact: {
     title: "Find Us",
     openNow: "Open Now",
-    closesAt: "· Closes at 8PM",
+    closesAt: "· Closes at 7PM",
+    closedNow: "Closed",
     directions: "Get Directions",
     callUs: "Call us",
     chatUs: "Chat with us",
@@ -439,6 +467,11 @@ const en: Translations = {
     bookingDeleted: "Booking deleted",
     deleteError: "Error deleting booking",
     bookingCancelled: "Booking cancelled",
+    attendanceQuestion: "Attended?",
+    markAttended: "Yes — Stamp",
+    markNoShow: "No-Show",
+    stampAwarded: "Stamp awarded ✓",
+    noShow: "No-Show",
     usersTab: {
       title: "Users",
       search: "Search by name, email, phone...",
@@ -550,6 +583,27 @@ const en: Translations = {
     reviews: "reviews",
     yrs: "yrs",
   },
+  auth: {
+    signIn: "Sign In",
+    createAccount: "Create Account",
+    welcomeBack: "Welcome back.",
+    joinCommunity: "Join the community.",
+    fullName: "Full Name",
+    email: "Email",
+    password: "Password",
+    loading: "Loading...",
+    noAccount: "Don't have an account?",
+    hasAccount: "Already have an account?",
+    signUp: "Sign Up",
+    errorDefault: "Something went wrong",
+  },
+  explore: {
+    title: "Our Barbers",
+    subtitle: "The Sharp Cut · Vienna 1220",
+    headBarber: "Head Barber",
+    womenSpecialist: "Women's Specialist",
+    book: "Book",
+  },
 };
 
 const de: Translations = {
@@ -559,7 +613,7 @@ const de: Translations = {
     line3: "DEINEN LOOK SOFORT.",
     sub: "Wiens Premium Barbershop. Einfach vorbeikommen oder vorab buchen.",
     cta: "Jetzt starten",
-    walkin: "Oder komm einfach vorbei · Di–Sa 10:00–20:00",
+    walkin: "Oder komm einfach vorbei · Di–Sa 09:00–19:00",
     pickLanguage: "Wähle deine Sprache",
   },
   nav: {
@@ -648,7 +702,8 @@ const de: Translations = {
   contact: {
     title: "Finde uns",
     openNow: "Jetzt geöffnet",
-    closesAt: "· Schließt um 20:00",
+    closesAt: "· Schließt um 19:00 Uhr",
+    closedNow: "Geschlossen",
     directions: "Route berechnen",
     callUs: "Anrufen",
     chatUs: "Schreib uns",
@@ -715,6 +770,11 @@ const de: Translations = {
     bookingDeleted: "Buchung gelöscht",
     deleteError: "Fehler beim Löschen der Buchung",
     bookingCancelled: "Buchung storniert",
+    attendanceQuestion: "Erschienen?",
+    markAttended: "Ja — Stempel",
+    markNoShow: "Nicht erschienen",
+    stampAwarded: "Stempel vergeben ✓",
+    noShow: "Nicht erschienen",
     usersTab: {
       title: "Kunden",
       search: "Nach Name, E-Mail, Telefon suchen...",
@@ -825,6 +885,27 @@ const de: Translations = {
     bookWith: (name) => `Mit ${name} buchen →`,
     reviews: "Bewertungen",
     yrs: "J.",
+  },
+  auth: {
+    signIn: "Anmelden",
+    createAccount: "Konto erstellen",
+    welcomeBack: "Willkommen zurück.",
+    joinCommunity: "Werde Teil der Community.",
+    fullName: "Vollständiger Name",
+    email: "E-Mail",
+    password: "Passwort",
+    loading: "Laden...",
+    noAccount: "Noch kein Konto?",
+    hasAccount: "Bereits ein Konto?",
+    signUp: "Registrieren",
+    errorDefault: "Ein Fehler ist aufgetreten",
+  },
+  explore: {
+    title: "Unsere Barbiere",
+    subtitle: "The Sharp Cut · Wien 1220",
+    headBarber: "Chef Barbier",
+    womenSpecialist: "Frauen Spezialistin",
+    book: "Buchen",
   },
 };
 

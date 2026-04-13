@@ -57,7 +57,7 @@ const AuthScreen = () => {
           <ArrowLeft size={18} className="text-foreground" />
         </button>
         <h1 className="font-heading text-2xl text-foreground">
-          {mode === "login" ? "Sign In" : "Create Account"}
+          {mode === "login" ? t.auth.signIn : t.auth.createAccount}
         </h1>
       </div>
 
@@ -65,7 +65,7 @@ const AuthScreen = () => {
         <div className="text-center mb-8">
           <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-20 mx-auto mb-2" />
           <p className="text-muted-foreground text-sm">
-            {mode === "login" ? "Welcome back." : "Join the community."}
+            {mode === "login" ? t.auth.welcomeBack : t.auth.joinCommunity}
           </p>
         </div>
 
@@ -78,7 +78,7 @@ const AuthScreen = () => {
                 value={form.fullName}
                 onChange={handleChange}
                 required
-                placeholder="Full Name"
+                placeholder={t.auth.fullName}
                 className="w-full bg-surface border border-border rounded-xl pl-12 pr-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper transition-colors"
               />
             </div>
@@ -92,7 +92,7 @@ const AuthScreen = () => {
               value={form.email}
               onChange={handleChange}
               required
-              placeholder="Email"
+              placeholder={t.auth.email}
               className="w-full bg-surface border border-border rounded-xl pl-12 pr-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper transition-colors"
             />
           </div>
@@ -106,7 +106,7 @@ const AuthScreen = () => {
               onChange={handleChange}
               required
               minLength={6}
-              placeholder="Password"
+              placeholder={t.auth.password}
               className="w-full bg-surface border border-border rounded-xl pl-12 pr-12 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper transition-colors"
             />
             <button
@@ -123,17 +123,17 @@ const AuthScreen = () => {
             disabled={loading}
             className="w-full gradient-copper text-primary-foreground font-semibold text-base py-3.5 rounded-full shadow-copper disabled:opacity-50"
           >
-            {loading ? "Loading..." : mode === "login" ? "Sign In" : "Create Account"}
+            {loading ? t.auth.loading : mode === "login" ? t.auth.signIn : t.auth.createAccount}
           </button>
         </form>
 
         <p className="text-center text-muted-foreground text-sm mt-6">
-          {mode === "login" ? "Don't have an account?" : "Already have an account?"}
+          {mode === "login" ? t.auth.noAccount : t.auth.hasAccount}
           <button
             onClick={() => setMode(mode === "login" ? "signup" : "login")}
             className="text-copper font-semibold ml-1"
           >
-            {mode === "login" ? "Sign Up" : "Sign In"}
+            {mode === "login" ? t.auth.signUp : t.auth.signIn}
           </button>
         </p>
       </div>

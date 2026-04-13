@@ -33,6 +33,7 @@ interface Booking {
   status: string;
   notes: string | null;
   created_at: string;
+  attendance_status: string | null;
 }
 
 interface Profile {
@@ -235,6 +236,18 @@ const AdminDashboard = () => {
     fetchBookings();
   };
 
+  const markAttendance = async (id: string, status: "attended" | "no_show") => {
+    const { error } = await supabase
+      .from("bookings")
+      .update({ attendance_status: status } as any)
+      .eq("id", id);
+    if (error) { toast.error(t.admin.updateError); return; }
+    toast.success(
+      status === "attended" ? t.admin.stampAwarded : t.admin.noShow
+    );
+    fetchBookings();
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -398,6 +411,39 @@ const AdminDashboard = () => {
                           <Trash2 size={12} /> {t.admin.delete}
                         </button>
                       </div>
+
+                      {/* ── Attendance — visible for past confirmed bookings ── */}
+                      {b.status === "confirmed" && new Date(b.booking_date + "T23:59:59") < new Date() && (
+                        <div className="mt-2 pt-2 border-t border-border flex items-center gap-2 flex-wrap">
+                          <span className="text-muted-foreground text-[10px] font-medium">
+                            {t.admin.attendanceQuestion}
+                          </span>
+                          {!b.attendance_status ? (
+                            <>
+                              <button
+                                onClick={() => markAttendance(b.id, "attended")}
+                                className="flex items-center gap-1 text-[11px] text-mint bg-mint/10 px-3 py-1 rounded-full border border-mint/20"
+                              >
+                                <CheckCircle size={11} /> {t.admin.markAttended}
+                              </button>
+                              <button
+                                onClick={() => markAttendance(b.id, "no_show")}
+                                className="flex items-center gap-1 text-[11px] text-muted-foreground bg-surface border border-border px-3 py-1 rounded-full"
+                              >
+                                <XCircle size={11} /> {t.admin.markNoShow}
+                              </button>
+                            </>
+                          ) : b.attendance_status === "attended" ? (
+                            <span className="flex items-center gap-1 text-[11px] text-mint bg-mint/10 px-3 py-1 rounded-full border border-mint/20">
+                              <CheckCircle size={11} /> {t.admin.stampAwarded}
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1 text-[11px] text-muted-foreground bg-surface border border-border px-3 py-1 rounded-full">
+                              <XCircle size={11} /> {t.admin.noShow}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })

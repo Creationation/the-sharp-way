@@ -1,0 +1,110 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+interface PendingBooking {
+  id: string;
+  user_id: string;
+  barber_name: string;
+  service_name: string;
+  booking_date: string;
+  booking_time: string;
+  profiles: { email: string | null; full_name: string | null } | null;
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+
+  const today = new Date();
+  const todayStr = today.toISOString().split("T")[0];
+
+  // Find all confirmed past bookings (before today) with no attendance recorded
+  const { data: pendingBookings, error } = await supabase
+    .from("bookings")
+    .select("id, user_id, barber_name, service_name, booking_date, booking_time, profiles(email, full_name)")
+    .eq("status", "confirmed")
+    .is("attendance_status", null)
+    .lt("booking_date", todayStr);
+
+  if (error) {
+    console.error("Error fetching pending bookings:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const autoStamped: string[] = [];
+  const errors: string[] = [];
+
+  for (const booking of (pendingBookings || []) as PendingBooking[]) {
+    // Auto-mark as attended — benefit of the doubt (barber did not mark as no-show)
+    const { error: updateErr } = await supabase
+      .from("bookings")
+      .update({ attendance_status: "attended" })
+      .eq("id", booking.id);
+
+    if (updateErr) {
+      errors.push(`${booking.id}: ${updateErr.message}`);
+    } else {
+      const name = booking.profiles?.full_name || booking.profiles?.email || booking.user_id;
+      autoStamped.push(`${booking.booking_date} ${booking.booking_time} — ${name} (${booking.barber_name})`);
+    }
+  }
+
+  // Send admin summary email if anything was auto-stamped
+  if (autoStamped.length > 0 && RESEND_API_KEY) {
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
+      <div style="font-family:sans-serif;max-width:520px;margin:auto;background:#0f0f0f;color:#f5f0e8;padding:32px;border-radius:16px;">
+        <h2 style="color:#b8935a;margin-bottom:4px;">✂️ Auto-Stempel vergeben</h2>
+        <p style="color:#888;margin-bottom:20px;font-size:13px;">
+          ${autoStamped.length} Buchung(en) wurden automatisch als <strong style="color:#b8935a;">besucht</strong> markiert
+          (kein Barber hat bis 21:00 Uhr reagiert).
+        </p>
+        <div style="background:#1a1a1a;border-radius:12px;padding:16px;border:1px solid #2a2a2a;margin-bottom:20px;">
+          <ul style="margin:0;padding-left:16px;font-size:13px;line-height:2;">
+            ${autoStamped.map((s) => `<li>${s}</li>`).join("")}
+          </ul>
+        </div>
+        <p style="color:#555;font-size:11px;">
+          Falls ein Kunde wirklich nicht erschienen ist, öffne das Admin-Dashboard und markiere ihn als "No-Show".
+          Der Stempel wird dann zurückgesetzt.
+        </p>
+        <a href="https://the-sharp-way.lovable.app/admin"
+           style="display:inline-block;margin-top:16px;background:linear-gradient(90deg,#b8935a,#d4a96a);color:#111;font-weight:700;font-size:13px;padding:12px 24px;border-radius:50px;text-decoration:none;">
+          → Admin Dashboard öffnen
+        </a>
+        <p style="color:#333;font-size:11px;margin-top:20px;">© 2026 The Sharp Cut · Lavaterstraße 2, 1220 Wien</p>
+      </div>
+    </body></html>`;
+
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: "The Sharp Cut <info@ugcpanel.app>",
+        to: ["info@ugcpanel.app"],
+        subject: `✂️ ${autoStamped.length} Auto-Stempel vergeben — The Sharp Cut`,
+        html,
+      }),
+    }).catch(() => {});
+  }
+
+  return new Response(
+    JSON.stringify({ auto_stamped: autoStamped.length, stamped: autoStamped, errors }),
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+  );
+});
