@@ -257,6 +257,7 @@ export interface Translations {
       loadError: string;
       confirmDelete: string;
       stripeReady: string;
+      stripeCouponId: string;
     };
     loyaltyTab: {
       title: string;
