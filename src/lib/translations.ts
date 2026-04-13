@@ -182,6 +182,12 @@ export interface Translations {
     markNoShow: string;
     stampAwarded: string;
     noShow: string;
+    allBarbers: string;
+    calendarLegend: string;
+    bookings1to5: string;
+    bookings6to10: string;
+    bookingsOver10: string;
+    noBookingsDay: string;
     usersTab: {
       title: string;
       search: string;
