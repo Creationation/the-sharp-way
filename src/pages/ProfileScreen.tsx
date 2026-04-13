@@ -259,7 +259,11 @@ const ProfileScreen = () => {
                 </div>
                 {activeTab === "upcoming" && b.status === "confirmed" && (
                   <button
-                    onClick={() => cancelBooking(b.id)}
+                    onClick={() => {
+                      setConfirmCancelId(b.id);
+                      setConfirmCancelDate(b.booking_date);
+                      setConfirmCancelTime(b.booking_time);
+                    }}
                     disabled={cancelling === b.id}
                     className="flex items-center gap-1.5 text-xs text-destructive bg-destructive/10 px-3 py-1.5 rounded-full disabled:opacity-50"
                   >
