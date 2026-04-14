@@ -94,6 +94,34 @@ serve(async (req) => {
       .update({ status: "cancelled", payment_status: newPaymentStatus })
       .eq("id", booking_id);
 
+    // Send Telegram notification
+    try {
+      // Fetch client profile for name
+      const { data: profile } = await sb
+        .from("profiles")
+        .select("full_name, email, phone")
+        .eq("user_id", booking.user_id)
+        .single();
+
+      await sb.functions.invoke("send-telegram-notification", {
+        body: {
+          type: "cancellation",
+          data: {
+            client_name: profile?.full_name || "–",
+            service_name: booking.service_name || "–",
+            service_price: booking.service_price || "–",
+            barber_name: booking.barber_name || "–",
+            booking_date: booking.booking_date || "–",
+            booking_time: booking.booking_time || "–",
+            charged,
+            payment_status: newPaymentStatus,
+          },
+        },
+      });
+    } catch (tgErr: any) {
+      console.error("[cancel] Telegram notification error:", tgErr);
+    }
+
     return new Response(JSON.stringify({
       cancelled: true,
       charged,
