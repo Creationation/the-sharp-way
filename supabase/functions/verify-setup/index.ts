@@ -130,6 +130,28 @@ serve(async (req) => {
       }).catch(() => {});
     }
 
+    // Send Telegram notification
+    try {
+      await sb.functions.invoke("send-telegram-notification", {
+        body: {
+          type: "new_booking",
+          data: {
+            client_name: meta.client_name || "–",
+            client_email: meta.client_email || "–",
+            client_phone: meta.client_phone || "–",
+            service_name: meta.service_name || "–",
+            service_price: meta.service_price || "–",
+            barber_name: meta.barber_name || "–",
+            booking_date: meta.booking_date || "–",
+            booking_time: meta.booking_time || "–",
+            notes: meta.notes || null,
+          },
+        },
+      });
+    } catch (tgErr: any) {
+      console.error("[verify-setup] Telegram notification error:", tgErr);
+    }
+
     return new Response(JSON.stringify({
       verified: true,
       payment_status: "verified",
