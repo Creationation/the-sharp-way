@@ -48,6 +48,7 @@ interface Props {
     confirmDelete: string;
     changePhoto: string;
     photoUploaded: string;
+    color: string;
   };
 }
 
@@ -71,7 +72,7 @@ const BarbersTab = ({ t }: Props) => {
   const fetchBarbers = async () => {
     const { data, error } = await supabase
       .from("barbers")
-      .select("id, name, specialty_en, specialty_de, rating, cuts, years, image_url, available, sort_order")
+      .select("id, name, specialty_en, specialty_de, rating, cuts, years, image_url, available, sort_order, color")
       .order("sort_order");
     if (error) {
       toast.error(t.loadError);
@@ -101,6 +102,7 @@ const BarbersTab = ({ t }: Props) => {
         image_url: barber.image_url,
         available: barber.available,
         sort_order: barber.sort_order,
+        color: barber.color,
       })
       .eq("id", barber.id);
     setSavingId(null);
