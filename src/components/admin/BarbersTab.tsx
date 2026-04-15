@@ -293,6 +293,7 @@ const BarbersTab = ({ t }: Props) => {
                   <Camera size={14} className="text-copper" />
                   {uploadingId === barber.id ? "..." : t.changePhoto}
                 </button>
+              </div>
             </div>
 
             <div>
