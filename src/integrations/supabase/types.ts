@@ -47,6 +47,7 @@ export type Database = {
       barbers: {
         Row: {
           available: boolean
+          color: string
           created_at: string
           cuts: number
           id: string
@@ -61,6 +62,7 @@ export type Database = {
         }
         Insert: {
           available?: boolean
+          color?: string
           created_at?: string
           cuts?: number
           id?: string
@@ -75,6 +77,7 @@ export type Database = {
         }
         Update: {
           available?: boolean
+          color?: string
           created_at?: string
           cuts?: number
           id?: string

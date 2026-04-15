@@ -238,6 +238,13 @@ export interface Translations {
       confirmDelete: string;
       changePhoto: string;
       photoUploaded: string;
+      color: string;
+    };
+    scheduleTab: {
+      title: string;
+      exportCsv: string;
+      noBookings: string;
+      hour: string;
     };
     promoCodesTab: {
       title: string;
@@ -580,6 +587,13 @@ const en: Translations = {
       confirmDelete: "Are you sure you want to delete this barber?",
       changePhoto: "Change Photo",
       photoUploaded: "Photo uploaded!",
+      color: "Color",
+    },
+    scheduleTab: {
+      title: "Schedule",
+      exportCsv: "Export CSV",
+      noBookings: "No bookings",
+      hour: "Hour",
     },
     promoCodesTab: {
       title: "Promo Codes",
@@ -922,6 +936,13 @@ const de: Translations = {
       confirmDelete: "Möchtest du diesen Barbier wirklich löschen?",
       changePhoto: "Foto ändern",
       photoUploaded: "Foto hochgeladen!",
+      color: "Farbe",
+    },
+    scheduleTab: {
+      title: "Tagesplan",
+      exportCsv: "CSV exportieren",
+      noBookings: "Keine Termine",
+      hour: "Uhrzeit",
     },
     promoCodesTab: {
       title: "Promo-Codes",

@@ -1,0 +1,1 @@
+ALTER TABLE public.barbers ADD COLUMN color text NOT NULL DEFAULT '#C78D4E';

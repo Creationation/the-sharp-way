@@ -23,6 +23,7 @@ export interface Barber {
   image_url: string;
   available: boolean;
   sort_order: number;
+  color: string;
 }
 
 export function useBarbers() {

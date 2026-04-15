@@ -23,6 +23,7 @@ interface BarberRow {
   image_url: string;
   available: boolean;
   sort_order: number;
+  color: string;
 }
 
 interface Props {
@@ -47,6 +48,7 @@ interface Props {
     confirmDelete: string;
     changePhoto: string;
     photoUploaded: string;
+    color: string;
   };
 }
 
@@ -70,7 +72,7 @@ const BarbersTab = ({ t }: Props) => {
   const fetchBarbers = async () => {
     const { data, error } = await supabase
       .from("barbers")
-      .select("id, name, specialty_en, specialty_de, rating, cuts, years, image_url, available, sort_order")
+      .select("id, name, specialty_en, specialty_de, rating, cuts, years, image_url, available, sort_order, color")
       .order("sort_order");
     if (error) {
       toast.error(t.loadError);
@@ -100,6 +102,7 @@ const BarbersTab = ({ t }: Props) => {
         image_url: barber.image_url,
         available: barber.available,
         sort_order: barber.sort_order,
+        color: barber.color,
       })
       .eq("id", barber.id);
     setSavingId(null);
@@ -290,6 +293,24 @@ const BarbersTab = ({ t }: Props) => {
                   <Camera size={14} className="text-copper" />
                   {uploadingId === barber.id ? "..." : t.changePhoto}
                 </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-muted-foreground text-xs mb-1 block">{t.color}</label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={barber.color}
+                  onChange={e => updateField(barber.id, "color", e.target.value)}
+                  className="w-10 h-10 rounded-lg border border-border cursor-pointer bg-transparent"
+                />
+                <input
+                  value={barber.color}
+                  onChange={e => updateField(barber.id, "color", e.target.value)}
+                  className="w-28 bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:border-copper/50 transition-colors font-mono"
+                />
+                <span className="w-6 h-6 rounded-full" style={{ backgroundColor: barber.color }} />
               </div>
             </div>
           </div>
