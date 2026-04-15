@@ -9,9 +9,14 @@ const SplashScreen = () => {
   const [phase, setPhase] = useState<"logo" | "content">("logo");
 
   useEffect(() => {
+    // Skip splash on repeat visits — go straight to /home
+    if (localStorage.getItem("sitdown_visited")) {
+      navigate("/home", { replace: true });
+      return;
+    }
     const timer = setTimeout(() => setPhase("content"), 1200);
     return () => clearTimeout(timer);
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden flex flex-col">
