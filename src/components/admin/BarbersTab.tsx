@@ -293,6 +293,23 @@ const BarbersTab = ({ t }: Props) => {
                   <Camera size={14} className="text-copper" />
                   {uploadingId === barber.id ? "..." : t.changePhoto}
                 </button>
+            </div>
+
+            <div>
+              <label className="text-muted-foreground text-xs mb-1 block">{t.color}</label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={barber.color}
+                  onChange={e => updateField(barber.id, "color", e.target.value)}
+                  className="w-10 h-10 rounded-lg border border-border cursor-pointer bg-transparent"
+                />
+                <input
+                  value={barber.color}
+                  onChange={e => updateField(barber.id, "color", e.target.value)}
+                  className="w-28 bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:border-copper/50 transition-colors font-mono"
+                />
+                <span className="w-6 h-6 rounded-full" style={{ backgroundColor: barber.color }} />
               </div>
             </div>
           </div>
