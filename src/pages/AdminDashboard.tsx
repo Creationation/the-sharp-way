@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
   ArrowLeft, Calendar as CalendarIcon, Clock, User, Trash2, XCircle,
   CheckCircle, ChevronLeft, ChevronRight, ToggleLeft, ToggleRight, Save,
-  Menu, X, Tag, Scissors, Trophy, Gift, Bell,
+  Menu, X, Tag, Scissors, Trophy, Gift, Bell, LayoutGrid,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +20,7 @@ import PromoCodesTab from "@/components/admin/PromoCodesTab";
 import LoyaltyTab from "@/components/admin/LoyaltyTab";
 import RewardsTab from "@/components/admin/RewardsTab";
 import NotificationsTab from "@/components/admin/NotificationsTab";
+import ScheduleTab from "@/components/admin/ScheduleTab";
 import { useBarbers } from "@/hooks/useBarbers";
 
 interface Booking {
@@ -62,7 +63,7 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  type TabId = "bookings" | "availability" | "users" | "promotions" | "barbers" | "codes" | "loyalty" | "rewards" | "notifications";
+  type TabId = "bookings" | "schedule" | "availability" | "users" | "promotions" | "barbers" | "codes" | "loyalty" | "rewards" | "notifications";
   const [tab, setTab] = useState<TabId>("bookings");
   const [menuOpen, setMenuOpen] = useState(false);
   const [pendingRewards, setPendingRewards] = useState(0);
@@ -71,6 +72,7 @@ const AdminDashboard = () => {
 
   const ADMIN_TABS: { id: TabId; label: string; Icon: React.ElementType }[] = [
     { id: "bookings",      label: t.admin.bookings,                                 Icon: CalendarIcon  },
+    { id: "schedule",       label: t.admin.scheduleTab.title,                        Icon: LayoutGrid    },
     { id: "availability",  label: t.admin.availability,                             Icon: Clock     },
     { id: "users",         label: t.admin.users,                                    Icon: User      },
     { id: "promotions",    label: t.admin.promotions,                               Icon: Tag       },
