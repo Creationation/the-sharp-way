@@ -81,7 +81,7 @@ const SplashScreen = () => {
 
             <div className="opacity-0 animate-fade-up animation-delay-400" style={{ animationFillMode: "forwards" }}>
               <button
-                onClick={() => navigate("/home")}
+                onClick={() => { localStorage.setItem("sitdown_visited", "1"); navigate("/home"); }}
                 className="gradient-copper text-primary-foreground font-body font-semibold text-base px-8 py-3.5 rounded-full shadow-copper hover:opacity-90 transition-all flex items-center gap-2"
               >
                 {t.splash.cta}
