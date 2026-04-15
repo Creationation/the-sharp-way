@@ -560,6 +560,14 @@ const AdminDashboard = () => {
         </>
       )}
 
+      {/* ═══════════════════ SCHEDULE TAB ═══════════════════ */}
+      {tab === "schedule" && (
+        <ScheduleTab
+          t={t.admin.scheduleTab}
+          barbers={dbBarbers.map(b => ({ id: b.id, name: b.name, color: (b as any).color || '#C78D4E' }))}
+        />
+      )}
+
       {/* ═══════════════════ AVAILABILITY TAB ═══════════════════ */}
       {tab === "availability" && (
         <div className="px-5">
