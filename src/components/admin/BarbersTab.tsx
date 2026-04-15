@@ -23,6 +23,7 @@ interface BarberRow {
   image_url: string;
   available: boolean;
   sort_order: number;
+  color: string;
 }
 
 interface Props {
