@@ -64,7 +64,7 @@ const AuthScreen = () => {
           <ArrowLeft size={18} className="text-foreground" />
         </button>
         <h1 className="font-heading text-2xl text-foreground">
-          {mode === "login" ? t.auth.signIn : t.auth.createAccount}
+          {mode === "login" ? t.auth.signIn : mode === "signup" ? t.auth.createAccount : t.auth.forgotTitle}
         </h1>
       </div>
 
@@ -72,7 +72,7 @@ const AuthScreen = () => {
         <div className="text-center mb-8">
           <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-44 mx-auto mb-2" />
           <p className="text-muted-foreground text-sm">
-            {mode === "login" ? t.auth.welcomeBack : t.auth.joinCommunity}
+            {mode === "login" ? t.auth.welcomeBack : mode === "signup" ? t.auth.joinCommunity : t.auth.forgotSubtitle}
           </p>
         </div>
 
@@ -104,45 +104,76 @@ const AuthScreen = () => {
             />
           </div>
 
-          <div className="relative">
-            <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input
-              name="password"
-              type={showPassword ? "text" : "password"}
-              value={form.password}
-              onChange={handleChange}
-              required
-              minLength={6}
-              placeholder={t.auth.password}
-              className="w-full bg-surface border border-border rounded-xl pl-12 pr-12 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper transition-colors"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
+          {mode !== "forgot" && (
+            <div className="relative">
+              <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                onChange={handleChange}
+                required
+                minLength={6}
+                placeholder={t.auth.password}
+                className="w-full bg-surface border border-border rounded-xl pl-12 pr-12 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper transition-colors"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          )}
+
+          {mode === "login" && (
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => setMode("forgot")}
+                className="text-copper text-sm font-medium"
+              >
+                {t.auth.forgotPassword}
+              </button>
+            </div>
+          )}
 
           <button
             type="submit"
             disabled={loading}
             className="w-full gradient-copper text-primary-foreground font-semibold text-base py-3.5 rounded-full shadow-copper disabled:opacity-50"
           >
-            {loading ? t.auth.loading : mode === "login" ? t.auth.signIn : t.auth.createAccount}
+            {loading
+              ? t.auth.loading
+              : mode === "login"
+                ? t.auth.signIn
+                : mode === "signup"
+                  ? t.auth.createAccount
+                  : t.auth.sendResetLink}
           </button>
         </form>
 
-        <p className="text-center text-muted-foreground text-sm mt-6">
-          {mode === "login" ? t.auth.noAccount : t.auth.hasAccount}
-          <button
-            onClick={() => setMode(mode === "login" ? "signup" : "login")}
-            className="text-copper font-semibold ml-1"
-          >
-            {mode === "login" ? t.auth.signUp : t.auth.signIn}
-          </button>
-        </p>
+        {mode === "forgot" ? (
+          <p className="text-center text-muted-foreground text-sm mt-6">
+            <button
+              onClick={() => setMode("login")}
+              className="text-copper font-semibold"
+            >
+              {t.auth.backToSignIn}
+            </button>
+          </p>
+        ) : (
+          <p className="text-center text-muted-foreground text-sm mt-6">
+            {mode === "login" ? t.auth.noAccount : t.auth.hasAccount}
+            <button
+              onClick={() => setMode(mode === "login" ? "signup" : "login")}
+              className="text-copper font-semibold ml-1"
+            >
+              {mode === "login" ? t.auth.signUp : t.auth.signIn}
+            </button>
+          </p>
+        )}
       </div>
     </div>
   );
