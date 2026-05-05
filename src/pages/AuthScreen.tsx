@@ -8,7 +8,7 @@ import { toast } from "sonner";
 const AuthScreen = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ email: "", password: "", fullName: "" });
@@ -22,7 +22,14 @@ const AuthScreen = () => {
     setLoading(true);
 
     try {
-      if (mode === "signup") {
+      if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(form.email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        toast.success(t.auth.resetLinkSent);
+        setMode("login");
+      } else if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
           email: form.email,
           password: form.password,
@@ -44,7 +51,7 @@ const AuthScreen = () => {
         navigate("/home");
       }
     } catch (error: any) {
-      toast.error(error.message || "Something went wrong");
+      toast.error(error.message || t.auth.errorDefault);
     } finally {
       setLoading(false);
     }
