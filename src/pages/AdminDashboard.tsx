@@ -22,6 +22,7 @@ import RewardsTab from "@/components/admin/RewardsTab";
 import NotificationsTab from "@/components/admin/NotificationsTab";
 import ScheduleTab from "@/components/admin/ScheduleTab";
 import { useBarbers } from "@/hooks/useBarbers";
+import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
 
 interface Booking {
   id: string;
@@ -114,6 +115,14 @@ const AdminDashboard = () => {
       fetchPendingRewardsCount();
     }
   }, [isAdmin, authLoading]);
+
+  // Live updates: refetch bookings whenever the table changes (new booking, cancel, status, ...)
+  useRealtimeBookings(() => {
+    if (isAdmin) {
+      fetchBookings();
+      if (tab === "availability") fetchAvailability();
+    }
+  }, isAdmin);
 
   const fetchPendingRewardsCount = async () => {
     const { count } = await supabase
