@@ -23,10 +23,14 @@ const AuthScreen = () => {
 
     try {
       if (mode === "forgot") {
-        const { error } = await supabase.auth.resetPasswordForEmail(form.email, {
-          redirectTo: `${window.location.origin}/reset-password`,
+        await supabase.functions.invoke("send-password-reset", {
+          body: {
+            email: form.email,
+            lang: localStorage.getItem("sitdown_lang") || "de",
+            redirectTo: `${window.location.origin}/reset-password`,
+          },
         });
-        if (error) throw error;
+        // Always show the same success message — no email enumeration
         toast.success(t.auth.resetLinkSent);
         setMode("login");
       } else if (mode === "signup") {
