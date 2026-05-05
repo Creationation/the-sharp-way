@@ -188,6 +188,16 @@ export interface Translations {
     bookings6to10: string;
     bookingsOver10: string;
     noBookingsDay: string;
+    searchPlaceholder: string;
+    searchResults: (n: number) => string;
+    clearSearch: string;
+    exportCsv: string;
+    exportNoData: string;
+    exportSuccess: string;
+    fromDate: string;
+    toDate: string;
+    resetFilters: string;
+    advancedFilters: string;
     usersTab: {
       title: string;
       search: string;
