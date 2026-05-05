@@ -427,6 +427,80 @@ const AdminDashboard = () => {
             </div>
           </div>
 
+          {/* Search + actions */}
+          <div className="px-5 mb-3 space-y-2.5">
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t.admin.searchPlaceholder}
+                className="w-full pl-9 pr-9 py-2.5 rounded-full bg-surface border border-border text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:border-copper/50"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={t.admin.clearSearch}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => setShowAdvanced(v => !v)}
+                className={`flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full border ${
+                  showAdvanced || dateFrom || dateTo
+                    ? "bg-copper/15 border-copper/40 text-copper"
+                    : "bg-surface border-border text-muted-foreground"
+                }`}
+              >
+                <CalendarIcon size={12} /> {t.admin.advancedFilters}
+              </button>
+              <button
+                onClick={exportCsv}
+                className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full bg-surface border border-border text-foreground hover:border-copper/40"
+              >
+                <Download size={12} /> {t.admin.exportCsv}
+              </button>
+              <button
+                onClick={resetFilters}
+                className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full bg-surface border border-border text-muted-foreground hover:text-foreground"
+              >
+                <RotateCcw size={12} /> {t.admin.resetFilters}
+              </button>
+              <span className="ml-auto self-center text-[11px] text-muted-foreground">
+                {t.admin.searchResults(filtered.length)}
+              </span>
+            </div>
+
+            {showAdvanced && (
+              <div className="card-app p-3 grid grid-cols-2 gap-2.5">
+                <div>
+                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider">{t.admin.fromDate}</label>
+                  <input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    className="mt-1 w-full bg-surface border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-copper/50"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider">{t.admin.toDate}</label>
+                  <input
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => setDateTo(e.target.value)}
+                    className="mt-1 w-full bg-surface border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-copper/50"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Calendar with booking density */}
           <div className="px-5 mb-5">
             <div className="card-app p-3">
