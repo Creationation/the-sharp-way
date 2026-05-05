@@ -19,6 +19,7 @@ import ReviewsScreen from "@/pages/ReviewsScreen";
 import ProfileScreen from "@/pages/ProfileScreen";
 import ContactScreen from "@/pages/ContactScreen";
 import AuthScreen from "@/pages/AuthScreen";
+import ResetPassword from "@/pages/ResetPassword";
 import AdminDashboard from "@/pages/AdminDashboard";
 import ExploreBarbers from "@/pages/ExploreBarbers";
 import NotFound from "@/pages/NotFound";
@@ -59,6 +60,7 @@ const App = () => {
             <Route path="/profile" element={<ProfileScreen />} />
             <Route path="/contact" element={<ContactScreen />} />
             <Route path="/auth" element={<AuthScreen />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/explore" element={<ExploreBarbers />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
