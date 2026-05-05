@@ -3,6 +3,7 @@ import {
   ArrowLeft, Calendar as CalendarIcon, Clock, User, Trash2, XCircle,
   CheckCircle, ChevronLeft, ChevronRight, ToggleLeft, ToggleRight, Save,
   Menu, X, Tag, Scissors, Trophy, Gift, Bell, LayoutGrid, BarChart3,
+  Search, Download, RotateCcw,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -93,6 +94,10 @@ const AdminDashboard = () => {
   const [filter, setFilter] = useState<"all" | "confirmed" | "cancelled">("all");
   const [barberFilter, setBarberFilter] = useState<string>("all");
   const [calendarDate, setCalendarDate] = useState<Date | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   // — Availability tab state —
   const [avBarber, setAvBarber] = useState("");
@@ -283,10 +288,62 @@ const AdminDashboard = () => {
     );
   }
 
+  const normalizedQuery = searchQuery.trim().toLowerCase();
   const filtered = bookings
     .filter(b => filter === "all" || b.status === filter)
     .filter(b => barberFilter === "all" || b.barber_name === barberFilter)
-    .filter(b => !calendarDate || b.booking_date === format(calendarDate, "yyyy-MM-dd"));
+    .filter(b => !calendarDate || b.booking_date === format(calendarDate, "yyyy-MM-dd"))
+    .filter(b => !dateFrom || b.booking_date >= dateFrom)
+    .filter(b => !dateTo || b.booking_date <= dateTo)
+    .filter(b => {
+      if (!normalizedQuery) return true;
+      const profile = profiles.get(b.user_id);
+      const haystack = [
+        profile?.full_name, profile?.email, profile?.phone,
+        b.barber_name, b.service_name, b.notes,
+      ].filter(Boolean).join(" ").toLowerCase();
+      return haystack.includes(normalizedQuery);
+    });
+
+  const exportCsv = () => {
+    if (filtered.length === 0) {
+      toast.error(t.admin.exportNoData);
+      return;
+    }
+    const headers = ["Date","Time","Status","Payment","Barber","Service","Price","Duration","Customer","Email","Phone","Notes"];
+    const escape = (v: string | null | undefined) => {
+      const s = (v ?? "").toString().replace(/"/g, '""');
+      return /[",\n;]/.test(s) ? `"${s}"` : s;
+    };
+    const rows = filtered.map(b => {
+      const p = profiles.get(b.user_id);
+      return [
+        b.booking_date, b.booking_time, b.status, b.payment_status ?? "",
+        b.barber_name, b.service_name, b.service_price, b.service_duration,
+        p?.full_name ?? "", p?.email ?? "", p?.phone ?? "", b.notes ?? "",
+      ].map(escape).join(",");
+    });
+    const csv = "\uFEFF" + [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `bookings-${format(new Date(), "yyyy-MM-dd-HHmm")}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(t.admin.exportSuccess);
+  };
+
+  const resetFilters = () => {
+    setFilter("all");
+    setBarberFilter("all");
+    setCalendarDate(undefined);
+    setSearchQuery("");
+    setDateFrom("");
+    setDateTo("");
+  };
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -368,6 +425,80 @@ const AdminDashboard = () => {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Search + actions */}
+          <div className="px-5 mb-3 space-y-2.5">
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t.admin.searchPlaceholder}
+                className="w-full pl-9 pr-9 py-2.5 rounded-full bg-surface border border-border text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:border-copper/50"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={t.admin.clearSearch}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => setShowAdvanced(v => !v)}
+                className={`flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full border ${
+                  showAdvanced || dateFrom || dateTo
+                    ? "bg-copper/15 border-copper/40 text-copper"
+                    : "bg-surface border-border text-muted-foreground"
+                }`}
+              >
+                <CalendarIcon size={12} /> {t.admin.advancedFilters}
+              </button>
+              <button
+                onClick={exportCsv}
+                className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full bg-surface border border-border text-foreground hover:border-copper/40"
+              >
+                <Download size={12} /> {t.admin.exportCsv}
+              </button>
+              <button
+                onClick={resetFilters}
+                className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full bg-surface border border-border text-muted-foreground hover:text-foreground"
+              >
+                <RotateCcw size={12} /> {t.admin.resetFilters}
+              </button>
+              <span className="ml-auto self-center text-[11px] text-muted-foreground">
+                {t.admin.searchResults(filtered.length)}
+              </span>
+            </div>
+
+            {showAdvanced && (
+              <div className="card-app p-3 grid grid-cols-2 gap-2.5">
+                <div>
+                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider">{t.admin.fromDate}</label>
+                  <input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    className="mt-1 w-full bg-surface border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-copper/50"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider">{t.admin.toDate}</label>
+                  <input
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => setDateTo(e.target.value)}
+                    className="mt-1 w-full bg-surface border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-copper/50"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Calendar with booking density */}

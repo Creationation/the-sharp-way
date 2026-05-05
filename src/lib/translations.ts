@@ -188,6 +188,16 @@ export interface Translations {
     bookings6to10: string;
     bookingsOver10: string;
     noBookingsDay: string;
+    searchPlaceholder: string;
+    searchResults: (n: number) => string;
+    clearSearch: string;
+    exportCsv: string;
+    exportNoData: string;
+    exportSuccess: string;
+    fromDate: string;
+    toDate: string;
+    resetFilters: string;
+    advancedFilters: string;
     usersTab: {
       title: string;
       search: string;
@@ -577,6 +587,16 @@ const en: Translations = {
     bookings6to10: "6–10 bookings",
     bookingsOver10: "10+ bookings",
     noBookingsDay: "No bookings",
+    searchPlaceholder: "Search by name, email, phone, service...",
+    searchResults: (n) => `${n} result${n === 1 ? "" : "s"}`,
+    clearSearch: "Clear",
+    exportCsv: "Export CSV",
+    exportNoData: "No bookings to export",
+    exportSuccess: "CSV exported",
+    fromDate: "From",
+    toDate: "To",
+    resetFilters: "Reset filters",
+    advancedFilters: "Advanced filters",
     usersTab: {
       title: "Users",
       search: "Search by name, email, phone...",
@@ -966,6 +986,16 @@ const de: Translations = {
     bookings6to10: "6–10 Termine",
     bookingsOver10: "10+ Termine",
     noBookingsDay: "Keine Termine",
+    searchPlaceholder: "Nach Name, E-Mail, Telefon, Dienstleistung suchen...",
+    searchResults: (n) => `${n} Ergebnis${n === 1 ? "" : "se"}`,
+    clearSearch: "Löschen",
+    exportCsv: "CSV exportieren",
+    exportNoData: "Keine Buchungen zum Exportieren",
+    exportSuccess: "CSV exportiert",
+    fromDate: "Von",
+    toDate: "Bis",
+    resetFilters: "Filter zurücksetzen",
+    advancedFilters: "Erweiterte Filter",
     usersTab: {
       title: "Kunden",
       search: "Nach Name, E-Mail, Telefon suchen...",
