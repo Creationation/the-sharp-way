@@ -314,6 +314,32 @@ export interface Translations {
       stampsAtRequest: string;
       loadError: string;
     };
+    statsTab: {
+      title: string;
+      revenueToday: string;
+      revenueWeek: string;
+      revenueMonth: string;
+      bookingsToday: string;
+      bookingsWeek: string;
+      bookingsMonth: string;
+      noShowRate: string;
+      cancelRate: string;
+      avgTicket: string;
+      totalClients: string;
+      newClientsMonth: string;
+      topServices: string;
+      topBarbers: string;
+      revenueLast30: string;
+      bookingsByWeekday: string;
+      servicesBreakdown: string;
+      weekdays: [string, string, string, string, string, string, string];
+      noData: string;
+      loadError: string;
+      bookings: string;
+      revenue: string;
+      tip: string;
+      tipDesc: string;
+    };
   };
   barber: {
     cuts: string;
