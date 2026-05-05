@@ -1,9 +1,10 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, addDays, subDays } from "date-fns";
 import { de as deLocale, enUS } from "date-fns/locale";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
 import * as XLSX from "xlsx";
 
 interface Barber {
@@ -67,19 +68,21 @@ const ScheduleTab = ({ t, barbers }: Props) => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      setLoading(true);
-      const dateStr = format(date, "yyyy-MM-dd");
-      const { data } = await supabase
-        .from("bookings")
-        .select("barber_name, booking_time, service_name, booking_date, status")
-        .eq("booking_date", dateStr);
-      setBookings((data as Booking[]) || []);
-      setLoading(false);
-    };
-    fetchBookings();
+  const fetchBookings = useCallback(async () => {
+    setLoading(true);
+    const dateStr = format(date, "yyyy-MM-dd");
+    const { data } = await supabase
+      .from("bookings")
+      .select("barber_name, booking_time, service_name, booking_date, status")
+      .eq("booking_date", dateStr);
+    setBookings((data as Booking[]) || []);
+    setLoading(false);
   }, [date]);
+
+  useEffect(() => { fetchBookings(); }, [fetchBookings]);
+
+  // Live updates — refetch when bookings table changes
+  useRealtimeBookings(fetchBookings);
 
   // Map: hour -> barber_name -> booking
   const grid = useMemo(() => {
