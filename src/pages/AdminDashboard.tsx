@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
   ArrowLeft, Calendar as CalendarIcon, Clock, User, Trash2, XCircle,
   CheckCircle, ChevronLeft, ChevronRight, ToggleLeft, ToggleRight, Save,
-  Menu, X, Tag, Scissors, Trophy, Gift, Bell, LayoutGrid,
+  Menu, X, Tag, Scissors, Trophy, Gift, Bell, LayoutGrid, BarChart3,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +21,7 @@ import LoyaltyTab from "@/components/admin/LoyaltyTab";
 import RewardsTab from "@/components/admin/RewardsTab";
 import NotificationsTab from "@/components/admin/NotificationsTab";
 import ScheduleTab from "@/components/admin/ScheduleTab";
+import StatsTab from "@/components/admin/StatsTab";
 import { useBarbers } from "@/hooks/useBarbers";
 import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
 
@@ -64,7 +65,7 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  type TabId = "bookings" | "schedule" | "availability" | "users" | "promotions" | "barbers" | "codes" | "loyalty" | "rewards" | "notifications";
+  type TabId = "bookings" | "schedule" | "stats" | "availability" | "users" | "promotions" | "barbers" | "codes" | "loyalty" | "rewards" | "notifications";
   const [tab, setTab] = useState<TabId>("bookings");
   const [menuOpen, setMenuOpen] = useState(false);
   const [pendingRewards, setPendingRewards] = useState(0);
@@ -73,7 +74,8 @@ const AdminDashboard = () => {
 
   const ADMIN_TABS: { id: TabId; label: string; Icon: React.ElementType }[] = [
     { id: "bookings",      label: t.admin.bookings,                                 Icon: CalendarIcon  },
-    { id: "schedule",       label: t.admin.scheduleTab.title,                        Icon: LayoutGrid    },
+    { id: "schedule",      label: t.admin.scheduleTab.title,                        Icon: LayoutGrid    },
+    { id: "stats",         label: t.admin.statsTab.title,                           Icon: BarChart3     },
     { id: "availability",  label: t.admin.availability,                             Icon: Clock     },
     { id: "users",         label: t.admin.users,                                    Icon: User      },
     { id: "promotions",    label: t.admin.promotions,                               Icon: Tag       },
@@ -81,7 +83,7 @@ const AdminDashboard = () => {
     { id: "codes",         label: t.admin.promoCodesTab.title,                      Icon: Tag       },
     { id: "loyalty",       label: t.admin.loyaltyTab.title,                         Icon: Trophy    },
     { id: "rewards",       label: t.admin.rewardsTab.title,                         Icon: Gift      },
-    { id: "notifications", label: t.admin.notificationsTab.title,                      Icon: Bell      },
+    { id: "notifications", label: t.admin.notificationsTab.title,                   Icon: Bell      },
   ];
 
   // — Bookings tab state —
@@ -701,6 +703,9 @@ const AdminDashboard = () => {
 
       {/* ═══════════════════ REWARDS TAB ═══════════════════ */}
       {tab === "rewards" && <RewardsTab t={t.admin.rewardsTab} />}
+
+      {/* ═══════════════════ STATS TAB ═══════════════════ */}
+      {tab === "stats" && <StatsTab isActive={tab === "stats"} />}
 
       {/* ═══════════════════ NOTIFICATIONS TAB ═══════════════════ */}
       {tab === "notifications" && (
