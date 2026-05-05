@@ -314,6 +314,32 @@ export interface Translations {
       stampsAtRequest: string;
       loadError: string;
     };
+    statsTab: {
+      title: string;
+      revenueToday: string;
+      revenueWeek: string;
+      revenueMonth: string;
+      bookingsToday: string;
+      bookingsWeek: string;
+      bookingsMonth: string;
+      noShowRate: string;
+      cancelRate: string;
+      avgTicket: string;
+      totalClients: string;
+      newClientsMonth: string;
+      topServices: string;
+      topBarbers: string;
+      revenueLast30: string;
+      bookingsByWeekday: string;
+      servicesBreakdown: string;
+      weekdays: [string, string, string, string, string, string, string];
+      noData: string;
+      loadError: string;
+      bookings: string;
+      revenue: string;
+      tip: string;
+      tipDesc: string;
+    };
   };
   barber: {
     cuts: string;
@@ -677,6 +703,32 @@ const en: Translations = {
       stampsAtRequest: "Stamps at request",
       loadError: "Failed to load reward requests",
     },
+    statsTab: {
+      title: "Statistics",
+      revenueToday: "Revenue · Today",
+      revenueWeek: "Revenue · 7 days",
+      revenueMonth: "Revenue · 30 days",
+      bookingsToday: "Bookings · Today",
+      bookingsWeek: "Bookings · 7 days",
+      bookingsMonth: "Bookings · 30 days",
+      noShowRate: "No-show rate",
+      cancelRate: "Cancellation rate",
+      avgTicket: "Avg. ticket",
+      totalClients: "Total clients",
+      newClientsMonth: "New clients · 30 days",
+      topServices: "Top services",
+      topBarbers: "Top barbers",
+      revenueLast30: "Revenue · last 30 days",
+      bookingsByWeekday: "Bookings by weekday",
+      servicesBreakdown: "Services breakdown",
+      weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      noData: "No data yet",
+      loadError: "Failed to load statistics",
+      bookings: "Bookings",
+      revenue: "Revenue",
+      tip: "Heads-up",
+      tipDesc: "Revenue is computed from confirmed bookings (cancelled bookings are excluded).",
+    },
   },
   barber: {
     cuts: "Cuts",
@@ -1039,6 +1091,32 @@ const de: Translations = {
       requestedOn: "Angefragt am",
       stampsAtRequest: "Stempel bei Anfrage",
       loadError: "Fehler beim Laden der Anfragen",
+    },
+    statsTab: {
+      title: "Statistiken",
+      revenueToday: "Umsatz · Heute",
+      revenueWeek: "Umsatz · 7 Tage",
+      revenueMonth: "Umsatz · 30 Tage",
+      bookingsToday: "Buchungen · Heute",
+      bookingsWeek: "Buchungen · 7 Tage",
+      bookingsMonth: "Buchungen · 30 Tage",
+      noShowRate: "No-Show-Quote",
+      cancelRate: "Stornoquote",
+      avgTicket: "Ø Ticket",
+      totalClients: "Kunden gesamt",
+      newClientsMonth: "Neukunden · 30 Tage",
+      topServices: "Top Leistungen",
+      topBarbers: "Top Barbiere",
+      revenueLast30: "Umsatz · letzte 30 Tage",
+      bookingsByWeekday: "Buchungen pro Wochentag",
+      servicesBreakdown: "Leistungs-Verteilung",
+      weekdays: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
+      noData: "Noch keine Daten",
+      loadError: "Statistiken konnten nicht geladen werden",
+      bookings: "Buchungen",
+      revenue: "Umsatz",
+      tip: "Hinweis",
+      tipDesc: "Der Umsatz wird aus bestätigten Buchungen berechnet (stornierte Buchungen werden ausgeschlossen).",
     },
   },
   barber: {
