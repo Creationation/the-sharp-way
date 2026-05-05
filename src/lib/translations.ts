@@ -339,6 +339,20 @@ export interface Translations {
     hasAccount: string;
     signUp: string;
     errorDefault: string;
+    forgotPassword: string;
+    forgotTitle: string;
+    forgotSubtitle: string;
+    sendResetLink: string;
+    resetLinkSent: string;
+    backToSignIn: string;
+    resetTitle: string;
+    resetSubtitle: string;
+    newPassword: string;
+    confirmPassword: string;
+    updatePassword: string;
+    passwordsDontMatch: string;
+    passwordUpdated: string;
+    invalidResetLink: string;
   };
   explore: {
     title: string;
@@ -688,6 +702,20 @@ const en: Translations = {
     hasAccount: "Already have an account?",
     signUp: "Sign Up",
     errorDefault: "Something went wrong",
+    forgotPassword: "Forgot password?",
+    forgotTitle: "Reset password",
+    forgotSubtitle: "Enter your email and we'll send you a reset link.",
+    sendResetLink: "Send reset link",
+    resetLinkSent: "Check your inbox for the reset link.",
+    backToSignIn: "Back to sign in",
+    resetTitle: "Set new password",
+    resetSubtitle: "Choose a strong password for your account.",
+    newPassword: "New password",
+    confirmPassword: "Confirm password",
+    updatePassword: "Update password",
+    passwordsDontMatch: "Passwords do not match",
+    passwordUpdated: "Password updated successfully.",
+    invalidResetLink: "Invalid or expired reset link.",
   },
   explore: {
     title: "Our Barbers",
@@ -1037,6 +1065,20 @@ const de: Translations = {
     hasAccount: "Bereits ein Konto?",
     signUp: "Registrieren",
     errorDefault: "Ein Fehler ist aufgetreten",
+    forgotPassword: "Passwort vergessen?",
+    forgotTitle: "Passwort zurücksetzen",
+    forgotSubtitle: "Gib deine E-Mail ein und wir senden dir einen Link.",
+    sendResetLink: "Link senden",
+    resetLinkSent: "Prüfe dein Postfach für den Reset-Link.",
+    backToSignIn: "Zurück zur Anmeldung",
+    resetTitle: "Neues Passwort festlegen",
+    resetSubtitle: "Wähle ein starkes Passwort für dein Konto.",
+    newPassword: "Neues Passwort",
+    confirmPassword: "Passwort bestätigen",
+    updatePassword: "Passwort aktualisieren",
+    passwordsDontMatch: "Passwörter stimmen nicht überein",
+    passwordUpdated: "Passwort erfolgreich aktualisiert.",
+    invalidResetLink: "Ungültiger oder abgelaufener Link.",
   },
   explore: {
     title: "Unsere Barbiere",
