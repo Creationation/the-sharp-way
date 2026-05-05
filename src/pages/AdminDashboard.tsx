@@ -288,10 +288,62 @@ const AdminDashboard = () => {
     );
   }
 
+  const normalizedQuery = searchQuery.trim().toLowerCase();
   const filtered = bookings
     .filter(b => filter === "all" || b.status === filter)
     .filter(b => barberFilter === "all" || b.barber_name === barberFilter)
-    .filter(b => !calendarDate || b.booking_date === format(calendarDate, "yyyy-MM-dd"));
+    .filter(b => !calendarDate || b.booking_date === format(calendarDate, "yyyy-MM-dd"))
+    .filter(b => !dateFrom || b.booking_date >= dateFrom)
+    .filter(b => !dateTo || b.booking_date <= dateTo)
+    .filter(b => {
+      if (!normalizedQuery) return true;
+      const profile = profiles.get(b.user_id);
+      const haystack = [
+        profile?.full_name, profile?.email, profile?.phone,
+        b.barber_name, b.service_name, b.notes,
+      ].filter(Boolean).join(" ").toLowerCase();
+      return haystack.includes(normalizedQuery);
+    });
+
+  const exportCsv = () => {
+    if (filtered.length === 0) {
+      toast.error(t.admin.exportNoData);
+      return;
+    }
+    const headers = ["Date","Time","Status","Payment","Barber","Service","Price","Duration","Customer","Email","Phone","Notes"];
+    const escape = (v: string | null | undefined) => {
+      const s = (v ?? "").toString().replace(/"/g, '""');
+      return /[",\n;]/.test(s) ? `"${s}"` : s;
+    };
+    const rows = filtered.map(b => {
+      const p = profiles.get(b.user_id);
+      return [
+        b.booking_date, b.booking_time, b.status, b.payment_status ?? "",
+        b.barber_name, b.service_name, b.service_price, b.service_duration,
+        p?.full_name ?? "", p?.email ?? "", p?.phone ?? "", b.notes ?? "",
+      ].map(escape).join(",");
+    });
+    const csv = "\uFEFF" + [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `bookings-${format(new Date(), "yyyy-MM-dd-HHmm")}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(t.admin.exportSuccess);
+  };
+
+  const resetFilters = () => {
+    setFilter("all");
+    setBarberFilter("all");
+    setCalendarDate(undefined);
+    setSearchQuery("");
+    setDateFrom("");
+    setDateTo("");
+  };
 
   return (
     <div className="min-h-screen bg-background pb-24">
