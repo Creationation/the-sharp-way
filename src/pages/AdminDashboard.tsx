@@ -94,6 +94,10 @@ const AdminDashboard = () => {
   const [filter, setFilter] = useState<"all" | "confirmed" | "cancelled">("all");
   const [barberFilter, setBarberFilter] = useState<string>("all");
   const [calendarDate, setCalendarDate] = useState<Date | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   // — Availability tab state —
   const [avBarber, setAvBarber] = useState("");
