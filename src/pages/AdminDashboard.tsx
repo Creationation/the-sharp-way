@@ -61,7 +61,7 @@ type SlotState = "available" | "booked" | "blocked";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { isAdmin, loading: authLoading } = useAuth();
+  const { isAdmin, loading: authLoading, adminChecked } = useAuth();
 
   const { lang } = useLanguage();
   const t = translations[lang];
