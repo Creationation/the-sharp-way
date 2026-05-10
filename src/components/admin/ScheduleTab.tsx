@@ -228,10 +228,27 @@ const ScheduleTab = ({ t, barbers }: Props) => {
         <button onClick={() => setDate(d => subDays(d, 1))} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center active:scale-95 transition-transform">
           <ChevronLeft size={18} className="text-foreground" />
         </button>
-        <div className="text-center">
-          <p className="text-foreground font-semibold text-sm capitalize">{format(date, "EEEE", { locale: dateLocale })}</p>
-          <p className="text-muted-foreground text-xs">{format(date, "dd MMMM yyyy", { locale: dateLocale })}</p>
-        </div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="flex-1 mx-2 text-center active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+              <div>
+                <p className="text-foreground font-semibold text-sm capitalize">{format(date, "EEEE", { locale: dateLocale })}</p>
+                <p className="text-muted-foreground text-xs">{format(date, "dd MMMM yyyy", { locale: dateLocale })}</p>
+              </div>
+              <CalendarIcon size={14} className="text-copper" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0 bg-surface border-border" align="center">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={(d) => d && setDate(d)}
+              locale={dateLocale}
+              initialFocus
+              className="pointer-events-auto"
+            />
+          </PopoverContent>
+        </Popover>
         <button onClick={() => setDate(d => addDays(d, 1))} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center active:scale-95 transition-transform">
           <ChevronRight size={18} className="text-foreground" />
         </button>
