@@ -115,8 +115,10 @@ const PromoCodesTab = ({ t }: Props) => {
     }
   };
 
+  const confirmDialog = useConfirm();
   const deleteCode = async (id: string) => {
-    if (!confirm(t.confirmDelete)) return;
+    const ok = await confirmDialog({ description: t.confirmDelete, destructive: true });
+    if (!ok) return;
     const { error } = await supabase.from("promo_codes").delete().eq("id", id);
     if (error) {
       toast.error(t.deleteError);

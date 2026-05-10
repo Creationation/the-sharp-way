@@ -86,9 +86,11 @@ const ServicesTab = ({ t }: { t: ServicesTabT }) => {
     fetchRows();
   };
 
+  const confirmDialog = useConfirm();
   const deleteRow = async (i: number) => {
     const r = rows[i];
-    if (!confirm(t.confirmDelete)) return;
+    const ok = await confirmDialog({ description: t.confirmDelete, destructive: true });
+    if (!ok) return;
     if (!r.id) { setRows(prev => prev.filter((_, idx) => idx !== i)); return; }
     const { error } = await supabase.from("services").delete().eq("id", r.id);
     if (error) { toast.error(t.deleteError); return; }
