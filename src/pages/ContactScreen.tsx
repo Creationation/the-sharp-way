@@ -1,6 +1,9 @@
-import { ArrowLeft, MapPin, Phone, Clock, MessageCircle, Navigation, Instagram } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, MapPin, Phone, Clock, MessageCircle, Navigation, Instagram, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const hoursData = [
   { time: "Closed" },        // Montag
