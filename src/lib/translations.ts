@@ -250,6 +250,26 @@ export interface Translations {
       photoUploaded: string;
       color: string;
     };
+    servicesTab: {
+      title: string;
+      nameDe: string;
+      nameEn: string;
+      price: string;
+      durationMin: string;
+      sortOrder: string;
+      active: string;
+      inactive: string;
+      addService: string;
+      save: string;
+      saved: string;
+      saveError: string;
+      deleted: string;
+      deleteError: string;
+      loadError: string;
+      confirmDelete: string;
+      noServices: string;
+      hint: string;
+    };
     scheduleTab: {
       title: string;
       exportCsv: string;
