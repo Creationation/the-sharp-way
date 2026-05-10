@@ -36,7 +36,7 @@ const buildEmail = (p: BookingPayload, isDE: boolean) => {
         date: "Datum",
         time: "Uhrzeit",
         total: "Gesamt",
-        policy: "Kostenlose Stornierung bis 24 Stunden vor dem Termin. Danach wird eine Gebühr von 5 € fällig.",
+        policy: "Kostenlose Stornierung bis 24 Std. vor dem Termin. Danach werden 5 € Kaution einbehalten und sind nicht erstattbar.",
         seeYou: "Bis bald · Sitdown Wien",
       }
     : {
@@ -47,7 +47,7 @@ const buildEmail = (p: BookingPayload, isDE: boolean) => {
         date: "Date",
         time: "Time",
         total: "Total",
-        policy: "Free cancellation up to 24 hours before your appointment. A 5 € fee applies after that.",
+        policy: "Free cancellation up to 24h before your appointment. After that, the €5 deposit is retained and is non-refundable.",
         seeYou: "See you soon · Sitdown Wien",
       };
 

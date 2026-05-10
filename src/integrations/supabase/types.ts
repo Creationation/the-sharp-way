@@ -105,6 +105,7 @@ export type Database = {
           reminder_sent_24h: boolean
           reminder_sent_2h: boolean
           reminder_sent_5h: boolean
+          reminder_sent_7d: boolean
           service_duration: string
           service_name: string
           service_price: string
@@ -127,6 +128,7 @@ export type Database = {
           reminder_sent_24h?: boolean
           reminder_sent_2h?: boolean
           reminder_sent_5h?: boolean
+          reminder_sent_7d?: boolean
           service_duration: string
           service_name: string
           service_price: string
@@ -149,6 +151,7 @@ export type Database = {
           reminder_sent_24h?: boolean
           reminder_sent_2h?: boolean
           reminder_sent_5h?: boolean
+          reminder_sent_7d?: boolean
           service_duration?: string
           service_name?: string
           service_price?: string
@@ -199,6 +202,7 @@ export type Database = {
           reminder_24h: boolean
           reminder_2h: boolean
           reminder_5h: boolean
+          reminder_7d: boolean
           updated_at: string
         }
         Insert: {
@@ -208,6 +212,7 @@ export type Database = {
           reminder_24h?: boolean
           reminder_2h?: boolean
           reminder_5h?: boolean
+          reminder_7d?: boolean
           updated_at?: string
         }
         Update: {
@@ -217,6 +222,7 @@ export type Database = {
           reminder_24h?: boolean
           reminder_2h?: boolean
           reminder_5h?: boolean
+          reminder_7d?: boolean
           updated_at?: string
         }
         Relationships: []

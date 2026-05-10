@@ -1,0 +1,2 @@
+ALTER TABLE public.bookings ADD COLUMN IF NOT EXISTS reminder_sent_7d boolean NOT NULL DEFAULT false;
+ALTER TABLE public.notification_settings ADD COLUMN IF NOT EXISTS reminder_7d boolean NOT NULL DEFAULT true;

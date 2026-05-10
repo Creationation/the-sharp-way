@@ -7,6 +7,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Settings {
   email_reminders: boolean;
+  reminder_7d: boolean;
   reminder_24h: boolean;
   reminder_5h: boolean;
   reminder_2h: boolean;
@@ -25,6 +26,12 @@ interface UpcomingBooking {
 }
 
 const REMINDERS_DATA = [
+  {
+    key: "reminder_7d" as const,
+    icon: "🗓️",
+    label: { en: "1 week before", de: "1 Woche vorher" },
+    desc:  { en: "Friendly heads-up the week before", de: "Erinnerung eine Woche vor dem Termin" },
+  },
   {
     key: "reminder_24h" as const,
     icon: "📅",
@@ -75,6 +82,7 @@ export default function NotificationsTab({ t }: Props) {
 
   const [settings, setSettings] = useState<Settings>({
     email_reminders: true,
+    reminder_7d: true,
     reminder_24h: true,
     reminder_5h: true,
     reminder_2h: true,
