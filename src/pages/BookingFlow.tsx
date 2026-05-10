@@ -140,6 +140,14 @@ const BookingFlow = () => {
 
   const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
   const [selectedServices, setSelectedServices] = useState<ServiceItem[]>([]);
+
+  // Default-select first service once services load (only if user has nothing selected)
+  useEffect(() => {
+    if (services.length > 0 && selectedServices.length === 0) {
+      setSelectedServices([services[0]]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [services.length]);
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
   const [selectedTime, setSelectedTime] = useState("12:00");
   const [confirmed, setConfirmed] = useState(false);
