@@ -815,12 +815,6 @@ const AdminDashboard = () => {
       {/* ═══════════════════ PROMO CODES TAB ═══════════════════ */}
       {tab === "codes" && <PromoCodesTab t={t.admin.promoCodesTab} />}
 
-      {/* ═══════════════════ LOYALTY TAB ═══════════════════ */}
-      {tab === "loyalty" && <LoyaltyTab t={t.admin.loyaltyTab} />}
-
-      {/* ═══════════════════ REWARDS TAB ═══════════════════ */}
-      {tab === "rewards" && <RewardsTab t={t.admin.rewardsTab} />}
-
       {/* ═══════════════════ STATS TAB ═══════════════════ */}
       {tab === "stats" && <StatsTab isActive={tab === "stats"} />}
 
