@@ -30,7 +30,7 @@ serve(async (req) => {
   // Find all confirmed past bookings (before today) with no attendance recorded
   const { data: pendingBookings, error } = await supabase
     .from("bookings")
-    .select("id, user_id, barber_name, service_name, booking_date, booking_time, profiles(email, full_name)")
+    .select("id, user_id, barber_name, service_name, booking_date, booking_time")
     .eq("status", "confirmed")
     .is("attendance_status", null)
     .lt("booking_date", todayStr);
@@ -43,11 +43,23 @@ serve(async (req) => {
     });
   }
 
+  // Fetch profile names client-side (no FK between bookings.user_id and profiles.user_id)
+  const userIds = Array.from(new Set(((pendingBookings || []) as PendingBooking[]).map(b => b.user_id).filter(Boolean)));
+  const profilesById: Record<string, { email: string | null; full_name: string | null }> = {};
+  if (userIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("user_id, email, full_name")
+      .in("user_id", userIds);
+    for (const p of profiles || []) {
+      profilesById[p.user_id] = { email: p.email, full_name: p.full_name };
+    }
+  }
+
   const autoStamped: string[] = [];
   const errors: string[] = [];
 
-  for (const booking of (pendingBookings || []) as unknown as PendingBooking[]) {
-    // Auto-mark as attended — benefit of the doubt (barber did not mark as no-show)
+  for (const booking of (pendingBookings || []) as PendingBooking[]) {
     const { error: updateErr } = await supabase
       .from("bookings")
       .update({ attendance_status: "attended" })
@@ -56,7 +68,8 @@ serve(async (req) => {
     if (updateErr) {
       errors.push(`${booking.id}: ${updateErr.message}`);
     } else {
-      const name = booking.profiles?.full_name || booking.profiles?.email || booking.user_id;
+      const profile = profilesById[booking.user_id];
+      const name = profile?.full_name || profile?.email || booking.user_id;
       autoStamped.push(`${booking.booking_date} ${booking.booking_time} — ${name} (${booking.barber_name})`);
     }
   }
