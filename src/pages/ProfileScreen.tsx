@@ -81,42 +81,6 @@ const ProfileScreen = () => {
   const upcoming = bookings.filter(b => b.booking_date >= today && b.status === "confirmed");
   const past = bookings.filter(b => b.booking_date < today || b.status === "cancelled");
 
-  const fetchLoyalty = async () => {
-    const [loyaltyRes, rewardRes] = await Promise.all([
-      supabase
-        .from("user_loyalty")
-        .select("stamps, total_points")
-        .eq("user_id", user!.id)
-        .maybeSingle(),
-      supabase
-        .from("reward_requests")
-        .select("id")
-        .eq("user_id", user!.id)
-        .eq("status", "pending")
-        .limit(1),
-    ]);
-    if (loyaltyRes.data) {
-      setStamps((loyaltyRes.data as any).stamps ?? 0);
-      setTotalPoints((loyaltyRes.data as any).total_points ?? 0);
-    }
-    setRewardPending((rewardRes.data?.length ?? 0) > 0);
-  };
-
-  const claimReward = async () => {
-    setClaimingReward(true);
-    const { error } = await supabase
-      .from("reward_requests")
-      .insert({ user_id: user!.id, stamps_at_request: stamps });
-    setClaimingReward(false);
-    if (error) {
-      toast.error("Error submitting request");
-    } else {
-      toast.success(t.profile.rewardClaimed);
-      setRewardPending(true);
-    }
-  };
-
-
   const handleSignOut = async () => {
     await signOut();
     navigate("/home");
