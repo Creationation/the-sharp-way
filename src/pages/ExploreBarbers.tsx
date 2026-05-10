@@ -35,7 +35,7 @@ const ExploreBarbers = () => {
           <h1 className="font-heading text-2xl text-foreground">
             {lang === "de" ? "Unsere Barbiere" : "Our Barbers"}
           </h1>
-          <p className="text-muted-foreground text-xs">The Sharp Cut · Wien 1220</p>
+          <p className="text-muted-foreground text-xs">Sitdown Wien · 1220</p>
         </div>
       </div>
 

@@ -9,7 +9,7 @@ const AboutSection = () => {
           <div className="rounded-lg overflow-hidden aspect-square">
             <img
               src={shopInterior}
-              alt="The Sharp Cut barbershop interior"
+              alt="Sitdown Wien barbershop interior"
               className="w-full h-full object-cover"
               loading="lazy"
             />
@@ -19,7 +19,7 @@ const AboutSection = () => {
           <div>
             <h2 className="text-4xl md:text-6xl font-heading text-copper mb-6">Our Story</h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              The Sharp Cut was born from a simple belief: every man deserves a barbershop that respects the craft.
+              Sitdown Wien was born from a simple belief: every man deserves a barbershop that respects the craft.
               Founded in 2019 in the heart of Vienna, we blend old-school tradition with modern technique.
             </p>
             <p className="text-muted-foreground leading-relaxed mb-8">
