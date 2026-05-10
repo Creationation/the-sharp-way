@@ -146,7 +146,9 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({
       cancelled: true,
-      charged,
+      charged: charged || alreadyCharged,
+      already_charged: alreadyCharged,
+      deposit_retained: depositRetained,
       hours_until: Math.round(hoursUntil),
       payment_status: newPaymentStatus,
     }), {
