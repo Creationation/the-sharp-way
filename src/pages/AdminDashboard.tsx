@@ -371,11 +371,6 @@ const AdminDashboard = () => {
                   >
                     <item.Icon size={14} className={tab === item.id ? "text-copper" : "text-muted-foreground"} />
                     <span className="flex-1 text-left">{item.label}</span>
-                    {item.id === "rewards" && pendingRewards > 0 && (
-                      <span className="bg-copper text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full">
-                        {pendingRewards}
-                      </span>
-                    )}
                   </button>
                 ))}
               </div>
