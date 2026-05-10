@@ -173,6 +173,17 @@ serve(async (req) => {
       day: "numeric", month: "long", weekday: "long",
     });
 
+    // 7d reminder: send when 6.5d < diff < 7.5d (window of 1 day to be safe with cron cadence)
+    if (settings.reminder_7d && !booking.reminder_sent_7d && diffHours >= 156 && diffHours <= 180) {
+      const { subject, html } = buildReminderEmail(name, booking.service_name, booking.barber_name, dateFormatted, booking.booking_time, "7d", "de");
+      const ok = await sendEmail(email, subject, html);
+      if (ok) {
+        await supabase.from("bookings").update({ reminder_sent_7d: true }).eq("id", booking.id);
+        sent++;
+        results.push(`7d → ${email}`);
+      }
+    }
+
     // 24h reminder: send when 23h < diff < 25h
     if (settings.reminder_24h && !booking.reminder_sent_24h && diffHours >= 23 && diffHours <= 25) {
       const { subject, html } = buildReminderEmail(name, booking.service_name, booking.barber_name, dateFormatted, booking.booking_time, "24h", "de");
