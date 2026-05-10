@@ -498,6 +498,10 @@ const en: Translations = {
     title: "Services",
     allCat: "All",
     bookBtn: "Book This Service",
+    catHerren: "Men",
+    catDamen: "Women",
+    catKinder: "Kids",
+    fromPrefix: "from",
   },
   toasts: {
     signInToBook: "Sign in to book an appointment",
