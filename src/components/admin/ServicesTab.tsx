@@ -23,7 +23,14 @@ interface ServicesTabT {
   confirmDelete: string;
   noServices: string;
   hint: string;
+  category: string;
+  catHerren: string;
+  catDamen: string;
+  catKinder: string;
+  fromPrice: string;
 }
+
+type ServiceCategory = "herren" | "damen" | "kinder";
 
 interface ServiceRow {
   id: string;
@@ -33,6 +40,8 @@ interface ServiceRow {
   duration_min: number;
   sort_order: number;
   active: boolean;
+  category: ServiceCategory;
+  is_from_price: boolean;
 }
 
 const blankRow = (sort: number): Omit<ServiceRow, "id"> & { id?: string } => ({
@@ -42,6 +51,8 @@ const blankRow = (sort: number): Omit<ServiceRow, "id"> & { id?: string } => ({
   duration_min: 30,
   sort_order: sort,
   active: true,
+  category: "herren",
+  is_from_price: false,
 });
 
 const ServicesTab = ({ t }: { t: ServicesTabT }) => {
