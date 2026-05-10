@@ -1209,6 +1209,11 @@ const de: Translations = {
       confirmDelete: "Diese Dienstleistung löschen?",
       noServices: "Keine Dienstleistungen",
       hint: "Inaktive Dienstleistungen bleiben in bestehenden Buchungen sichtbar, werden aber im Buchungsablauf ausgeblendet.",
+      category: "Kategorie",
+      catHerren: "Herren",
+      catDamen: "Damen",
+      catKinder: "Kinder",
+      fromPrice: "Ab-Preis (\"ab\")",
     },
     galleryTab: {
       title: "Galerie",
