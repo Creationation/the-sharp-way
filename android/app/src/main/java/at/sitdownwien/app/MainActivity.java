@@ -1,4 +1,4 @@
-package at.thesharpcut.app;
+package at.sitdownwien.app;
 
 import com.getcapacitor.BridgeActivity;
 

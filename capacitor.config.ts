@@ -1,11 +1,11 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'at.thesharpcut.app',
+  appId: 'at.sitdownwien.app',
   appName: 'Sitdown Wien',
   webDir: 'dist',
   server: {
-    url: 'https://the-sharp-way.lovable.app',
+    url: 'https://sitdownvienna.lovable.app',
     cleartext: false,
   },
 };
