@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, Bookmark, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useGalleryImages } from "@/hooks/useGalleryImages";
 import fade1 from "@/assets/fade-1.jpg";
 import fade2 from "@/assets/fade-2.jpg";
 import fade3 from "@/assets/fade-3.jpg";
@@ -21,8 +22,9 @@ import design2 from "@/assets/design-2.jpg";
 import design3 from "@/assets/design-3.jpg";
 import design4 from "@/assets/design-4.jpg";
 
+// Fallback gallery (shown when admin hasn't uploaded any photos yet)
 // tagIndex maps to filters array: 1=Fades, 2=Beards, 3=Classic, 4=Women, 5=Design
-const galleryImages = [
+const fallbackImages = [
   { src: fade1, tagIndex: 1, saved: false },
   { src: fade2, tagIndex: 1, saved: false },
   { src: fade3, tagIndex: 1, saved: false },
@@ -48,8 +50,14 @@ const GalleryScreen = () => {
   const { t } = useLanguage();
   const [activeFilter, setActiveFilter] = useState(0);
   const [lightbox, setLightbox] = useState<string | null>(null);
+  const { images: dbImages, loading } = useGalleryImages({ onlyActive: true });
 
-  const filters = t.gallery.filters; // ["All/Alle", "Fades", "Beards/Bärte", "Classic/Klassisch"]
+  const filters = t.gallery.filters;
+
+  // Use DB images if any exist, otherwise fallback to bundled photos
+  const galleryImages = dbImages.length > 0
+    ? dbImages.map(img => ({ src: img.image_url, tagIndex: img.category, saved: false }))
+    : fallbackImages;
 
   const filtered = activeFilter === 0
     ? galleryImages
@@ -57,7 +65,6 @@ const GalleryScreen = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
       <div className="px-5 pt-12 pb-4 flex items-center gap-4">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
           <ArrowLeft size={18} className="text-foreground" />
@@ -65,7 +72,6 @@ const GalleryScreen = () => {
         <h1 className="font-heading text-2xl text-foreground">{t.gallery.title}</h1>
       </div>
 
-      {/* Filters — only show categories we have photos for */}
       <div className="px-5 mb-5">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
           {filters.map((f, i) => (
@@ -84,33 +90,37 @@ const GalleryScreen = () => {
         </div>
       </div>
 
-      {/* Masonry grid */}
-      <div className="px-5 columns-2 gap-3 space-y-3">
-        {filtered.map((img, i) => (
-          <div
-            key={img.src}
-            className="relative rounded-2xl overflow-hidden cursor-pointer break-inside-avoid group"
-            onClick={() => setLightbox(img.src)}
-          >
-            <img
-              src={img.src}
-              alt={filters[img.tagIndex]}
-              className={`w-full object-cover ${i % 3 === 0 ? "h-56" : "h-44"}`}
-              loading="lazy"
-            />
-            <div className="absolute top-2.5 right-2.5">
-              <Bookmark size={18} className={img.saved ? "text-copper fill-copper" : "text-foreground/70"} />
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <div className="w-8 h-8 border-2 border-copper border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <div className="px-5 columns-2 gap-3 space-y-3">
+          {filtered.map((img, i) => (
+            <div
+              key={img.src + i}
+              className="relative rounded-2xl overflow-hidden cursor-pointer break-inside-avoid group"
+              onClick={() => setLightbox(img.src)}
+            >
+              <img
+                src={img.src}
+                alt={filters[img.tagIndex]}
+                className={`w-full object-cover ${i % 3 === 0 ? "h-56" : "h-44"}`}
+                loading="lazy"
+              />
+              <div className="absolute top-2.5 right-2.5">
+                <Bookmark size={18} className={img.saved ? "text-copper fill-copper" : "text-foreground/70"} />
+              </div>
+              <div className="absolute bottom-2.5 left-2.5">
+                <span className="bg-background/70 backdrop-blur-sm text-foreground text-[10px] font-medium px-2 py-1 rounded-full">
+                  {filters[img.tagIndex]}
+                </span>
+              </div>
             </div>
-            <div className="absolute bottom-2.5 left-2.5">
-              <span className="bg-background/70 backdrop-blur-sm text-foreground text-[10px] font-medium px-2 py-1 rounded-full">
-                {filters[img.tagIndex]}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
-      {/* Lightbox */}
       {lightbox && (
         <div
           className="fixed inset-0 z-[100] bg-background/95 flex items-center justify-center animate-fade-in"

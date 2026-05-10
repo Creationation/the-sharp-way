@@ -270,6 +270,28 @@ export interface Translations {
       noServices: string;
       hint: string;
     };
+    galleryTab: {
+      title: string;
+      uploadPhoto: string;
+      uploading: string;
+      uploaded: string;
+      uploadError: string;
+      category: string;
+      sortOrder: string;
+      active: string;
+      inactive: string;
+      save: string;
+      saved: string;
+      saveError: string;
+      deleted: string;
+      deleteError: string;
+      loadError: string;
+      confirmDelete: string;
+      noImages: string;
+      hint: string;
+      categories: string[];
+      filterAll: string;
+    };
     scheduleTab: {
       title: string;
       exportCsv: string;
@@ -689,6 +711,28 @@ const en: Translations = {
       noServices: "No services",
       hint: "Inactive services stay visible on existing bookings but are hidden from the booking flow.",
     },
+    galleryTab: {
+      title: "Gallery",
+      uploadPhoto: "Upload Photo",
+      uploading: "Uploading...",
+      uploaded: "Photo uploaded",
+      uploadError: "Upload failed",
+      category: "Category",
+      sortOrder: "Order",
+      active: "Active",
+      inactive: "Inactive",
+      save: "Save",
+      saved: "Saved",
+      saveError: "Error saving",
+      deleted: "Photo deleted",
+      deleteError: "Error deleting",
+      loadError: "Failed to load gallery",
+      confirmDelete: "Delete this photo?",
+      noImages: "No photos yet · upload one to get started",
+      hint: "Photos are publicly visible on the gallery page. Inactive photos stay in storage but are hidden.",
+      categories: ["Fades", "Beards", "Classic", "Women", "Design"],
+      filterAll: "All",
+    },
     scheduleTab: {
       title: "Schedule",
       exportCsv: "Export CSV",
@@ -1107,6 +1151,28 @@ const de: Translations = {
       confirmDelete: "Diese Dienstleistung löschen?",
       noServices: "Keine Dienstleistungen",
       hint: "Inaktive Dienstleistungen bleiben in bestehenden Buchungen sichtbar, werden aber im Buchungsablauf ausgeblendet.",
+    },
+    galleryTab: {
+      title: "Galerie",
+      uploadPhoto: "Foto hochladen",
+      uploading: "Wird hochgeladen...",
+      uploaded: "Foto hochgeladen",
+      uploadError: "Upload fehlgeschlagen",
+      category: "Kategorie",
+      sortOrder: "Reihenfolge",
+      active: "Aktiv",
+      inactive: "Inaktiv",
+      save: "Speichern",
+      saved: "Gespeichert",
+      saveError: "Fehler beim Speichern",
+      deleted: "Foto gelöscht",
+      deleteError: "Fehler beim Löschen",
+      loadError: "Fehler beim Laden der Galerie",
+      confirmDelete: "Dieses Foto löschen?",
+      noImages: "Noch keine Fotos · lade eines hoch, um zu starten",
+      hint: "Fotos sind öffentlich auf der Galerie-Seite sichtbar. Inaktive Fotos bleiben gespeichert, werden aber ausgeblendet.",
+      categories: ["Fades", "Bärte", "Klassisch", "Frauen", "Design"],
+      filterAll: "Alle",
     },
     scheduleTab: {
       title: "Tagesplan",
