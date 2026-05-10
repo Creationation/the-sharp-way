@@ -70,6 +70,7 @@ const App = () => {
           </Routes>
           <BottomNav />
         </BrowserRouter>
+        </ConfirmProvider>
       </AuthProvider>
       </LanguageProvider>
     </TooltipProvider>
