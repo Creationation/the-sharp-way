@@ -5,7 +5,7 @@ import { format, addDays, subDays } from "date-fns";
 import { de as deLocale, enUS } from "date-fns/locale";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
 interface Barber {
   id: string;
