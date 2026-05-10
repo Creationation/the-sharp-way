@@ -18,7 +18,7 @@ const HeroSection = () => {
       {/* Content */}
       <div className="relative z-10 container text-center px-4">
         <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-heading leading-none mb-6 opacity-0 animate-fade-up">
-          Sharp Cuts.<br />
+          Sitdown.<br />
           Clean Lines.<br />
           <span className="text-gradient-copper">Bold Style.</span>
         </h1>
@@ -29,7 +29,8 @@ const HeroSection = () => {
           href="#booking"
           className="inline-block gradient-copper text-primary-foreground font-heading text-xl md:text-2xl tracking-widest px-10 py-4 rounded-sm shadow-copper hover:opacity-90 transition-all opacity-0 animate-fade-up animation-delay-400"
         >
-          BOOK YOUR CUT
+          BOOK NOW
+        </a>
         </a>
       </div>
 
