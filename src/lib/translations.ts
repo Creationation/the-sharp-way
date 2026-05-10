@@ -1062,6 +1062,7 @@ const de: Translations = {
     rewardPending: "⏳ Anfrage wird bearbeitet...",
     rewardClaimed: "Belohnung angefragt!",
     freeCutReady: "Du hast einen GRATIS-Schnitt verdient! Tippe zum Einlösen.",
+    replayIntro: "Intro erneut ansehen",
   },
   admin: {
     title: "Admin-Bereich",
