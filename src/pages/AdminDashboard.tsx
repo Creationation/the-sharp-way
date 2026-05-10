@@ -24,6 +24,7 @@ import NotificationsTab from "@/components/admin/NotificationsTab";
 import ScheduleTab from "@/components/admin/ScheduleTab";
 import StatsTab from "@/components/admin/StatsTab";
 import ServicesTab from "@/components/admin/ServicesTab";
+import GalleryTab from "@/components/admin/GalleryTab";
 import { useBarbers } from "@/hooks/useBarbers";
 import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
 
