@@ -101,36 +101,108 @@ const ScheduleTab = ({ t, barbers }: Props) => {
     return map;
   }, [barbers]);
 
-  const exportXlsx = () => {
+  const exportXlsx = async () => {
     const dateStr = format(date, "yyyy-MM-dd");
     const dateLabel = format(date, "EEEE dd MMMM yyyy", { locale: dateLocale });
 
-    // Build data rows
-    const header = [t.hour, ...barbers.map(b => b.name)];
-    const rows = HOURS.map(h => {
-      const cells = barbers.map(b => {
-        const booking = grid[h]?.[b.name];
-        if (!booking) return "";
-        const statusLabel = STATUS_LABELS[booking.status]?.[lang] || booking.status;
-        return `${booking.service_name} · ${booking.booking_time} · ${statusLabel}`;
-      });
-      return [h, ...cells];
+    const wb = new ExcelJS.Workbook();
+    wb.creator = "Sitdown Wien";
+    wb.created = new Date();
+    const ws = wb.addWorksheet("Tagesplan", {
+      views: [{ state: "frozen", ySplit: 3 }],
     });
 
-    const wsData = [[`Tagesplan · ${dateLabel}`], [], header, ...rows];
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-
     // Column widths
-    ws["!cols"] = [{ wch: 8 }, ...barbers.map(() => ({ wch: 32 }))];
+    ws.columns = [
+      { width: 10 },
+      ...barbers.map(() => ({ width: 34 })),
+    ];
 
-    // Merge title row
-    ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: barbers.length } }];
+    // Title row
+    const titleRow = ws.addRow([`${lang === "de" ? "Tagesplan" : "Daily schedule"} · ${dateLabel}`]);
+    ws.mergeCells(1, 1, 1, barbers.length + 1);
+    titleRow.font = { name: "Inter", size: 14, bold: true, color: { argb: "FF1A1A1A" } };
+    titleRow.alignment = { horizontal: "center", vertical: "middle" };
+    titleRow.height = 28;
+    titleRow.getCell(1).fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFF5EFE6" },
+    };
 
-    // Apply styles (xlsx community edition has limited style support, use xlsx-style-compatible approach)
-    // For each data cell with a booking, add a comment-like note
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Tagesplan");
-    XLSX.writeFile(wb, `tagesplan-${dateStr}.xlsx`);
+    // Spacer
+    ws.addRow([]);
+
+    // Header row
+    const headerRow = ws.addRow([t.hour, ...barbers.map(b => b.name)]);
+    headerRow.height = 22;
+    headerRow.eachCell((cell, colNumber) => {
+      cell.font = { name: "Inter", bold: true, size: 11, color: { argb: "FFFFFFFF" } };
+      cell.alignment = { horizontal: "center", vertical: "middle" };
+      cell.border = {
+        top: { style: "thin", color: { argb: "FFCCCCCC" } },
+        bottom: { style: "thin", color: { argb: "FFCCCCCC" } },
+        left: { style: "thin", color: { argb: "FFCCCCCC" } },
+        right: { style: "thin", color: { argb: "FFCCCCCC" } },
+      };
+      if (colNumber === 1) {
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF333333" } };
+      } else {
+        const barber = barbers[colNumber - 2];
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: hexToArgb(barber.color) },
+        };
+      }
+    });
+
+    // Data rows
+    for (const h of HOURS) {
+      const rowValues: string[] = [h];
+      for (const b of barbers) {
+        const booking = grid[h]?.[b.name];
+        if (!booking) {
+          rowValues.push("");
+        } else {
+          const statusLabel = STATUS_LABELS[booking.status]?.[lang] || booking.status;
+          rowValues.push(`${booking.service_name} · ${booking.booking_time} · ${statusLabel}`);
+        }
+      }
+      const row = ws.addRow(rowValues);
+      row.height = 32;
+      row.eachCell((cell, colNumber) => {
+        cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFE5E5E5" } },
+          bottom: { style: "thin", color: { argb: "FFE5E5E5" } },
+          left: { style: "thin", color: { argb: "FFE5E5E5" } },
+          right: { style: "thin", color: { argb: "FFE5E5E5" } },
+        };
+        if (colNumber === 1) {
+          cell.font = { name: "Inter", bold: true, size: 11, color: { argb: "FF555555" } };
+          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF8F8F8" } };
+        } else {
+          const barber = barbers[colNumber - 2];
+          const booking = grid[h]?.[barber.name];
+          if (booking) {
+            cell.font = { name: "Inter", bold: true, size: 10, color: { argb: hexToArgb(barber.color) } };
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: hexToLightArgb(barber.color) } };
+          }
+        }
+      });
+    }
+
+    const buffer = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `tagesplan-${dateStr}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const getStatusStyle = (status: string) => {
