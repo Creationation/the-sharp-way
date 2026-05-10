@@ -74,7 +74,7 @@ const SplashScreen = () => {
                       : "bg-surface border-border text-muted-foreground"
                   }`}
                 >
-                  🇬🇧 English
+                  <GB title="United Kingdom" className="w-5 h-auto rounded-sm shadow-sm" /> English
                 </button>
               </div>
             </div>
