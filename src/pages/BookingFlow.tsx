@@ -22,14 +22,14 @@ const MONTH_ABBR: Record<string, string[]> = {
   de: ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"],
 };
 
-// Generate next 6 open days from a start date (Tue–Sat, skip Monday=1 and Sunday=0)
+// Generate next 6 open days from a start date (Mon–Sat, skip Sunday=0)
 function getAvailableDates(from?: Date): Date[] {
   const result: Date[] = [];
   const d = from ? new Date(from) : new Date();
   if (!from) d.setDate(d.getDate() + 1);
   d.setHours(0, 0, 0, 0);
   while (result.length < 6) {
-    if (d.getDay() !== 1 && d.getDay() !== 0) result.push(new Date(d));
+    if (d.getDay() !== 0) result.push(new Date(d));
     d.setDate(d.getDate() + 1);
   }
   return result;
@@ -922,8 +922,8 @@ function CalendarModal({ lang, onSelect, onClose }: CalendarModalProps) {
 
   const isDisabled = (d: Date) => {
     const day = d.getDay();
-    // Monday (1) and Sunday (0) are closed
-    if (day === 0 || day === 1) return true;
+    // Sunday (0) is closed
+    if (day === 0) return true;
     if (d < today) return true;
     if (d > maxDate) return true;
     return false;

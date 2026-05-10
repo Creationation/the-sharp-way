@@ -29,8 +29,8 @@ const ContactFooter = () => {
               <Clock className="text-copper mt-1 flex-shrink-0" size={20} />
               <div>
                 <p className="text-foreground font-semibold">Öffnungszeiten / Opening Hours</p>
-                <p className="text-muted-foreground">Dienstag – Samstag / Tue – Sat: 09:00 – 19:00</p>
-                <p className="text-muted-foreground">Sonntag & Montag / Sun & Mon: Geschlossen / Closed</p>
+                <p className="text-muted-foreground">Montag – Samstag / Mon – Sat: 09:00 – 19:00</p>
+                <p className="text-muted-foreground">Sonntag / Sun: Geschlossen / Closed</p>
               </div>
             </div>
           </div>

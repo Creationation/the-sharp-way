@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const hoursData = [
-  { time: "Closed" },        // Montag
+  { time: "09:00 – 19:00" }, // Montag
   { time: "09:00 – 19:00" }, // Dienstag
   { time: "09:00 – 19:00" }, // Mittwoch
   { time: "09:00 – 19:00" }, // Donnerstag
@@ -18,8 +18,8 @@ const hoursData = [
 function isOpenNow(): boolean {
   const now = new Date();
   const day = now.getDay(); // 0=Sun, 1=Mon, 2=Tue … 6=Sat
-  // Open Tue(2) to Sat(6)
-  if (day < 2 || day > 6) return false;
+  // Open Mon(1) to Sat(6), closed Sun(0)
+  if (day === 0) return false;
   const minutes = now.getHours() * 60 + now.getMinutes();
   return minutes >= 9 * 60 && minutes < 19 * 60;
 }

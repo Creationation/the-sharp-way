@@ -469,7 +469,7 @@ const en: Translations = {
     line3: "YOUR LOOK INSTANTLY.",
     sub: "Vienna's premium barbershop. Walk in or book ahead.",
     cta: "Get Started",
-    walkin: "Or walk in anytime · Tue–Sat 09:00–19:00",
+    walkin: "Or walk in anytime · Mon–Sat 09:00–19:00",
     pickLanguage: "Choose your language",
   },
   nav: {
@@ -931,7 +931,7 @@ const de: Translations = {
     line3: "DEINEN LOOK SOFORT.",
     sub: "Wiens Premium Barbershop. Einfach vorbeikommen oder vorab buchen.",
     cta: "Jetzt starten",
-    walkin: "Oder komm einfach vorbei · Di–Sa 09:00–19:00",
+    walkin: "Oder komm einfach vorbei · Mo–Sa 09:00–19:00",
     pickLanguage: "Wähle deine Sprache",
   },
   nav: {
