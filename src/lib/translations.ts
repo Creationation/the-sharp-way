@@ -976,7 +976,7 @@ const de: Translations = {
     cancelError: "Fehler beim Stornieren",
     bookingCancelled: "Termin storniert",
     cancelledFree: "Termin storniert · keine Gebühr.",
-    cancelledCharged: "Termin storniert · 5 € Kaution wurde abgebucht.",
+    cancelledCharged: "Termin storniert · 5 € Kaution wird einbehalten (keine Erstattung innerhalb 24 Std.).",
     cancelling: "Wird storniert...",
     copied: "Kopiert!",
     accountCreated: "Konto erstellt!",
