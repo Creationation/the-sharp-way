@@ -747,6 +747,11 @@ const en: Translations = {
       confirmDelete: "Delete this service?",
       noServices: "No services",
       hint: "Inactive services stay visible on existing bookings but are hidden from the booking flow.",
+      category: "Category",
+      catHerren: "Men",
+      catDamen: "Women",
+      catKinder: "Kids",
+      fromPrice: "From price (\"from\")",
     },
     galleryTab: {
       title: "Gallery",
