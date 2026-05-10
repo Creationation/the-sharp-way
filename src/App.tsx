@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { ConfirmProvider } from "@/hooks/useConfirm";
 import BottomNav from "@/components/BottomNav";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import SplashScreen from "@/pages/SplashScreen";
@@ -45,6 +46,7 @@ const App = () => {
     <TooltipProvider>
       <LanguageProvider>
       <AuthProvider>
+        <ConfirmProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
