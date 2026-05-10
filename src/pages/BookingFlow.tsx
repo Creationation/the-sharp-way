@@ -128,8 +128,8 @@ const BookingFlow = () => {
   const { barbers, loading: barbersLoading } = useBarbers();
   const { services: dbServices } = useServices({ onlyActive: true });
   const services: ServiceItem[] = dbServices.map(s => ({
-    name: s.name,
-    price: `€${s.price}`,
+    name: lang === "en" ? (s.name_en || s.name) : s.name,
+    price: s.is_from_price ? `${t.services.fromPrefix} €${s.price}` : `€${s.price}`,
     duration: `${s.duration_min}min`,
   }));
 
