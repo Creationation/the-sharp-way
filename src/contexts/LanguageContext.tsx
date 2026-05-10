@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { translations, type Lang, type Translations } from "@/lib/translations";
 
 interface LanguageContextType {
@@ -13,6 +13,11 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
   const [lang, setLangState] = useState<Lang>(() => {
     return (localStorage.getItem("sitdown_lang") as Lang) || "de";
   });
+
+  // Sync <html lang> for SEO + a11y
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   const setLang = (l: Lang) => {
     localStorage.setItem("sitdown_lang", l);
