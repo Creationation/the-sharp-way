@@ -13,7 +13,6 @@ interface PendingBooking {
   service_name: string;
   booking_date: string;
   booking_time: string;
-  profiles: { email: string | null; full_name: string | null } | null;
 }
 
 serve(async (req) => {
@@ -80,11 +79,11 @@ serve(async (req) => {
           Falls ein Kunde wirklich nicht erschienen ist, öffne das Admin-Dashboard und markiere ihn als "No-Show".
           Der Stempel wird dann zurückgesetzt.
         </p>
-        <a href="https://the-sharp-way.lovable.app/admin"
+        <a href="https://sitdownvienna.lovable.app/admin"
            style="display:inline-block;margin-top:16px;background:linear-gradient(90deg,#b8935a,#d4a96a);color:#111;font-weight:700;font-size:13px;padding:12px 24px;border-radius:50px;text-decoration:none;">
           → Admin Dashboard öffnen
         </a>
-        <p style="color:#333;font-size:11px;margin-top:20px;">© 2026 The Sharp Cut · Lavaterstraße 2, 1220 Wien</p>
+        <p style="color:#333;font-size:11px;margin-top:20px;">© 2026 Sitdown Wien · Lavaterstraße 2, 1220 Wien</p>
       </div>
     </body></html>`;
 
@@ -95,9 +94,9 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "The Sharp Cut <info@ugcpanel.app>",
+        from: "Sitdown Wien <info@ugcpanel.app>",
         to: ["info@ugcpanel.app"],
-        subject: `✂️ ${autoStamped.length} Auto-Stempel vergeben — The Sharp Cut`,
+        subject: `✂️ ${autoStamped.length} Auto-Stempel vergeben — Sitdown Wien`,
         html,
       }),
     }).catch(() => {});
