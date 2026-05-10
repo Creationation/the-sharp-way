@@ -31,7 +31,6 @@ const HeroSection = () => {
         >
           BOOK NOW
         </a>
-        </a>
       </div>
 
       {/* Scroll indicator */}
