@@ -65,6 +65,35 @@ serve(async (req) => {
       throw new Error("Failed to save booking");
     }
 
+    // If appointment is less than 24h away, charge the 5€ deposit immediately
+    // (the daily cron only catches bookings made before its run; same-day or <24h
+    // bookings would otherwise never be charged).
+    try {
+      const apptDate = new Date(`${meta.booking_date}T${meta.booking_time || "10:00"}:00`);
+      const hoursUntil = (apptDate.getTime() - Date.now()) / (1000 * 60 * 60);
+      if (hoursUntil < 24 && booking) {
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: 500,
+          currency: "eur",
+          customer: customerId,
+          payment_method: paymentMethodId,
+          off_session: true,
+          confirm: true,
+          metadata: {
+            booking_id: (booking as any).id,
+            charge_type: "immediate_deposit_under_24h",
+          },
+        });
+        if (paymentIntent.status === "succeeded") {
+          await sb.from("bookings")
+            .update({ payment_status: "charged" })
+            .eq("id", (booking as any).id);
+        }
+      }
+    } catch (chargeErr: any) {
+      console.error("[verify-setup] Immediate deposit charge failed:", chargeErr);
+    }
+
     // Increment promo code usage if applicable
     if (meta.promo_code) {
       await sb.rpc("use_promo_code", { _code: meta.promo_code }).catch(() => {});
