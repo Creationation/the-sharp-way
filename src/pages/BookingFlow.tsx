@@ -295,7 +295,7 @@ const BookingFlow = () => {
         if (barber) setSelectedBarber(barber);
         const restoredSvcs = (draft.serviceNames as string[])
           .map((name: string) => services.find(s => s.name === name))
-          .filter(Boolean) as typeof services;
+          .filter(Boolean) as ServiceItem[];
         if (restoredSvcs.length > 0) setSelectedServices(restoredSvcs);
         if (draft.customDateISO) setCustomDate(new Date(draft.customDateISO));
         if (typeof draft.selectedDayIdx === "number") setSelectedDayIdx(draft.selectedDayIdx);
