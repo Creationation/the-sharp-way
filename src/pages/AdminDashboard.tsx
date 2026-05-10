@@ -67,7 +67,7 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  type TabId = "bookings" | "schedule" | "stats" | "availability" | "users" | "promotions" | "barbers" | "codes" | "loyalty" | "rewards" | "notifications";
+  type TabId = "bookings" | "schedule" | "stats" | "availability" | "users" | "promotions" | "barbers" | "services" | "codes" | "loyalty" | "rewards" | "notifications";
   const [tab, setTab] = useState<TabId>("bookings");
   const [menuOpen, setMenuOpen] = useState(false);
   const [pendingRewards, setPendingRewards] = useState(0);
