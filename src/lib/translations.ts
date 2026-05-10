@@ -41,6 +41,10 @@ export interface Translations {
     title: string;
     allCat: string;
     bookBtn: string;
+    catHerren: string;
+    catDamen: string;
+    catKinder: string;
+    fromPrefix: string;
   };
   toasts: {
     signInToBook: string;
