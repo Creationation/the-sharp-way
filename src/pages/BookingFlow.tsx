@@ -6,19 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useBarbers, type Barber } from "@/hooks/useBarbers";
+import { useServices } from "@/hooks/useServices";
 import { toast } from "sonner";
 import PaymentExplanation from "@/components/PaymentExplanation";
 
-const services = [
-  { name: "Haarschnitt", price: "€20", duration: "30min" },
-  { name: "Maschinenschnitt", price: "€15", duration: "20min" },
-  { name: "Haarschnitt + Waschen/Föhnen", price: "€25", duration: "45min" },
-  { name: "Haarschnitt + Komplett Service", price: "€38", duration: "60min" },
-  { name: "Moderne Bartrasur", price: "€15", duration: "20min" },
-  { name: "Bart Rasur", price: "€10", duration: "15min" },
-  { name: "Haare färben", price: "€35", duration: "60min" },
-  { name: "Kinder Haarschnitt (bis 10 J.)", price: "€16", duration: "20min" },
-];
+type ServiceItem = { name: string; price: string; duration: string };
 
 const DAY_ABBR: Record<string, string[]> = {
   en: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
