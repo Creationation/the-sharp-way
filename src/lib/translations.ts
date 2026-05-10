@@ -955,6 +955,10 @@ const de: Translations = {
     title: "Leistungen",
     allCat: "Alle",
     bookBtn: "Service buchen",
+    catHerren: "Herren",
+    catDamen: "Damen",
+    catKinder: "Kinder",
+    fromPrefix: "ab",
   },
   toasts: {
     signInToBook: "Melde dich an, um einen Termin zu buchen",
