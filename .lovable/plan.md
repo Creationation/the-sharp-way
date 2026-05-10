@@ -1,61 +1,31 @@
+## Findings
 
+A full project scan (`rg -in "sharp|SHARP20"` across all source, edge functions, Android, emails, Telegram templates, configs) returned **zero matches**. The codebase is already clean.
 
-## Bot Telegram — Notifications de réservation pour Sitdown Wien
+The "SHARP20" still visible in the app (screenshot of the promo banner / marquee) comes from **two database rows**, not code:
 
-### Objectif
-Envoyer automatiquement un message Telegram à l'admin/owner du salon quand :
-- Un client **réserve** un rendez-vous (nouvelle réservation confirmée)
-- Un client **annule** un rendez-vous
+1. `promotions` table — row `edd6d084…` 
+   - `subtitle_en`: "First visit? 20% OFF — Code: **SHARP20**"
+   - `subtitle_de`: "Erstbesuch? 20% Rabatt — Code: **SHARP20**"
+2. `promo_codes` table — row `70ad7020…`
+   - `code`: **SHARP20**
 
-### Prérequis (à faire par toi)
-1. Ouvre Telegram et parle à **@BotFather**
-2. Envoie `/newbot`, choisis un nom (ex: "Sitdown Wien Bot") et un username (ex: `sitdown_wien_bot`)
-3. Copie le **token** que BotFather te donne
-4. Envoie un message à ton bot (pour activer le chat), puis récupère ton **chat_id** en visitant `https://api.telegram.org/bot<TOKEN>/getUpdates`
+## Plan
 
-### Plan technique
+Single SQL migration that:
 
-**Etape 1 — Stocker les secrets**
-- Ajouter 2 secrets dans le projet : `TELEGRAM_BOT_TOKEN` et `TELEGRAM_CHAT_ID` (le chat_id de l'admin qui recevra les notifications)
+1. Updates `promotions.subtitle_en` and `subtitle_de` → replace `SHARP20` with `SITDOWN20`.
+2. Updates `promo_codes.code` from `SHARP20` to `SITDOWN20` (preserves usage stats, Stripe coupon link, expiry, etc.).
 
-**Etape 2 — Créer l'edge function `send-telegram-notification`**
-- Nouvelle edge function qui reçoit un payload (type: "new_booking" ou "cancellation", + détails du RDV)
-- Formate un message lisible avec les infos : client, service, barber, date, heure, prix
-- Envoie le message via l'API Telegram (`sendMessage`) au chat_id de l'admin
-- Messages formatés en HTML avec emojis pour une lecture rapide
+```sql
+UPDATE public.promotions
+SET subtitle_en = REPLACE(subtitle_en, 'SHARP20', 'SITDOWN20'),
+    subtitle_de = REPLACE(subtitle_de, 'SHARP20', 'SITDOWN20')
+WHERE subtitle_en ILIKE '%SHARP20%' OR subtitle_de ILIKE '%SHARP20%';
 
-**Etape 3 — Intégrer dans `verify-setup/index.ts` (nouvelle réservation)**
-- Après la sauvegarde du booking et l'envoi de l'email de confirmation, appeler `send-telegram-notification` avec les détails de la réservation
-
-**Etape 4 — Intégrer dans `cancel-booking/index.ts` (annulation)**
-- Après la mise à jour du statut "cancelled", appeler `send-telegram-notification` avec les détails de l'annulation (+ info si le dépôt a été facturé ou non)
-
-### Exemple de message Telegram
-
-```text
-✂️ Neuer Termin gebucht!
-
-👤 Max Mustermann
-📧 max@email.com
-💇 Haarschnitt — 20€
-🧔 Barber: Alex
-📅 15.04.2026 um 14:30
-💳 Karte hinterlegt (5€ Anzahlung)
-
-→ Admin Dashboard öffnen
+UPDATE public.promo_codes
+SET code = 'SITDOWN20'
+WHERE code = 'SHARP20';
 ```
 
-```text
-❌ Termin storniert
-
-👤 Max Mustermann
-💇 Haarschnitt — 20€
-📅 15.04.2026 um 14:30
-💰 5€ Stornogebühr abgebucht ✅
-```
-
-### Fichiers modifiés
-- `supabase/functions/send-telegram-notification/index.ts` — **nouveau**
-- `supabase/functions/verify-setup/index.ts` — ajout appel Telegram après booking
-- `supabase/functions/cancel-booking/index.ts` — ajout appel Telegram après annulation
-
+After this, the promo banner the client sees will read `Code: SITDOWN20`, matching the hardcoded `PromoBanner.tsx` value already changed earlier. No code changes required.
