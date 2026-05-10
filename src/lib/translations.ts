@@ -514,7 +514,7 @@ const en: Translations = {
     cancelError: "Failed to cancel booking",
     bookingCancelled: "Booking cancelled",
     cancelledFree: "Booking cancelled · no charge.",
-    cancelledCharged: "Booking cancelled · €5 deposit was charged.",
+    cancelledCharged: "Booking cancelled · €5 deposit retained (non-refundable within 24h).",
     cancelling: "Cancelling...",
     copied: "Copied!",
     accountCreated: "Account created!",
