@@ -36,10 +36,6 @@ const ProfileScreen = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState<string | null>(null);
-  const [stamps, setStamps] = useState(0);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const [rewardPending, setRewardPending] = useState(false);
-  const [claimingReward, setClaimingReward] = useState(false);
   const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null);
   const [confirmCancelDate, setConfirmCancelDate] = useState<string>("");
   const [confirmCancelTime, setConfirmCancelTime] = useState<string>("");
