@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ConfirmProvider } from "@/hooks/useConfirm";
 import BottomNav from "@/components/BottomNav";
+import ScrollToTop from "@/components/ScrollToTop";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import SplashScreen from "@/pages/SplashScreen";
@@ -52,6 +53,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<SplashScreen />} />
             <Route path="/home" element={<HomeDashboard />} />

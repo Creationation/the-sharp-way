@@ -61,7 +61,7 @@ type SlotState = "available" | "booked" | "blocked";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { isAdmin, loading: authLoading } = useAuth();
+  const { isAdmin, loading: authLoading, adminChecked } = useAuth();
 
   const { lang } = useLanguage();
   const t = translations[lang];
@@ -112,14 +112,14 @@ const AdminDashboard = () => {
   }, [barberNames]);
 
   useEffect(() => {
-    if (!authLoading && !isAdmin) {
+    if (!authLoading && adminChecked && !isAdmin) {
       navigate("/home");
       return;
     }
     if (isAdmin) {
       fetchBookings();
     }
-  }, [isAdmin, authLoading]);
+  }, [isAdmin, authLoading, adminChecked]);
 
   // Live updates: refetch bookings whenever the table changes (new booking, cancel, status, ...)
   useRealtimeBookings(() => {
@@ -270,7 +270,7 @@ const AdminDashboard = () => {
     return counts;
   }, [bookings, barberFilter]);
 
-  if (authLoading) {
+  if (authLoading || !adminChecked) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-copper border-t-transparent rounded-full animate-spin" />
