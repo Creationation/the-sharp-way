@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Trophy, Gift, ChevronRight, Calendar, Clock, LogOut, Shield, XCircle, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ChevronRight, Calendar, Clock, LogOut, Shield, XCircle, AlertTriangle } from "lucide-react";
 import { DE, GB } from "country-flag-icons/react/3x2";
 import { useNavigate } from "react-router-dom";
 import {
