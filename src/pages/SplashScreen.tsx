@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import heroBg from "@/assets/hero-bg.jpg";
+import { DE, GB } from "country-flag-icons/react/3x2";
 
 const SplashScreen = () => {
   const navigate = useNavigate();
