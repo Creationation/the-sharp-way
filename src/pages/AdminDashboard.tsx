@@ -23,6 +23,7 @@ import RewardsTab from "@/components/admin/RewardsTab";
 import NotificationsTab from "@/components/admin/NotificationsTab";
 import ScheduleTab from "@/components/admin/ScheduleTab";
 import StatsTab from "@/components/admin/StatsTab";
+import ServicesTab from "@/components/admin/ServicesTab";
 import { useBarbers } from "@/hooks/useBarbers";
 import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
 
@@ -66,7 +67,7 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  type TabId = "bookings" | "schedule" | "stats" | "availability" | "users" | "promotions" | "barbers" | "codes" | "loyalty" | "rewards" | "notifications";
+  type TabId = "bookings" | "schedule" | "stats" | "availability" | "users" | "promotions" | "barbers" | "services" | "codes" | "loyalty" | "rewards" | "notifications";
   const [tab, setTab] = useState<TabId>("bookings");
   const [menuOpen, setMenuOpen] = useState(false);
   const [pendingRewards, setPendingRewards] = useState(0);
@@ -81,6 +82,7 @@ const AdminDashboard = () => {
     { id: "users",         label: t.admin.users,                                    Icon: User      },
     { id: "promotions",    label: t.admin.promotions,                               Icon: Tag       },
     { id: "barbers",       label: t.admin.barbersTab.title,                         Icon: Scissors  },
+    { id: "services",      label: t.admin.servicesTab.title,                        Icon: Scissors  },
     { id: "codes",         label: t.admin.promoCodesTab.title,                      Icon: Tag       },
     { id: "loyalty",       label: t.admin.loyaltyTab.title,                         Icon: Trophy    },
     { id: "rewards",       label: t.admin.rewardsTab.title,                         Icon: Gift      },
@@ -825,6 +827,9 @@ const AdminDashboard = () => {
 
       {/* ═══════════════════ BARBERS TAB ═══════════════════ */}
       {tab === "barbers" && <BarbersTab t={t.admin.barbersTab} />}
+
+      {/* ═══════════════════ SERVICES TAB ═══════════════════ */}
+      {tab === "services" && <ServicesTab t={t.admin.servicesTab} />}
 
       {/* ═══════════════════ PROMO CODES TAB ═══════════════════ */}
       {tab === "codes" && <PromoCodesTab t={t.admin.promoCodesTab} />}

@@ -6,19 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useBarbers, type Barber } from "@/hooks/useBarbers";
+import { useServices } from "@/hooks/useServices";
 import { toast } from "sonner";
 import PaymentExplanation from "@/components/PaymentExplanation";
 
-const services = [
-  { name: "Haarschnitt", price: "€20", duration: "30min" },
-  { name: "Maschinenschnitt", price: "€15", duration: "20min" },
-  { name: "Haarschnitt + Waschen/Föhnen", price: "€25", duration: "45min" },
-  { name: "Haarschnitt + Komplett Service", price: "€38", duration: "60min" },
-  { name: "Moderne Bartrasur", price: "€15", duration: "20min" },
-  { name: "Bart Rasur", price: "€10", duration: "15min" },
-  { name: "Haare färben", price: "€35", duration: "60min" },
-  { name: "Kinder Haarschnitt (bis 10 J.)", price: "€16", duration: "20min" },
-];
+type ServiceItem = { name: string; price: string; duration: string };
 
 const DAY_ABBR: Record<string, string[]> = {
   en: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
@@ -134,6 +126,12 @@ const BookingFlow = () => {
   const { user } = useAuth();
   const { t, lang } = useLanguage();
   const { barbers, loading: barbersLoading } = useBarbers();
+  const { services: dbServices } = useServices({ onlyActive: true });
+  const services: ServiceItem[] = dbServices.map(s => ({
+    name: s.name,
+    price: `€${s.price}`,
+    duration: `${s.duration_min}min`,
+  }));
 
   const [customDate, setCustomDate] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -141,7 +139,15 @@ const BookingFlow = () => {
   const availableDates = customDate ? getAvailableDates(customDate) : getAvailableDates();
 
   const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
-  const [selectedServices, setSelectedServices] = useState<typeof services>([services[0]]);
+  const [selectedServices, setSelectedServices] = useState<ServiceItem[]>([]);
+
+  // Default-select first service once services load (only if user has nothing selected)
+  useEffect(() => {
+    if (services.length > 0 && selectedServices.length === 0) {
+      setSelectedServices([services[0]]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [services.length]);
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
   const [selectedTime, setSelectedTime] = useState("12:00");
   const [confirmed, setConfirmed] = useState(false);
@@ -297,7 +303,7 @@ const BookingFlow = () => {
         if (barber) setSelectedBarber(barber);
         const restoredSvcs = (draft.serviceNames as string[])
           .map((name: string) => services.find(s => s.name === name))
-          .filter(Boolean) as typeof services;
+          .filter(Boolean) as ServiceItem[];
         if (restoredSvcs.length > 0) setSelectedServices(restoredSvcs);
         if (draft.customDateISO) setCustomDate(new Date(draft.customDateISO));
         if (typeof draft.selectedDayIdx === "number") setSelectedDayIdx(draft.selectedDayIdx);
@@ -355,7 +361,7 @@ const BookingFlow = () => {
     };
   }, [confirmed, lang]);
 
-  const toggleService = (s: typeof services[0]) => {
+  const toggleService = (s: ServiceItem) => {
     setSelectedServices(prev => {
       const exists = prev.some(p => p.name === s.name);
       if (exists && prev.length === 1) return prev; // keep at least one

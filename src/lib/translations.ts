@@ -250,6 +250,26 @@ export interface Translations {
       photoUploaded: string;
       color: string;
     };
+    servicesTab: {
+      title: string;
+      nameDe: string;
+      nameEn: string;
+      price: string;
+      durationMin: string;
+      sortOrder: string;
+      active: string;
+      inactive: string;
+      addService: string;
+      save: string;
+      saved: string;
+      saveError: string;
+      deleted: string;
+      deleteError: string;
+      loadError: string;
+      confirmDelete: string;
+      noServices: string;
+      hint: string;
+    };
     scheduleTab: {
       title: string;
       exportCsv: string;
@@ -649,6 +669,26 @@ const en: Translations = {
       photoUploaded: "Photo uploaded!",
       color: "Color",
     },
+    servicesTab: {
+      title: "Services",
+      nameDe: "Name (DE)",
+      nameEn: "Name (EN)",
+      price: "Price (€)",
+      durationMin: "Duration (min)",
+      sortOrder: "Order",
+      active: "Active",
+      inactive: "Inactive",
+      addService: "Add Service",
+      save: "Save",
+      saved: "Service saved",
+      saveError: "Error saving",
+      deleted: "Service deleted",
+      deleteError: "Error deleting",
+      loadError: "Failed to load services",
+      confirmDelete: "Delete this service?",
+      noServices: "No services",
+      hint: "Inactive services stay visible on existing bookings but are hidden from the booking flow.",
+    },
     scheduleTab: {
       title: "Schedule",
       exportCsv: "Export CSV",
@@ -1047,6 +1087,26 @@ const de: Translations = {
       changePhoto: "Foto ändern",
       photoUploaded: "Foto hochgeladen!",
       color: "Farbe",
+    },
+    servicesTab: {
+      title: "Dienstleistungen",
+      nameDe: "Name (DE)",
+      nameEn: "Name (EN)",
+      price: "Preis (€)",
+      durationMin: "Dauer (Min)",
+      sortOrder: "Reihenfolge",
+      active: "Aktiv",
+      inactive: "Inaktiv",
+      addService: "Dienstleistung hinzufügen",
+      save: "Speichern",
+      saved: "Dienstleistung gespeichert",
+      saveError: "Fehler beim Speichern",
+      deleted: "Dienstleistung gelöscht",
+      deleteError: "Fehler beim Löschen",
+      loadError: "Fehler beim Laden der Dienstleistungen",
+      confirmDelete: "Diese Dienstleistung löschen?",
+      noServices: "Keine Dienstleistungen",
+      hint: "Inaktive Dienstleistungen bleiben in bestehenden Buchungen sichtbar, werden aber im Buchungsablauf ausgeblendet.",
     },
     scheduleTab: {
       title: "Tagesplan",

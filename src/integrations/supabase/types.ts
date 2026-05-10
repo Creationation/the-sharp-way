@@ -341,6 +341,42 @@ export type Database = {
         }
         Relationships: []
       }
+      services: {
+        Row: {
+          active: boolean
+          created_at: string
+          duration_min: number
+          id: string
+          name: string
+          name_en: string
+          price: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          duration_min?: number
+          id?: string
+          name: string
+          name_en?: string
+          price?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          duration_min?: number
+          id?: string
+          name?: string
+          name_en?: string
+          price?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_loyalty: {
         Row: {
           created_at: string
