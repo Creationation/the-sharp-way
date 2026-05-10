@@ -374,9 +374,11 @@ export type Database = {
       services: {
         Row: {
           active: boolean
+          category: string
           created_at: string
           duration_min: number
           id: string
+          is_from_price: boolean
           name: string
           name_en: string
           price: number
@@ -385,9 +387,11 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          category?: string
           created_at?: string
           duration_min?: number
           id?: string
+          is_from_price?: boolean
           name: string
           name_en?: string
           price?: number
@@ -396,9 +400,11 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          category?: string
           created_at?: string
           duration_min?: number
           id?: string
+          is_from_price?: boolean
           name?: string
           name_en?: string
           price?: number
