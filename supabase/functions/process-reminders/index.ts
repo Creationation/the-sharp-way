@@ -15,10 +15,13 @@ interface Booking {
   booking_date: string;
   booking_time: string;
   status: string;
+  reminder_sent_7d: boolean;
   reminder_sent_24h: boolean;
   reminder_sent_5h: boolean;
   reminder_sent_2h: boolean;
 }
+
+type ReminderType = "7d" | "24h" | "5h" | "2h";
 
 function buildReminderEmail(
   name: string,
@@ -26,18 +29,23 @@ function buildReminderEmail(
   barber: string,
   date: string,
   time: string,
-  type: "24h" | "5h" | "2h",
+  type: ReminderType,
   lang: "de" | "en"
 ): { subject: string; html: string } {
   const isDE = lang === "de";
 
-  const titles: Record<typeof type, Record<typeof lang, string>> = {
-    "24h": { de: "Dein Termin ist morgen ✂️", en: "Your appointment is tomorrow ✂️" },
-    "5h":  { de: "Dein Termin ist heute ✂️",  en: "Your appointment is today ✂️" },
-    "2h":  { de: "Noch 2 Stunden! ✂️",        en: "2 hours to go! ✂️" },
+  const titles: Record<ReminderType, Record<"de" | "en", string>> = {
+    "7d":  { de: "Dein Termin in 1 Woche ✂️",  en: "Your appointment in 1 week ✂️" },
+    "24h": { de: "Dein Termin ist morgen ✂️",  en: "Your appointment is tomorrow ✂️" },
+    "5h":  { de: "Dein Termin ist heute ✂️",   en: "Your appointment is today ✂️" },
+    "2h":  { de: "Noch 2 Stunden! ✂️",         en: "2 hours to go! ✂️" },
   };
 
-  const bodies: Record<typeof type, Record<typeof lang, string>> = {
+  const bodies: Record<ReminderType, Record<"de" | "en", string>> = {
+    "7d": {
+      de: `Kleine Erinnerung: in <strong>1 Woche</strong> · ${date} um <strong>${time}</strong> Uhr bei <strong>${barber}</strong> — <em>${service}</em>`,
+      en: `Friendly reminder: in <strong>1 week</strong> · ${date} at <strong>${time}</strong> with <strong>${barber}</strong> — <em>${service}</em>`,
+    },
     "24h": {
       de: `Vergiss deinen Termin nicht! Morgen um <strong>${time}</strong> Uhr bist du bei <strong>${barber}</strong> — <em>${service}</em>`,
       en: `Don't forget! Tomorrow at <strong>${time}</strong> with <strong>${barber}</strong> — <em>${service}</em>`,
@@ -55,19 +63,29 @@ function buildReminderEmail(
   const subject = titles[type][lang];
   const bodyText = bodies[type][lang];
 
+  // For 7d & 24h, the user can still cancel free (>24h). For 5h & 2h, deposit is non-refundable.
+  const stillFree = type === "7d" || type === "24h";
+  const policyText = isDE
+    ? stillFree
+      ? "Kostenlose Stornierung bis 24 Std. vor dem Termin · danach werden 5 € Kaution einbehalten (nicht erstattbar)."
+      : "Stornierung jetzt nicht mehr kostenlos möglich · die 5 € Kaution wird einbehalten und ist nicht erstattbar."
+    : stillFree
+      ? "Free cancellation up to 24h before · after that the €5 deposit is retained (non-refundable)."
+      : "Cancellation is no longer free · the €5 deposit is retained and non-refundable.";
+
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
     <div style="font-family:sans-serif;max-width:480px;margin:auto;background:#0f0f0f;color:#f5f0e8;padding:32px;border-radius:16px;">
       <h2 style="color:#b8935a;font-size:22px;margin-bottom:4px;">${subject}</h2>
       <p style="color:#888;margin-bottom:20px;">Hi ${name},</p>
-      <div style="background:#1a1a1a;border-radius:12px;padding:20px;border:1px solid #2a2a2a;margin-bottom:20px;">
+      <div style="background:#1a1a1a;border-radius:12px;padding:20px;border:1px solid #2a2a2a;margin-bottom:16px;">
         <p style="margin:0;line-height:1.7;">${bodyText}</p>
         <p style="color:#888;margin:12px 0 0;font-size:13px;">📍 Lavaterstrasse 2, 1220 Wien</p>
       </div>
-      <p style="color:#555;font-size:11px;">${
-        isDE
-          ? "Kostenlose Stornierung bis 2 Stunden vorher · +43 664 4686073"
-          : "Free cancellation up to 2 hours before · +43 664 4686073"
-      }</p>
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:14px 16px;margin-bottom:16px;">
+        <p style="margin:0;color:#b8935a;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">${isDE ? "Stornierungsbedingungen" : "Cancellation policy"}</p>
+        <p style="margin:6px 0 0;color:#bbb;font-size:12px;line-height:1.6;">${policyText}</p>
+      </div>
+      <p style="color:#555;font-size:11px;">+43 664 4686073</p>
       <p style="color:#333;font-size:11px;margin-top:16px;">© 2026 Sitdown Wien</p>
     </div>
   </body></html>`;
