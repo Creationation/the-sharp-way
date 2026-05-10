@@ -32,7 +32,7 @@ serve(async (req) => {
     });
     const todayVienna = viennaFormatter.format(new Date());
 
-    console.log(`[charge-daily] Charging deposits for: ${todayVienna}`);
+    
 
     const { data: appointments, error: fetchErr } = await sb
       .from("bookings")
@@ -45,7 +45,7 @@ serve(async (req) => {
 
     if (fetchErr) throw fetchErr;
 
-    console.log(`[charge-daily] Found ${(appointments || []).length} bookings to charge`);
+    
 
     const results: any[] = [];
 

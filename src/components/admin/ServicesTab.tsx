@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Plus, Save, Trash2, Scissors } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useConfirm } from "@/hooks/useConfirm";
 
 interface ServicesTabT {
   title: string;

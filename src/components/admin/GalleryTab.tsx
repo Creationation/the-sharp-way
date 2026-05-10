@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Upload, Trash2, Save, ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useConfirm } from "@/hooks/useConfirm";
 
 interface GalleryTabT {
   title: string;
