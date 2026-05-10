@@ -527,7 +527,7 @@ const en: Translations = {
     barberUnavailable: "This barber is not available on this day",
     confirmCancelTitle: "Cancel booking?",
     confirmCancelFree: "This booking can be cancelled free of charge (more than 24h before the appointment).",
-    confirmCancelCharged: "Less than 24 hours before the appointment · the €5 deposit will be charged.",
+    confirmCancelCharged: "Less than 24h before the appointment · the €5 deposit is non-refundable and will be retained.",
     confirmCancelBtn: "Yes, cancel",
     cancelBtn: "Back",
     paymentStatus: "Payment",
