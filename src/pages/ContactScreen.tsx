@@ -26,9 +26,36 @@ function isOpenNow(): boolean {
 
 const ContactScreen = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const open = isOpenNow();
   const whatsappUrl = `https://wa.me/436644686073?text=${encodeURIComponent("Hallo, ich möchte einen Termin bei Sitdown Barber vereinbaren.")}`;
+
+  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [sending, setSending] = useState(false);
+
+  const submitMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = form.name.trim();
+    const email = form.email.trim();
+    const message = form.message.trim();
+    if (!name || !email || !message) {
+      toast.error(t.contact.formRequired);
+      return;
+    }
+    if (name.length > 100 || email.length > 255 || message.length > 2000) return;
+    setSending(true);
+    try {
+      const { error } = await supabase.functions.invoke("send-contact-message", {
+        body: { name, email, phone: form.phone.trim(), message, lang },
+      });
+      if (error) throw error;
+      toast.success(t.contact.formSuccess);
+      setForm({ name: "", email: "", phone: "", message: "" });
+    } catch {
+      toast.error(t.contact.formError);
+    }
+    setSending(false);
+  };
 
   const hours = hoursData.map((h, i) => ({
     day: t.contact.days[i],
