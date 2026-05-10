@@ -40,11 +40,20 @@ serve(async (req) => {
         data.notes ? `\n📝 Notizen: ${data.notes}` : "",
       ].filter(Boolean).join("\n");
     } else if (type === "cancellation") {
-      const chargeInfo = data.charged
-        ? "💰 5€ Stornogebühr abgebucht ✅"
-        : data.payment_status === "released"
-        ? "💰 Keine Gebühr (>24h vorher)"
-        : "💰 Keine Gebühr";
+      const hoursLabel = typeof data.hours_until === "number"
+        ? `${data.hours_until}h vor Termin`
+        : null;
+
+      let chargeInfo: string;
+      if (data.already_charged) {
+        chargeInfo = "💰 5€ Kaution einbehalten · bereits abgebucht (nicht erstattbar · <24h)";
+      } else if (data.charged) {
+        chargeInfo = "💰 5€ Kaution einbehalten · jetzt abgebucht (nicht erstattbar · <24h)";
+      } else if (data.payment_status === "released") {
+        chargeInfo = "💰 Keine Gebühr · Karte freigegeben (>24h vorher)";
+      } else {
+        chargeInfo = "💰 Keine Gebühr";
+      }
 
       text = [
         "❌ <b>Termin storniert</b>",
@@ -53,8 +62,9 @@ serve(async (req) => {
         `💇 ${data.service_name || "–"} — ${data.service_price || "–"}`,
         `🧔 Barber: ${data.barber_name || "–"}`,
         `📅 ${data.booking_date || "–"} um ${data.booking_time || "–"}`,
+        hoursLabel ? `⏱ ${hoursLabel}` : "",
         chargeInfo,
-      ].join("\n");
+      ].filter(Boolean).join("\n");
     } else {
       throw new Error("Unknown notification type");
     }
