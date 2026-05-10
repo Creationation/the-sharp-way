@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
   ArrowLeft, Calendar as CalendarIcon, Clock, User, Trash2, XCircle,
   CheckCircle, ChevronLeft, ChevronRight, ToggleLeft, ToggleRight, Save,
-  Menu, X, Tag, Scissors, Trophy, Gift, Bell, LayoutGrid, BarChart3,
+  Menu, X, Tag, Scissors, Bell, LayoutGrid, BarChart3,
   Search, Download, RotateCcw,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -18,8 +18,6 @@ import UsersTab from "@/components/admin/UsersTab";
 import PromotionsTab from "@/components/admin/PromotionsTab";
 import BarbersTab from "@/components/admin/BarbersTab";
 import PromoCodesTab from "@/components/admin/PromoCodesTab";
-import LoyaltyTab from "@/components/admin/LoyaltyTab";
-import RewardsTab from "@/components/admin/RewardsTab";
 import NotificationsTab from "@/components/admin/NotificationsTab";
 import ScheduleTab from "@/components/admin/ScheduleTab";
 import StatsTab from "@/components/admin/StatsTab";
@@ -68,10 +66,9 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  type TabId = "bookings" | "schedule" | "stats" | "availability" | "users" | "promotions" | "barbers" | "services" | "gallery" | "codes" | "loyalty" | "rewards" | "notifications";
+  type TabId = "bookings" | "schedule" | "stats" | "availability" | "users" | "promotions" | "barbers" | "services" | "gallery" | "codes" | "notifications";
   const [tab, setTab] = useState<TabId>("bookings");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [pendingRewards, setPendingRewards] = useState(0);
   const { barbers: dbBarbers } = useBarbers();
   const barberNames = dbBarbers.map(b => b.name);
 
@@ -86,8 +83,6 @@ const AdminDashboard = () => {
     { id: "services",      label: t.admin.servicesTab.title,                        Icon: Scissors  },
     { id: "gallery",       label: t.admin.galleryTab.title,                         Icon: LayoutGrid},
     { id: "codes",         label: t.admin.promoCodesTab.title,                      Icon: Tag       },
-    { id: "loyalty",       label: t.admin.loyaltyTab.title,                         Icon: Trophy    },
-    { id: "rewards",       label: t.admin.rewardsTab.title,                         Icon: Gift      },
     { id: "notifications", label: t.admin.notificationsTab.title,                   Icon: Bell      },
   ];
 
@@ -123,7 +118,6 @@ const AdminDashboard = () => {
     }
     if (isAdmin) {
       fetchBookings();
-      fetchPendingRewardsCount();
     }
   }, [isAdmin, authLoading]);
 
@@ -134,14 +128,6 @@ const AdminDashboard = () => {
       if (tab === "availability") fetchAvailability();
     }
   }, isAdmin);
-
-  const fetchPendingRewardsCount = async () => {
-    const { count } = await supabase
-      .from("reward_requests")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "pending");
-    setPendingRewards(count ?? 0);
-  };
 
   const fetchBookings = async () => {
     const { data, error } = await supabase
@@ -367,11 +353,6 @@ const AdminDashboard = () => {
               {ADMIN_TABS.find(x => x.id === tab)?.label}
             </span>
             {menuOpen ? <X size={14} className="text-muted-foreground" /> : <Menu size={14} className="text-muted-foreground" />}
-            {pendingRewards > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-copper rounded-full text-[9px] text-primary-foreground flex items-center justify-center font-bold">
-                {pendingRewards}
-              </span>
-            )}
           </button>
 
           {menuOpen && (
@@ -390,11 +371,6 @@ const AdminDashboard = () => {
                   >
                     <item.Icon size={14} className={tab === item.id ? "text-copper" : "text-muted-foreground"} />
                     <span className="flex-1 text-left">{item.label}</span>
-                    {item.id === "rewards" && pendingRewards > 0 && (
-                      <span className="bg-copper text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full">
-                        {pendingRewards}
-                      </span>
-                    )}
                   </button>
                 ))}
               </div>
@@ -838,12 +814,6 @@ const AdminDashboard = () => {
 
       {/* ═══════════════════ PROMO CODES TAB ═══════════════════ */}
       {tab === "codes" && <PromoCodesTab t={t.admin.promoCodesTab} />}
-
-      {/* ═══════════════════ LOYALTY TAB ═══════════════════ */}
-      {tab === "loyalty" && <LoyaltyTab t={t.admin.loyaltyTab} />}
-
-      {/* ═══════════════════ REWARDS TAB ═══════════════════ */}
-      {tab === "rewards" && <RewardsTab t={t.admin.rewardsTab} />}
 
       {/* ═══════════════════ STATS TAB ═══════════════════ */}
       {tab === "stats" && <StatsTab isActive={tab === "stats"} />}

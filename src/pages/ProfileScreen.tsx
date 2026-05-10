@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Trophy, Gift, ChevronRight, Calendar, Clock, LogOut, Shield, XCircle, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ChevronRight, Calendar, Clock, LogOut, Shield, XCircle, AlertTriangle } from "lucide-react";
 import { DE, GB } from "country-flag-icons/react/3x2";
 import { useNavigate } from "react-router-dom";
 import {
@@ -36,10 +36,6 @@ const ProfileScreen = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState<string | null>(null);
-  const [stamps, setStamps] = useState(0);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const [rewardPending, setRewardPending] = useState(false);
-  const [claimingReward, setClaimingReward] = useState(false);
   const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null);
   const [confirmCancelDate, setConfirmCancelDate] = useState<string>("");
   const [confirmCancelTime, setConfirmCancelTime] = useState<string>("");
@@ -51,7 +47,6 @@ const ProfileScreen = () => {
       return;
     }
     fetchBookings();
-    fetchLoyalty();
   }, [user, authLoading]);
 
   const fetchBookings = async () => {
@@ -86,42 +81,6 @@ const ProfileScreen = () => {
   const upcoming = bookings.filter(b => b.booking_date >= today && b.status === "confirmed");
   const past = bookings.filter(b => b.booking_date < today || b.status === "cancelled");
 
-  const fetchLoyalty = async () => {
-    const [loyaltyRes, rewardRes] = await Promise.all([
-      supabase
-        .from("user_loyalty")
-        .select("stamps, total_points")
-        .eq("user_id", user!.id)
-        .maybeSingle(),
-      supabase
-        .from("reward_requests")
-        .select("id")
-        .eq("user_id", user!.id)
-        .eq("status", "pending")
-        .limit(1),
-    ]);
-    if (loyaltyRes.data) {
-      setStamps((loyaltyRes.data as any).stamps ?? 0);
-      setTotalPoints((loyaltyRes.data as any).total_points ?? 0);
-    }
-    setRewardPending((rewardRes.data?.length ?? 0) > 0);
-  };
-
-  const claimReward = async () => {
-    setClaimingReward(true);
-    const { error } = await supabase
-      .from("reward_requests")
-      .insert({ user_id: user!.id, stamps_at_request: stamps });
-    setClaimingReward(false);
-    if (error) {
-      toast.error("Error submitting request");
-    } else {
-      toast.success(t.profile.rewardClaimed);
-      setRewardPending(true);
-    }
-  };
-
-
   const handleSignOut = async () => {
     await signOut();
     navigate("/home");
@@ -153,54 +112,6 @@ const ProfileScreen = () => {
           </div>
         </div>
       </div>
-
-      {/* Loyalty Card */}
-      <div className="px-5 mb-6">
-        <div className="relative rounded-2xl overflow-hidden">
-          <div className="absolute inset-0 gradient-copper opacity-20" />
-          <div className="relative border border-copper/30 rounded-2xl p-5">
-            <div className="flex items-center justify-between mb-4">
-              <p className="font-heading text-lg text-copper tracking-widest">{t.profile.member}</p>
-              <span className="text-foreground text-[10px] bg-surface px-2 py-1 rounded-full">{t.profile.gold}</span>
-            </div>
-            <div className="grid grid-cols-5 gap-2 mb-4">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`aspect-square rounded-xl flex items-center justify-center text-lg ${
-                    i < stamps
-                      ? "gradient-copper text-primary-foreground"
-                      : i === 9
-                      ? "border-2 border-copper border-dashed"
-                      : "bg-surface border border-border"
-                  }`}
-                >
-                  {i < stamps ? "✂️" : i === 9 ? "🎁" : ""}
-                </div>
-              ))}
-            </div>
-            <p className="text-muted-foreground text-xs text-center">
-              {t.profile.stampsLabel(stamps)}
-            </p>
-
-            {stamps >= 10 && !rewardPending && (
-              <button
-                onClick={claimReward}
-                disabled={claimingReward}
-                className="mt-3 w-full gradient-copper text-primary-foreground font-semibold py-3 rounded-full shadow-copper text-sm animate-pulse disabled:opacity-50 disabled:animate-none"
-              >
-                {claimingReward ? "..." : t.profile.claimReward}
-              </button>
-            )}
-            {rewardPending && (
-              <p className="mt-3 text-copper text-xs text-center font-medium">
-                {t.profile.rewardPending}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
 
       {/* My Bookings */}
       <div className="px-5 mb-5">
