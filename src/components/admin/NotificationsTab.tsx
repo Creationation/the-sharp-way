@@ -82,6 +82,7 @@ export default function NotificationsTab({ t }: Props) {
 
   const [settings, setSettings] = useState<Settings>({
     email_reminders: true,
+    reminder_7d: true,
     reminder_24h: true,
     reminder_5h: true,
     reminder_2h: true,
