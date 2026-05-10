@@ -82,6 +82,7 @@ const AdminDashboard = () => {
     { id: "users",         label: t.admin.users,                                    Icon: User      },
     { id: "promotions",    label: t.admin.promotions,                               Icon: Tag       },
     { id: "barbers",       label: t.admin.barbersTab.title,                         Icon: Scissors  },
+    { id: "services",      label: t.admin.servicesTab.title,                        Icon: Scissors  },
     { id: "codes",         label: t.admin.promoCodesTab.title,                      Icon: Tag       },
     { id: "loyalty",       label: t.admin.loyaltyTab.title,                         Icon: Trophy    },
     { id: "rewards",       label: t.admin.rewardsTab.title,                         Icon: Gift      },
