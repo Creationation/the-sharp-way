@@ -41,6 +41,10 @@ export interface Translations {
     title: string;
     allCat: string;
     bookBtn: string;
+    catHerren: string;
+    catDamen: string;
+    catKinder: string;
+    fromPrefix: string;
   };
   toasts: {
     signInToBook: string;
@@ -281,6 +285,11 @@ export interface Translations {
       confirmDelete: string;
       noServices: string;
       hint: string;
+      category: string;
+      catHerren: string;
+      catDamen: string;
+      catKinder: string;
+      fromPrice: string;
     };
     galleryTab: {
       title: string;
@@ -494,6 +503,10 @@ const en: Translations = {
     title: "Services",
     allCat: "All",
     bookBtn: "Book This Service",
+    catHerren: "Men",
+    catDamen: "Women",
+    catKinder: "Kids",
+    fromPrefix: "from",
   },
   toasts: {
     signInToBook: "Sign in to book an appointment",
@@ -734,6 +747,11 @@ const en: Translations = {
       confirmDelete: "Delete this service?",
       noServices: "No services",
       hint: "Inactive services stay visible on existing bookings but are hidden from the booking flow.",
+      category: "Category",
+      catHerren: "Men",
+      catDamen: "Women",
+      catKinder: "Kids",
+      fromPrice: "From price (\"from\")",
     },
     galleryTab: {
       title: "Gallery",
@@ -947,6 +965,10 @@ const de: Translations = {
     title: "Leistungen",
     allCat: "Alle",
     bookBtn: "Service buchen",
+    catHerren: "Herren",
+    catDamen: "Damen",
+    catKinder: "Kinder",
+    fromPrefix: "ab",
   },
   toasts: {
     signInToBook: "Melde dich an, um einen Termin zu buchen",
@@ -1187,6 +1209,11 @@ const de: Translations = {
       confirmDelete: "Diese Dienstleistung löschen?",
       noServices: "Keine Dienstleistungen",
       hint: "Inaktive Dienstleistungen bleiben in bestehenden Buchungen sichtbar, werden aber im Buchungsablauf ausgeblendet.",
+      category: "Kategorie",
+      catHerren: "Herren",
+      catDamen: "Damen",
+      catKinder: "Kinder",
+      fromPrice: "Ab-Preis (\"ab\")",
     },
     galleryTab: {
       title: "Galerie",

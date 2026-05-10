@@ -23,7 +23,14 @@ interface ServicesTabT {
   confirmDelete: string;
   noServices: string;
   hint: string;
+  category: string;
+  catHerren: string;
+  catDamen: string;
+  catKinder: string;
+  fromPrice: string;
 }
+
+type ServiceCategory = "herren" | "damen" | "kinder";
 
 interface ServiceRow {
   id: string;
@@ -33,6 +40,8 @@ interface ServiceRow {
   duration_min: number;
   sort_order: number;
   active: boolean;
+  category: ServiceCategory;
+  is_from_price: boolean;
 }
 
 const blankRow = (sort: number): Omit<ServiceRow, "id"> & { id?: string } => ({
@@ -42,6 +51,8 @@ const blankRow = (sort: number): Omit<ServiceRow, "id"> & { id?: string } => ({
   duration_min: 30,
   sort_order: sort,
   active: true,
+  category: "herren",
+  is_from_price: false,
 });
 
 const ServicesTab = ({ t }: { t: ServicesTabT }) => {
@@ -77,6 +88,8 @@ const ServicesTab = ({ t }: { t: ServicesTabT }) => {
       duration_min: Number(r.duration_min) || 30,
       sort_order: Number(r.sort_order) || 0,
       active: r.active,
+      category: r.category,
+      is_from_price: r.is_from_price,
     };
     const res = r.id
       ? await supabase.from("services").update(payload).eq("id", r.id)
@@ -173,6 +186,34 @@ const ServicesTab = ({ t }: { t: ServicesTabT }) => {
                 onChange={(e) => updateLocal(i, { sort_order: parseInt(e.target.value) || 0 })}
                 className="mt-1 w-full bg-surface border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-copper/50"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] text-muted-foreground uppercase tracking-wider">{t.category}</label>
+              <select
+                value={r.category}
+                onChange={(e) => updateLocal(i, { category: e.target.value as ServiceCategory })}
+                className="mt-1 w-full bg-surface border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-copper/50"
+              >
+                <option value="herren">{t.catHerren}</option>
+                <option value="damen">{t.catDamen}</option>
+                <option value="kinder">{t.catKinder}</option>
+              </select>
+            </div>
+            <div className="flex items-end">
+              <button
+                type="button"
+                onClick={() => updateLocal(i, { is_from_price: !r.is_from_price })}
+                className={`w-full mt-1 text-[11px] px-3 py-1.5 rounded-lg border transition-colors ${
+                  r.is_from_price
+                    ? "bg-copper/10 border-copper/40 text-copper"
+                    : "bg-surface border-border text-muted-foreground"
+                }`}
+              >
+                {t.fromPrice} {r.is_from_price ? "✓" : ""}
+              </button>
             </div>
           </div>
 
