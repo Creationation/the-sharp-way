@@ -69,10 +69,14 @@ serve(async (req) => {
     const hoursUntil = (apptDate.getTime() - now.getTime()) / (1000 * 60 * 60);
 
     let charged = false;
+    let alreadyCharged = false;
 
     if (hoursUntil < 24) {
-      // Less than 24h: charge 5€ deposit
-      if (booking.stripe_customer_id && booking.stripe_payment_method_id && booking.payment_status === "verified") {
+      // Less than 24h: 5€ deposit is non-refundable.
+      // If already charged at booking time (same-day booking), keep it. Otherwise charge now.
+      if (booking.payment_status === "charged") {
+        alreadyCharged = true;
+      } else if (booking.stripe_customer_id && booking.stripe_payment_method_id && booking.payment_status === "verified") {
         try {
           const paymentIntent = await stripe.paymentIntents.create({
             amount: DEPOSIT_AMOUNT_CENTS,
@@ -83,7 +87,7 @@ serve(async (req) => {
             confirm: true,
             metadata: {
               booking_id: booking.id,
-              charge_type: "late_cancellation",
+              charge_type: "late_cancellation_non_refundable",
             },
           });
           charged = paymentIntent.status === "succeeded";
@@ -102,7 +106,8 @@ serve(async (req) => {
       }
     }
 
-    const newPaymentStatus = charged ? "charged" : hoursUntil >= 24 ? "released" : booking.payment_status;
+    const newPaymentStatus = (charged || alreadyCharged) ? "charged" : hoursUntil >= 24 ? "released" : booking.payment_status;
+    const depositRetained = charged || alreadyCharged;
 
     await sb.from("bookings")
       .update({ status: "cancelled", payment_status: newPaymentStatus })
@@ -128,6 +133,9 @@ serve(async (req) => {
             booking_date: booking.booking_date || "–",
             booking_time: booking.booking_time || "–",
             charged,
+            already_charged: alreadyCharged,
+            deposit_retained: depositRetained,
+            hours_until: Math.round(hoursUntil),
             payment_status: newPaymentStatus,
           },
         },
@@ -138,7 +146,9 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({
       cancelled: true,
-      charged,
+      charged: charged || alreadyCharged,
+      already_charged: alreadyCharged,
+      deposit_retained: depositRetained,
       hours_until: Math.round(hoursUntil),
       payment_status: newPaymentStatus,
     }), {
