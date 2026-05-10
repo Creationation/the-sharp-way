@@ -270,7 +270,28 @@ export interface Translations {
       noServices: string;
       hint: string;
     };
-    scheduleTab: {
+    galleryTab: {
+      title: string;
+      uploadPhoto: string;
+      uploading: string;
+      uploaded: string;
+      uploadError: string;
+      category: string;
+      sortOrder: string;
+      active: string;
+      inactive: string;
+      save: string;
+      saved: string;
+      saveError: string;
+      deleted: string;
+      deleteError: string;
+      loadError: string;
+      confirmDelete: string;
+      noImages: string;
+      hint: string;
+      categories: string[];
+      filterAll: string;
+    };
       title: string;
       exportCsv: string;
       noBookings: string;
