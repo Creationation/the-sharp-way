@@ -118,7 +118,6 @@ const AdminDashboard = () => {
     }
     if (isAdmin) {
       fetchBookings();
-      fetchPendingRewardsCount();
     }
   }, [isAdmin, authLoading]);
 
@@ -129,14 +128,6 @@ const AdminDashboard = () => {
       if (tab === "availability") fetchAvailability();
     }
   }, isAdmin);
-
-  const fetchPendingRewardsCount = async () => {
-    const { count } = await supabase
-      .from("reward_requests")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "pending");
-    setPendingRewards(count ?? 0);
-  };
 
   const fetchBookings = async () => {
     const { data, error } = await supabase
