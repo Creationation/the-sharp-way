@@ -117,6 +117,17 @@ export interface Translations {
     days: string[];
     closed: string;
     copyright: string;
+    formTitle: string;
+    formSubtitle: string;
+    formName: string;
+    formEmail: string;
+    formPhone: string;
+    formMessage: string;
+    formSend: string;
+    formSending: string;
+    formSuccess: string;
+    formError: string;
+    formRequired: string;
   };
   profile: {
     title: string;
