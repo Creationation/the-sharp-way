@@ -40,6 +40,20 @@ serve(async (req) => {
       .single();
 
     if (fetchErr || !booking) throw new Error("Booking not found");
+
+    // Authorization: user must own the booking OR be an admin
+    const { data: roles } = await sb
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id);
+    const isAdmin = (roles || []).some((r: any) => r.role === "admin");
+    if (booking.user_id !== user.id && !isAdmin) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (booking.status === "cancelled") {
       return new Response(JSON.stringify({ cancelled: true, already_cancelled: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
