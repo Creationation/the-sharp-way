@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { ChevronLeft, ChevronRight, Download } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, CalendarIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, addDays, subDays } from "date-fns";
 import { de as deLocale, enUS } from "date-fns/locale";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import ExcelJS from "exceljs";
 
 interface Barber {
