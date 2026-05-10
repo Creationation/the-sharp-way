@@ -88,6 +88,8 @@ const ServicesTab = ({ t }: { t: ServicesTabT }) => {
       duration_min: Number(r.duration_min) || 30,
       sort_order: Number(r.sort_order) || 0,
       active: r.active,
+      category: r.category,
+      is_from_price: r.is_from_price,
     };
     const res = r.id
       ? await supabase.from("services").update(payload).eq("id", r.id)
