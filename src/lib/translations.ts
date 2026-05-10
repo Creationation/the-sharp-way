@@ -156,6 +156,7 @@ export interface Translations {
     rewardPending: string;
     rewardClaimed: string;
     freeCutReady: string;
+    replayIntro: string;
   };
   admin: {
     title: string;
