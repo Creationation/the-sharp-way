@@ -353,11 +353,6 @@ const AdminDashboard = () => {
               {ADMIN_TABS.find(x => x.id === tab)?.label}
             </span>
             {menuOpen ? <X size={14} className="text-muted-foreground" /> : <Menu size={14} className="text-muted-foreground" />}
-            {pendingRewards > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-copper rounded-full text-[9px] text-primary-foreground flex items-center justify-center font-bold">
-                {pendingRewards}
-              </span>
-            )}
           </button>
 
           {menuOpen && (
