@@ -292,6 +292,7 @@ export interface Translations {
       categories: string[];
       filterAll: string;
     };
+    scheduleTab: {
       title: string;
       exportCsv: string;
       noBookings: string;
