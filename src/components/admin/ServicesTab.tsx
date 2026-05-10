@@ -189,6 +189,34 @@ const ServicesTab = ({ t }: { t: ServicesTabT }) => {
             </div>
           </div>
 
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] text-muted-foreground uppercase tracking-wider">{t.category}</label>
+              <select
+                value={r.category}
+                onChange={(e) => updateLocal(i, { category: e.target.value as ServiceCategory })}
+                className="mt-1 w-full bg-surface border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-copper/50"
+              >
+                <option value="herren">{t.catHerren}</option>
+                <option value="damen">{t.catDamen}</option>
+                <option value="kinder">{t.catKinder}</option>
+              </select>
+            </div>
+            <div className="flex items-end">
+              <button
+                type="button"
+                onClick={() => updateLocal(i, { is_from_price: !r.is_from_price })}
+                className={`w-full mt-1 text-[11px] px-3 py-1.5 rounded-lg border transition-colors ${
+                  r.is_from_price
+                    ? "bg-copper/10 border-copper/40 text-copper"
+                    : "bg-surface border-border text-muted-foreground"
+                }`}
+              >
+                {t.fromPrice} {r.is_from_price ? "✓" : ""}
+              </button>
+            </div>
+          </div>
+
           <div className="flex items-center justify-between">
             <button
               onClick={() => updateLocal(i, { active: !r.active })}
