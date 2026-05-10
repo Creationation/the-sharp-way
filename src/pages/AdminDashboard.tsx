@@ -112,14 +112,14 @@ const AdminDashboard = () => {
   }, [barberNames]);
 
   useEffect(() => {
-    if (!authLoading && !isAdmin) {
+    if (!authLoading && adminChecked && !isAdmin) {
       navigate("/home");
       return;
     }
     if (isAdmin) {
       fetchBookings();
     }
-  }, [isAdmin, authLoading]);
+  }, [isAdmin, authLoading, adminChecked]);
 
   // Live updates: refetch bookings whenever the table changes (new booking, cancel, status, ...)
   useRealtimeBookings(() => {
