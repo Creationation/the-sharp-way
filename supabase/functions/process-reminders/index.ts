@@ -8,6 +8,7 @@ const corsHeaders = {
 
 interface Booking {
   id: string;
+  user_id: string;
   barber_name: string;
   service_name: string;
   service_price: string;
@@ -17,7 +18,6 @@ interface Booking {
   reminder_sent_24h: boolean;
   reminder_sent_5h: boolean;
   reminder_sent_2h: boolean;
-  profiles: { email: string | null; full_name: string | null } | null;
 }
 
 function buildReminderEmail(
@@ -101,16 +101,29 @@ serve(async (req) => {
 
   const now = new Date();
 
-  // Fetch all confirmed upcoming bookings with profile email
+  // Fetch all confirmed upcoming bookings (no FK between bookings.user_id and profiles.user_id,
+  // so we fetch profiles separately and merge client-side)
   const todayStr = now.toISOString().split("T")[0];
   const { data: bookings, error } = await supabase
     .from("bookings")
-    .select("*, profiles(email, full_name)")
+    .select("*")
     .eq("status", "confirmed")
     .gte("booking_date", todayStr);
 
   if (error || !bookings) {
     return new Response(JSON.stringify({ error: "Failed to fetch bookings" }), { status: 500, headers: corsHeaders });
+  }
+
+  const userIds = Array.from(new Set((bookings as Booking[]).map(b => b.user_id).filter(Boolean)));
+  const profilesById: Record<string, { email: string | null; full_name: string | null }> = {};
+  if (userIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("user_id, email, full_name")
+      .in("user_id", userIds);
+    for (const p of profiles || []) {
+      profilesById[p.user_id] = { email: p.email, full_name: p.full_name };
+    }
   }
 
   let sent = 0;
@@ -126,10 +139,11 @@ serve(async (req) => {
   }
 
   for (const booking of bookings as Booking[]) {
-    const email = booking.profiles?.email;
+    const profile = profilesById[booking.user_id];
+    const email = profile?.email;
     if (!email) continue;
 
-    const name = booking.profiles?.full_name || email.split("@")[0];
+    const name = profile?.full_name || email.split("@")[0];
 
     // Build appointment datetime (Vienna timezone offset = +1h or +2h — use simple UTC+1)
     const [h, m] = booking.booking_time.split(":").map(Number);

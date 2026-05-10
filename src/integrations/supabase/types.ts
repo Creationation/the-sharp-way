@@ -457,7 +457,45 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      promo_codes_public: {
+        Row: {
+          active: boolean | null
+          code: string | null
+          current_uses: number | null
+          description: string | null
+          discount_type: string | null
+          discount_value: number | null
+          expires_at: string | null
+          id: string | null
+          max_uses: number | null
+          min_order_amount: number | null
+        }
+        Insert: {
+          active?: boolean | null
+          code?: string | null
+          current_uses?: number | null
+          description?: string | null
+          discount_type?: string | null
+          discount_value?: number | null
+          expires_at?: string | null
+          id?: string | null
+          max_uses?: number | null
+          min_order_amount?: number | null
+        }
+        Update: {
+          active?: boolean | null
+          code?: string | null
+          current_uses?: number | null
+          description?: string | null
+          discount_type?: string | null
+          discount_value?: number | null
+          expires_at?: string | null
+          id?: string | null
+          max_uses?: number | null
+          min_order_amount?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       admin_adjust_loyalty: {

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Plus, Trash2, Save, ToggleLeft, ToggleRight, Ticket, Link2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useConfirm } from "@/hooks/useConfirm";
 
 interface PromoCode {
   id: string;
@@ -115,8 +116,10 @@ const PromoCodesTab = ({ t }: Props) => {
     }
   };
 
+  const confirmDialog = useConfirm();
   const deleteCode = async (id: string) => {
-    if (!confirm(t.confirmDelete)) return;
+    const ok = await confirmDialog({ description: t.confirmDelete, destructive: true });
+    if (!ok) return;
     const { error } = await supabase.from("promo_codes").delete().eq("id", id);
     if (error) {
       toast.error(t.deleteError);

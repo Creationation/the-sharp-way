@@ -1,27 +1,21 @@
-import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useRef } from "react";
 
 /**
- * Subscribes to live INSERT/UPDATE/DELETE on the bookings table
- * and calls onChange() each time something changes.
+ * Polls bookings every 30 seconds by calling onChange().
  *
- * Use in any admin screen that needs live updates (Bookings, Schedule, ...).
+ * Replaces the previous Supabase Realtime subscription on the bookings table
+ * (removed for security: no per-user channel authorization on realtime.messages).
+ * 30s is more than reactive enough for a barbershop admin dashboard.
+ *
+ * The hook name is kept for backwards compatibility with existing imports.
  */
-export function useRealtimeBookings(onChange: () => void, enabled = true) {
+export function useRealtimeBookings(onChange: () => void, enabled = true, intervalMs = 30000) {
+  const cbRef = useRef(onChange);
+  cbRef.current = onChange;
+
   useEffect(() => {
     if (!enabled) return;
-    const channel = supabase
-      .channel("admin-bookings-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "bookings" },
-        () => onChange()
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled]);
+    const id = setInterval(() => cbRef.current(), intervalMs);
+    return () => clearInterval(id);
+  }, [enabled, intervalMs]);
 }

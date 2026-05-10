@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Upload, Trash2, Save, ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useConfirm } from "@/hooks/useConfirm";
 
 interface GalleryTabT {
   title: string;
@@ -105,8 +106,10 @@ const GalleryTab = ({ t }: { t: GalleryTabT }) => {
     fetchRows();
   };
 
+  const confirmDialog = useConfirm();
   const deleteRow = async (r: ImageRow) => {
-    if (!confirm(t.confirmDelete)) return;
+    const ok = await confirmDialog({ description: t.confirmDelete, destructive: true });
+    if (!ok) return;
     // Try to delete from storage too — best-effort
     try {
       const path = r.image_url.split("/gallery/").pop();

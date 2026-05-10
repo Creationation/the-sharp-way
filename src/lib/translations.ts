@@ -899,7 +899,7 @@ const en: Translations = {
   },
   explore: {
     title: "Our Barbers",
-    subtitle: "The Sharp Cut · Vienna 1220",
+    subtitle: "Sitdown Wien · 1220",
     headBarber: "Head Barber",
     womenSpecialist: "Women's Specialist",
     book: "Book",
@@ -1352,7 +1352,7 @@ const de: Translations = {
   },
   explore: {
     title: "Unsere Barbiere",
-    subtitle: "The Sharp Cut · Wien 1220",
+    subtitle: "Sitdown Wien · 1220",
     headBarber: "Chef Barbier",
     womenSpecialist: "Frauen Spezialistin",
     book: "Buchen",

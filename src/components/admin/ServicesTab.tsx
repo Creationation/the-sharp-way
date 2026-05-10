@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Plus, Save, Trash2, Scissors } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useConfirm } from "@/hooks/useConfirm";
 
 interface ServicesTabT {
   title: string;
@@ -86,9 +87,11 @@ const ServicesTab = ({ t }: { t: ServicesTabT }) => {
     fetchRows();
   };
 
+  const confirmDialog = useConfirm();
   const deleteRow = async (i: number) => {
     const r = rows[i];
-    if (!confirm(t.confirmDelete)) return;
+    const ok = await confirmDialog({ description: t.confirmDelete, destructive: true });
+    if (!ok) return;
     if (!r.id) { setRows(prev => prev.filter((_, idx) => idx !== i)); return; }
     const { error } = await supabase.from("services").delete().eq("id", r.id);
     if (error) { toast.error(t.deleteError); return; }

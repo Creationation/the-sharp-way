@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { Plus, Trash2, Save, ToggleLeft, ToggleRight, User, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useConfirm } from "@/hooks/useConfirm";
 import barber1 from "@/assets/barber-1.jpg";
 import barber2 from "@/assets/barber-2.jpg";
 import barber3 from "@/assets/barber-3.jpg";
@@ -135,8 +136,10 @@ const BarbersTab = ({ t }: Props) => {
     }
   };
 
+  const confirmDialog = useConfirm();
   const deleteBarber = async (id: string) => {
-    if (!confirm(t.confirmDelete)) return;
+    const ok = await confirmDialog({ description: t.confirmDelete, destructive: true });
+    if (!ok) return;
     const { error } = await supabase.from("barbers").delete().eq("id", id);
     if (error) {
       toast.error(t.deleteError);

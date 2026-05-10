@@ -13,7 +13,6 @@ interface PendingBooking {
   service_name: string;
   booking_date: string;
   booking_time: string;
-  profiles: { email: string | null; full_name: string | null } | null;
 }
 
 serve(async (req) => {
@@ -31,7 +30,7 @@ serve(async (req) => {
   // Find all confirmed past bookings (before today) with no attendance recorded
   const { data: pendingBookings, error } = await supabase
     .from("bookings")
-    .select("id, user_id, barber_name, service_name, booking_date, booking_time, profiles(email, full_name)")
+    .select("id, user_id, barber_name, service_name, booking_date, booking_time")
     .eq("status", "confirmed")
     .is("attendance_status", null)
     .lt("booking_date", todayStr);
@@ -44,11 +43,23 @@ serve(async (req) => {
     });
   }
 
+  // Fetch profile names client-side (no FK between bookings.user_id and profiles.user_id)
+  const userIds = Array.from(new Set(((pendingBookings || []) as PendingBooking[]).map(b => b.user_id).filter(Boolean)));
+  const profilesById: Record<string, { email: string | null; full_name: string | null }> = {};
+  if (userIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("user_id, email, full_name")
+      .in("user_id", userIds);
+    for (const p of profiles || []) {
+      profilesById[p.user_id] = { email: p.email, full_name: p.full_name };
+    }
+  }
+
   const autoStamped: string[] = [];
   const errors: string[] = [];
 
-  for (const booking of (pendingBookings || []) as unknown as PendingBooking[]) {
-    // Auto-mark as attended — benefit of the doubt (barber did not mark as no-show)
+  for (const booking of (pendingBookings || []) as PendingBooking[]) {
     const { error: updateErr } = await supabase
       .from("bookings")
       .update({ attendance_status: "attended" })
@@ -57,7 +68,8 @@ serve(async (req) => {
     if (updateErr) {
       errors.push(`${booking.id}: ${updateErr.message}`);
     } else {
-      const name = booking.profiles?.full_name || booking.profiles?.email || booking.user_id;
+      const profile = profilesById[booking.user_id];
+      const name = profile?.full_name || profile?.email || booking.user_id;
       autoStamped.push(`${booking.booking_date} ${booking.booking_time} — ${name} (${booking.barber_name})`);
     }
   }
@@ -80,11 +92,11 @@ serve(async (req) => {
           Falls ein Kunde wirklich nicht erschienen ist, öffne das Admin-Dashboard und markiere ihn als "No-Show".
           Der Stempel wird dann zurückgesetzt.
         </p>
-        <a href="https://the-sharp-way.lovable.app/admin"
+        <a href="https://sitdownvienna.lovable.app/admin"
            style="display:inline-block;margin-top:16px;background:linear-gradient(90deg,#b8935a,#d4a96a);color:#111;font-weight:700;font-size:13px;padding:12px 24px;border-radius:50px;text-decoration:none;">
           → Admin Dashboard öffnen
         </a>
-        <p style="color:#333;font-size:11px;margin-top:20px;">© 2026 The Sharp Cut · Lavaterstraße 2, 1220 Wien</p>
+        <p style="color:#333;font-size:11px;margin-top:20px;">© 2026 Sitdown Wien · Lavaterstraße 2, 1220 Wien</p>
       </div>
     </body></html>`;
 
@@ -95,9 +107,9 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "The Sharp Cut <info@ugcpanel.app>",
+        from: "Sitdown Wien <info@ugcpanel.app>",
         to: ["info@ugcpanel.app"],
-        subject: `✂️ ${autoStamped.length} Auto-Stempel vergeben — The Sharp Cut`,
+        subject: `✂️ ${autoStamped.length} Auto-Stempel vergeben — Sitdown Wien`,
         html,
       }),
     }).catch(() => {});
