@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ConfirmProvider } from "@/hooks/useConfirm";
 import BottomNav from "@/components/BottomNav";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import SplashScreen from "@/pages/SplashScreen";
 import HomeDashboard from "@/pages/HomeDashboard";
@@ -44,6 +45,7 @@ const App = () => {
   return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <ErrorBoundary>
       <LanguageProvider>
       <AuthProvider>
         <ConfirmProvider>
@@ -73,6 +75,7 @@ const App = () => {
         </ConfirmProvider>
       </AuthProvider>
       </LanguageProvider>
+      </ErrorBoundary>
     </TooltipProvider>
   </QueryClientProvider>
   );
