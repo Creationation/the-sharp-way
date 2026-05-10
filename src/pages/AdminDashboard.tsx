@@ -66,10 +66,9 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  type TabId = "bookings" | "schedule" | "stats" | "availability" | "users" | "promotions" | "barbers" | "services" | "gallery" | "codes" | "loyalty" | "rewards" | "notifications";
+  type TabId = "bookings" | "schedule" | "stats" | "availability" | "users" | "promotions" | "barbers" | "services" | "gallery" | "codes" | "notifications";
   const [tab, setTab] = useState<TabId>("bookings");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [pendingRewards, setPendingRewards] = useState(0);
   const { barbers: dbBarbers } = useBarbers();
   const barberNames = dbBarbers.map(b => b.name);
 
@@ -84,8 +83,6 @@ const AdminDashboard = () => {
     { id: "services",      label: t.admin.servicesTab.title,                        Icon: Scissors  },
     { id: "gallery",       label: t.admin.galleryTab.title,                         Icon: LayoutGrid},
     { id: "codes",         label: t.admin.promoCodesTab.title,                      Icon: Tag       },
-    { id: "loyalty",       label: t.admin.loyaltyTab.title,                         Icon: Trophy    },
-    { id: "rewards",       label: t.admin.rewardsTab.title,                         Icon: Gift      },
     { id: "notifications", label: t.admin.notificationsTab.title,                   Icon: Bell      },
   ];
 
