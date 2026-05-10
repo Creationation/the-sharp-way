@@ -126,6 +126,12 @@ const BookingFlow = () => {
   const { user } = useAuth();
   const { t, lang } = useLanguage();
   const { barbers, loading: barbersLoading } = useBarbers();
+  const { services: dbServices } = useServices({ onlyActive: true });
+  const services: ServiceItem[] = dbServices.map(s => ({
+    name: s.name,
+    price: `€${s.price}`,
+    duration: `${s.duration_min}min`,
+  }));
 
   const [customDate, setCustomDate] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -133,7 +139,7 @@ const BookingFlow = () => {
   const availableDates = customDate ? getAvailableDates(customDate) : getAvailableDates();
 
   const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
-  const [selectedServices, setSelectedServices] = useState<typeof services>([services[0]]);
+  const [selectedServices, setSelectedServices] = useState<ServiceItem[]>([]);
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
   const [selectedTime, setSelectedTime] = useState("12:00");
   const [confirmed, setConfirmed] = useState(false);
