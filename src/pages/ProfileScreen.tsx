@@ -324,7 +324,7 @@ const ProfileScreen = () => {
         {[
           { label: t.profile.reviews, action: () => navigate("/reviews") },
           { label: t.profile.contact, action: () => navigate("/contact") },
-          
+          { label: t.profile.replayIntro, action: () => { localStorage.removeItem("sitdown_visited"); navigate("/"); } },
         ].map(item => (
           <button
             key={item.label}

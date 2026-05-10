@@ -117,6 +117,17 @@ export interface Translations {
     days: string[];
     closed: string;
     copyright: string;
+    formTitle: string;
+    formSubtitle: string;
+    formName: string;
+    formEmail: string;
+    formPhone: string;
+    formMessage: string;
+    formSend: string;
+    formSending: string;
+    formSuccess: string;
+    formError: string;
+    formRequired: string;
   };
   profile: {
     title: string;
@@ -145,6 +156,7 @@ export interface Translations {
     rewardPending: string;
     rewardClaimed: string;
     freeCutReady: string;
+    replayIntro: string;
   };
   admin: {
     title: string;
@@ -558,6 +570,17 @@ const en: Translations = {
     days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
     closed: "Closed",
     copyright: "© 2026 Sitdown Wien. All rights reserved.",
+    formTitle: "Send us a message",
+    formSubtitle: "We usually reply within a few hours.",
+    formName: "Your name",
+    formEmail: "Your email",
+    formPhone: "Phone (optional)",
+    formMessage: "Your message",
+    formSend: "Send message",
+    formSending: "Sending...",
+    formSuccess: "Message sent · we will get back to you soon.",
+    formError: "Could not send message. Please try again.",
+    formRequired: "Please fill in name, email and message.",
   },
   profile: {
     title: "Profile",
@@ -586,6 +609,7 @@ const en: Translations = {
     rewardPending: "⏳ Reward request pending...",
     rewardClaimed: "Reward requested!",
     freeCutReady: "You've earned a FREE cut! Tap to claim.",
+    replayIntro: "Replay intro",
   },
   admin: {
     title: "Admin Dashboard",
@@ -999,6 +1023,17 @@ const de: Translations = {
     days: ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"],
     closed: "Geschlossen",
     copyright: "© 2026 Sitdown Wien. Alle Rechte vorbehalten.",
+    formTitle: "Schreib uns eine Nachricht",
+    formSubtitle: "Wir antworten meist innerhalb weniger Stunden.",
+    formName: "Dein Name",
+    formEmail: "Deine E-Mail",
+    formPhone: "Telefon (optional)",
+    formMessage: "Deine Nachricht",
+    formSend: "Nachricht senden",
+    formSending: "Wird gesendet...",
+    formSuccess: "Nachricht gesendet · wir melden uns bald.",
+    formError: "Nachricht konnte nicht gesendet werden. Bitte erneut versuchen.",
+    formRequired: "Bitte Name, E-Mail und Nachricht ausfüllen.",
   },
   profile: {
     title: "Profil",
@@ -1027,6 +1062,7 @@ const de: Translations = {
     rewardPending: "⏳ Anfrage wird bearbeitet...",
     rewardClaimed: "Belohnung angefragt!",
     freeCutReady: "Du hast einen GRATIS-Schnitt verdient! Tippe zum Einlösen.",
+    replayIntro: "Intro erneut ansehen",
   },
   admin: {
     title: "Admin-Bereich",

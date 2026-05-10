@@ -1,6 +1,9 @@
-import { ArrowLeft, MapPin, Phone, Clock, MessageCircle, Navigation, Instagram } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, MapPin, Phone, Clock, MessageCircle, Navigation, Instagram, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const hoursData = [
   { time: "Closed" },        // Montag
@@ -23,9 +26,36 @@ function isOpenNow(): boolean {
 
 const ContactScreen = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const open = isOpenNow();
   const whatsappUrl = `https://wa.me/436644686073?text=${encodeURIComponent("Hallo, ich möchte einen Termin bei Sitdown Barber vereinbaren.")}`;
+
+  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [sending, setSending] = useState(false);
+
+  const submitMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = form.name.trim();
+    const email = form.email.trim();
+    const message = form.message.trim();
+    if (!name || !email || !message) {
+      toast.error(t.contact.formRequired);
+      return;
+    }
+    if (name.length > 100 || email.length > 255 || message.length > 2000) return;
+    setSending(true);
+    try {
+      const { error } = await supabase.functions.invoke("send-contact-message", {
+        body: { name, email, phone: form.phone.trim(), message, lang },
+      });
+      if (error) throw error;
+      toast.success(t.contact.formSuccess);
+      setForm({ name: "", email: "", phone: "", message: "" });
+    } catch {
+      toast.error(t.contact.formError);
+    }
+    setSending(false);
+  };
 
   const hours = hoursData.map((h, i) => ({
     day: t.contact.days[i],
@@ -115,6 +145,59 @@ const ContactScreen = () => {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Contact form */}
+      <div className="px-5 mb-5">
+        <form onSubmit={submitMessage} className="card-app p-4 space-y-3">
+          <div>
+            <h3 className="font-heading text-lg text-foreground">{t.contact.formTitle}</h3>
+            <p className="text-muted-foreground text-xs mt-0.5">{t.contact.formSubtitle}</p>
+          </div>
+          <input
+            type="text"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder={t.contact.formName}
+            maxLength={100}
+            required
+            className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper"
+          />
+          <input
+            type="email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            placeholder={t.contact.formEmail}
+            maxLength={255}
+            required
+            className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper"
+          />
+          <input
+            type="tel"
+            value={form.phone}
+            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            placeholder={t.contact.formPhone}
+            maxLength={40}
+            className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper"
+          />
+          <textarea
+            value={form.message}
+            onChange={(e) => setForm({ ...form, message: e.target.value })}
+            placeholder={t.contact.formMessage}
+            maxLength={2000}
+            rows={4}
+            required
+            className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper resize-none"
+          />
+          <button
+            type="submit"
+            disabled={sending}
+            className="w-full gradient-copper text-primary-foreground font-semibold py-3 rounded-full shadow-copper flex items-center justify-center gap-2 disabled:opacity-60"
+          >
+            <Send size={16} />
+            {sending ? t.contact.formSending : t.contact.formSend}
+          </button>
+        </form>
       </div>
 
       {/* Get Directions */}
