@@ -353,7 +353,7 @@ const BookingFlow = () => {
     };
   }, [confirmed, lang]);
 
-  const toggleService = (s: typeof services[0]) => {
+  const toggleService = (s: ServiceItem) => {
     setSelectedServices(prev => {
       const exists = prev.some(p => p.name === s.name);
       if (exists && prev.length === 1) return prev; // keep at least one
