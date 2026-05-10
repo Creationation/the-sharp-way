@@ -113,54 +113,6 @@ const ProfileScreen = () => {
         </div>
       </div>
 
-      {/* Loyalty Card */}
-      <div className="px-5 mb-6">
-        <div className="relative rounded-2xl overflow-hidden">
-          <div className="absolute inset-0 gradient-copper opacity-20" />
-          <div className="relative border border-copper/30 rounded-2xl p-5">
-            <div className="flex items-center justify-between mb-4">
-              <p className="font-heading text-lg text-copper tracking-widest">{t.profile.member}</p>
-              <span className="text-foreground text-[10px] bg-surface px-2 py-1 rounded-full">{t.profile.gold}</span>
-            </div>
-            <div className="grid grid-cols-5 gap-2 mb-4">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`aspect-square rounded-xl flex items-center justify-center text-lg ${
-                    i < stamps
-                      ? "gradient-copper text-primary-foreground"
-                      : i === 9
-                      ? "border-2 border-copper border-dashed"
-                      : "bg-surface border border-border"
-                  }`}
-                >
-                  {i < stamps ? "✂️" : i === 9 ? "🎁" : ""}
-                </div>
-              ))}
-            </div>
-            <p className="text-muted-foreground text-xs text-center">
-              {t.profile.stampsLabel(stamps)}
-            </p>
-
-            {stamps >= 10 && !rewardPending && (
-              <button
-                onClick={claimReward}
-                disabled={claimingReward}
-                className="mt-3 w-full gradient-copper text-primary-foreground font-semibold py-3 rounded-full shadow-copper text-sm animate-pulse disabled:opacity-50 disabled:animate-none"
-              >
-                {claimingReward ? "..." : t.profile.claimReward}
-              </button>
-            )}
-            {rewardPending && (
-              <p className="mt-3 text-copper text-xs text-center font-medium">
-                {t.profile.rewardPending}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-
       {/* My Bookings */}
       <div className="px-5 mb-5">
         <h3 className="font-heading text-lg text-foreground mb-3">{t.profile.myBookings}</h3>
