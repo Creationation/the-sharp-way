@@ -469,7 +469,7 @@ const en: Translations = {
     line3: "YOUR LOOK INSTANTLY.",
     sub: "Vienna's premium barbershop. Walk in or book ahead.",
     cta: "Get Started",
-    walkin: "Or walk in anytime · Tue–Sat 09:00–19:00",
+    walkin: "Or walk in anytime · Mon–Sat 09:00–19:00",
     pickLanguage: "Choose your language",
   },
   nav: {
