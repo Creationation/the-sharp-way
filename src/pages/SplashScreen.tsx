@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import heroBg from "@/assets/hero-bg.jpg";
+import { DE, GB } from "country-flag-icons/react/3x2";
 
 const SplashScreen = () => {
   const navigate = useNavigate();
@@ -64,7 +65,7 @@ const SplashScreen = () => {
                       : "bg-surface border-border text-muted-foreground"
                   }`}
                 >
-                  🇩🇪 Deutsch
+                  <DE title="Deutschland" className="w-5 h-auto rounded-sm shadow-sm" /> Deutsch
                 </button>
                 <button
                   onClick={() => setLang("en")}
@@ -74,7 +75,7 @@ const SplashScreen = () => {
                       : "bg-surface border-border text-muted-foreground"
                   }`}
                 >
-                  🇬🇧 English
+                  <GB title="United Kingdom" className="w-5 h-auto rounded-sm shadow-sm" /> English
                 </button>
               </div>
             </div>
