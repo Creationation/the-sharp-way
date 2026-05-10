@@ -833,6 +833,9 @@ const AdminDashboard = () => {
       {/* ═══════════════════ SERVICES TAB ═══════════════════ */}
       {tab === "services" && <ServicesTab t={t.admin.servicesTab} />}
 
+      {/* ═══════════════════ GALLERY TAB ═══════════════════ */}
+      {tab === "gallery" && <GalleryTab t={t.admin.galleryTab} />}
+
       {/* ═══════════════════ PROMO CODES TAB ═══════════════════ */}
       {tab === "codes" && <PromoCodesTab t={t.admin.promoCodesTab} />}
 
