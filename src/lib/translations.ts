@@ -609,6 +609,7 @@ const en: Translations = {
     rewardPending: "⏳ Reward request pending...",
     rewardClaimed: "Reward requested!",
     freeCutReady: "You've earned a FREE cut! Tap to claim.",
+    replayIntro: "Replay intro",
   },
   admin: {
     title: "Admin Dashboard",
