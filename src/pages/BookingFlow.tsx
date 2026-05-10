@@ -922,8 +922,8 @@ function CalendarModal({ lang, onSelect, onClose }: CalendarModalProps) {
 
   const isDisabled = (d: Date) => {
     const day = d.getDay();
-    // Monday (1) and Sunday (0) are closed
-    if (day === 0 || day === 1) return true;
+    // Sunday (0) is closed
+    if (day === 0) return true;
     if (d < today) return true;
     if (d > maxDate) return true;
     return false;
