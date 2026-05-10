@@ -147,6 +147,59 @@ const ContactScreen = () => {
         </div>
       </div>
 
+      {/* Contact form */}
+      <div className="px-5 mb-5">
+        <form onSubmit={submitMessage} className="card-app p-4 space-y-3">
+          <div>
+            <h3 className="font-heading text-lg text-foreground">{t.contact.formTitle}</h3>
+            <p className="text-muted-foreground text-xs mt-0.5">{t.contact.formSubtitle}</p>
+          </div>
+          <input
+            type="text"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder={t.contact.formName}
+            maxLength={100}
+            required
+            className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper"
+          />
+          <input
+            type="email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            placeholder={t.contact.formEmail}
+            maxLength={255}
+            required
+            className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper"
+          />
+          <input
+            type="tel"
+            value={form.phone}
+            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            placeholder={t.contact.formPhone}
+            maxLength={40}
+            className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper"
+          />
+          <textarea
+            value={form.message}
+            onChange={(e) => setForm({ ...form, message: e.target.value })}
+            placeholder={t.contact.formMessage}
+            maxLength={2000}
+            rows={4}
+            required
+            className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper resize-none"
+          />
+          <button
+            type="submit"
+            disabled={sending}
+            className="w-full gradient-copper text-primary-foreground font-semibold py-3 rounded-full shadow-copper flex items-center justify-center gap-2 disabled:opacity-60"
+          >
+            <Send size={16} />
+            {sending ? t.contact.formSending : t.contact.formSend}
+          </button>
+        </form>
+      </div>
+
       {/* Get Directions */}
       <div className="px-5 mb-5">
         <a
