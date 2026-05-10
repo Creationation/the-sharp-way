@@ -989,7 +989,7 @@ const de: Translations = {
     barberUnavailable: "Dieser Barbier ist heute nicht verfügbar",
     confirmCancelTitle: "Termin stornieren?",
     confirmCancelFree: "Dieser Termin kann kostenlos storniert werden (mehr als 24 Std. vor dem Termin).",
-    confirmCancelCharged: "Weniger als 24 Stunden vor dem Termin · die 5 € Kaution wird abgebucht.",
+    confirmCancelCharged: "Weniger als 24 Std. vor dem Termin · die 5 € Kaution ist nicht erstattbar und wird einbehalten.",
     confirmCancelBtn: "Ja, stornieren",
     cancelBtn: "Zurück",
     paymentStatus: "Zahlung",
