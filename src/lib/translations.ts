@@ -285,6 +285,11 @@ export interface Translations {
       confirmDelete: string;
       noServices: string;
       hint: string;
+      category: string;
+      catHerren: string;
+      catDamen: string;
+      catKinder: string;
+      fromPrice: string;
     };
     galleryTab: {
       title: string;
