@@ -23,7 +23,7 @@ const AboutSection = () => {
               Founded in 2019 in the heart of Vienna, we blend old-school tradition with modern technique.
             </p>
             <p className="text-muted-foreground leading-relaxed mb-8">
-              From straight-razor shaves to precision fades, our master barbers deliver an experience — not just a haircut.
+              From straight-razor shaves to precision fades, our master barbers deliver an experience, not just a haircut.
               Walk in, sit down, and leave looking your absolute best.
             </p>
 
