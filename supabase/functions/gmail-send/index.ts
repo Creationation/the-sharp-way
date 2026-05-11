@@ -31,21 +31,25 @@ function b64UrlEncode(input: string): string {
   return utf8ToB64(input).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
+function cleanHeader(value: string): string {
+  return value.replace(/[\r\n]+/g, " ").trim();
+}
+
 function buildRaw(body: SendBody): string {
-  const encodedBody = utf8ToB64(body.body);
+  const text = body.body.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
   const lines = [
-    `From: ${body.from || DEFAULT_FROM}`,
-    `To: ${body.to}`,
-    body.cc ? `Cc: ${body.cc}` : null,
-    body.bcc ? `Bcc: ${body.bcc}` : null,
-    `Subject: =?UTF-8?B?${utf8ToB64(body.subject)}?=`,
-    body.inReplyTo ? `In-Reply-To: ${body.inReplyTo}` : null,
-    body.references ? `References: ${body.references}` : null,
+    `From: ${cleanHeader(body.from || DEFAULT_FROM)}`,
+    `To: ${cleanHeader(body.to)}`,
+    body.cc ? `Cc: ${cleanHeader(body.cc)}` : null,
+    body.bcc ? `Bcc: ${cleanHeader(body.bcc)}` : null,
+    `Subject: =?UTF-8?B?${utf8ToB64(cleanHeader(body.subject))}?=`,
+    body.inReplyTo ? `In-Reply-To: ${cleanHeader(body.inReplyTo)}` : null,
+    body.references ? `References: ${cleanHeader(body.references)}` : null,
     "MIME-Version: 1.0",
     'Content-Type: text/plain; charset="UTF-8"',
-    "Content-Transfer-Encoding: base64",
+    "Content-Transfer-Encoding: 8bit",
     "",
-    encodedBody,
+    text,
   ].filter(Boolean);
   return lines.join("\r\n");
 }
@@ -58,6 +62,7 @@ serve(async (req) => {
 
   try {
     const body: SendBody = await req.json();
+    body.body = body.body?.trim() ?? "";
     if (!body.to || !body.subject || !body.body) {
       return new Response(JSON.stringify({ error: "Missing to/subject/body" }), {
         status: 400,
