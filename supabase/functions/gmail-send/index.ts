@@ -15,29 +15,37 @@ interface SendBody {
   threadId?: string;
   inReplyTo?: string;
   references?: string;
+  from?: string;
+}
+
+const DEFAULT_FROM = "Sitdown Vienna <hello@sitdownvienna.app>";
+
+function utf8ToB64(str: string): string {
+  const bytes = new TextEncoder().encode(str);
+  let bin = "";
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin);
 }
 
 function b64UrlEncode(input: string): string {
-  // Encode UTF-8 to base64url
-  const bytes = new TextEncoder().encode(input);
-  let bin = "";
-  for (const b of bytes) bin += String.fromCharCode(b);
-  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return utf8ToB64(input).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
 function buildRaw(body: SendBody): string {
+  const encodedBody = utf8ToB64(body.body);
   const lines = [
+    `From: ${body.from || DEFAULT_FROM}`,
     `To: ${body.to}`,
     body.cc ? `Cc: ${body.cc}` : null,
     body.bcc ? `Bcc: ${body.bcc}` : null,
-    `Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(body.subject)))}?=`,
+    `Subject: =?UTF-8?B?${utf8ToB64(body.subject)}?=`,
     body.inReplyTo ? `In-Reply-To: ${body.inReplyTo}` : null,
     body.references ? `References: ${body.references}` : null,
     "MIME-Version: 1.0",
     'Content-Type: text/html; charset="UTF-8"',
-    "Content-Transfer-Encoding: 7bit",
+    "Content-Transfer-Encoding: base64",
     "",
-    body.body,
+    encodedBody,
   ].filter(Boolean);
   return lines.join("\r\n");
 }

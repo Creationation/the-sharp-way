@@ -12,6 +12,7 @@ import {
   MailOpen,
   Loader2,
   AlertCircle,
+  Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,21 +34,22 @@ interface GmailMessage {
   unread: boolean;
 }
 
-interface GmailDetail extends GmailMessage {
+interface ThreadMessage extends GmailMessage {
   cc?: string;
   messageIdHeader?: string;
   references?: string;
   html: string;
   text: string;
+  fromMe?: boolean;
 }
 
 type FilterType = "all" | "unread" | "stripe" | "clients";
 
 const FILTER_QUERIES: Record<FilterType, string> = {
-  all: "in:inbox",
-  unread: "in:inbox is:unread",
-  stripe: "in:inbox from:stripe.com",
-  clients: "in:inbox -from:stripe.com -from:noreply",
+  all: "in:anywhere -in:trash -in:spam",
+  unread: "is:unread -in:trash -in:spam",
+  stripe: "from:stripe.com -in:trash -in:spam",
+  clients: "in:anywhere -from:stripe.com -from:noreply -in:trash -in:spam",
 };
 
 const STR = {
@@ -68,7 +70,9 @@ const STR = {
     loadFailed: "Failed to load",
     noSubject: "(no subject)",
     to: "To",
+    me: "Me",
     replyPlaceholder: "Your reply...",
+    messagesInThread: "messages",
   },
   de: {
     searchPlaceholder: "Suchen...",
@@ -87,7 +91,9 @@ const STR = {
     loadFailed: "Laden fehlgeschlagen",
     noSubject: "(kein Betreff)",
     to: "An",
+    me: "Ich",
     replyPlaceholder: "Ihre Antwort...",
+    messagesInThread: "Nachrichten",
   },
 };
 
@@ -109,8 +115,10 @@ const InboxView: React.FC = () => {
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
 
-  const [selected, setSelected] = useState<GmailDetail | null>(null);
-  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [thread, setThread] = useState<ThreadMessage[] | null>(null);
+  const [threadId, setThreadId] = useState<string | null>(null);
+  const [loadingThread, setLoadingThread] = useState(false);
+  const [expandedMsgId, setExpandedMsgId] = useState<string | null>(null);
 
   const [replyOpen, setReplyOpen] = useState(false);
   const [replyBody, setReplyBody] = useState("");
@@ -139,16 +147,19 @@ const InboxView: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter, search]);
 
-  const openMessage = async (m: GmailMessage) => {
-    setLoadingDetail(true);
-    setSelected({ ...m, html: "", text: "" });
+  const openThread = async (m: GmailMessage) => {
+    setLoadingThread(true);
+    setThreadId(m.threadId);
+    setThread(null);
     try {
-      const { data, error } = await supabase.functions.invoke("gmail-get", {
-        body: { id: m.id },
+      const { data, error } = await supabase.functions.invoke("gmail-thread", {
+        body: { id: m.threadId },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      setSelected(data);
+      const msgs: ThreadMessage[] = data.messages ?? [];
+      setThread(msgs);
+      setExpandedMsgId(msgs[msgs.length - 1]?.id ?? null);
 
       if (m.unread) {
         supabase.functions
@@ -161,51 +172,63 @@ const InboxView: React.FC = () => {
       }
     } catch (e: any) {
       toast.error(e.message ?? s.loadFailed);
-      setSelected(null);
+      setThread(null);
+      setThreadId(null);
     } finally {
-      setLoadingDetail(false);
+      setLoadingThread(false);
     }
   };
 
-  const handleArchive = async (id: string) => {
-    const { error } = await supabase.functions.invoke("gmail-modify", {
-      body: { id, action: "archive" },
-    });
-    if (error) return toast.error(s.error);
-    toast.success(s.archived);
-    setSelected(null);
-    setMessages((prev) => prev.filter((x) => x.id !== id));
+  const closeThread = () => {
+    setThread(null);
+    setThreadId(null);
+    setReplyOpen(false);
+    setReplyBody("");
+    setExpandedMsgId(null);
   };
 
-  const handleTrash = async (id: string) => {
-    const { error } = await supabase.functions.invoke("gmail-modify", {
-      body: { id, action: "trash" },
-    });
-    if (error) return toast.error(s.error);
+  const handleArchive = async () => {
+    if (!thread || !threadId) return;
+    for (const m of thread) {
+      await supabase.functions.invoke("gmail-modify", {
+        body: { id: m.id, action: "archive" },
+      });
+    }
+    toast.success(s.archived);
+    setMessages((prev) => prev.filter((x) => x.threadId !== threadId));
+    closeThread();
+  };
+
+  const handleTrash = async () => {
+    if (!thread || !threadId) return;
+    for (const m of thread) {
+      await supabase.functions.invoke("gmail-modify", {
+        body: { id: m.id, action: "trash" },
+      });
+    }
     toast.success(s.deleted);
-    setSelected(null);
-    setMessages((prev) => prev.filter((x) => x.id !== id));
+    setMessages((prev) => prev.filter((x) => x.threadId !== threadId));
+    closeThread();
   };
 
   const handleReply = async () => {
-    if (!selected || !replyBody.trim()) return;
+    if (!thread || !replyBody.trim()) return;
+    const last = thread[thread.length - 1];
     setSending(true);
     try {
-      const { name: _n, email } = parseFromName(selected.from);
-      const subject = selected.subject.startsWith("Re:")
-        ? selected.subject
-        : `Re: ${selected.subject}`;
-      const refs = [selected.references, selected.messageIdHeader]
-        .filter(Boolean)
-        .join(" ");
+      const { email } = parseFromName(last.fromMe ? last.to : last.from);
+      const subject = (last.subject || "").startsWith("Re:")
+        ? last.subject
+        : `Re: ${last.subject}`;
+      const refs = [last.references, last.messageIdHeader].filter(Boolean).join(" ");
 
       const { data, error } = await supabase.functions.invoke("gmail-send", {
         body: {
           to: email,
           subject,
           body: replyBody.replace(/\n/g, "<br>"),
-          threadId: selected.threadId,
-          inReplyTo: selected.messageIdHeader,
+          threadId: last.threadId,
+          inReplyTo: last.messageIdHeader,
           references: refs,
         },
       });
@@ -214,6 +237,8 @@ const InboxView: React.FC = () => {
       toast.success(s.replySent);
       setReplyOpen(false);
       setReplyBody("");
+      // reload thread to show the just-sent reply
+      await openThread({ ...last } as any);
     } catch (e: any) {
       toast.error(e.message ?? s.sendFailed);
     } finally {
@@ -221,70 +246,130 @@ const InboxView: React.FC = () => {
     }
   };
 
-  if (selected) {
-    const { name, email } = parseFromName(selected.from);
+  // ---------- Thread (conversation) view ----------
+  if (threadId) {
+    const subject = thread?.[0]?.subject || s.noSubject;
     return (
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2">
-          <Button variant="ghost" size="sm" onClick={() => { setSelected(null); setReplyOpen(false); setReplyBody(""); }}>
+          <Button variant="ghost" size="sm" onClick={closeThread}>
             <ArrowLeft size={16} className="mr-1" /> {s.back}
           </Button>
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon" onClick={() => handleArchive(selected.id)}>
+            <Button variant="ghost" size="icon" onClick={handleArchive}>
               <Archive size={16} />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => handleTrash(selected.id)}>
+            <Button variant="ghost" size="icon" onClick={handleTrash}>
               <Trash2 size={16} className="text-red-500" />
             </Button>
-            <Button size="sm" className="bg-copper hover:bg-copper/90" onClick={() => setReplyOpen(true)}>
+            <Button size="sm" className="bg-copper hover:bg-copper/90 text-black" onClick={() => setReplyOpen(true)}>
               <Reply size={14} className="mr-1" /> {s.reply}
             </Button>
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-4 space-y-2">
-          <h2 className="font-bold text-lg leading-tight">{selected.subject || s.noSubject}</h2>
-          <div className="flex items-center justify-between text-sm">
-            <div className="min-w-0">
-              <div className="font-medium truncate">{name}</div>
-              <div className="text-xs text-muted-foreground truncate">{email}</div>
+        <div className="bg-card border border-border rounded-2xl p-4">
+          <h2 className="font-bold text-lg leading-tight">{subject}</h2>
+          {thread && (
+            <div className="text-xs text-muted-foreground mt-1">
+              {thread.length} {s.messagesInThread}
             </div>
-            <div className="text-xs text-muted-foreground shrink-0 ml-2">
-              {selected.date && format(new Date(selected.date), "dd MMM yyyy HH:mm", { locale: dateLocale })}
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-card border border-border rounded-2xl overflow-hidden">
-          {loadingDetail ? (
-            <div className="p-8 flex items-center justify-center text-muted-foreground">
-              <Loader2 className="animate-spin mr-2" size={16} /> {s.loading}
-            </div>
-          ) : selected.html ? (
-            <iframe
-              title="email-body"
-              sandbox=""
-              srcDoc={`<!doctype html><html><head><meta charset="utf-8"><base target="_blank"><style>body{font-family:Inter,system-ui,sans-serif;color:#0D0D0D;background:#fff;padding:16px;margin:0;font-size:14px;line-height:1.5}img{max-width:100%;height:auto}a{color:#C9A46E}</style></head><body>${selected.html}</body></html>`}
-              className="w-full min-h-[400px] bg-white"
-            />
-          ) : (
-            <pre className="p-4 text-sm whitespace-pre-wrap font-sans">{selected.text || selected.snippet}</pre>
           )}
         </div>
 
-        {replyOpen && (
-          <div className="bg-card border border-copper/40 rounded-2xl p-4 space-y-3">
-            <div className="text-xs text-muted-foreground">{s.to} · {email}</div>
+        {loadingThread && (
+          <div className="bg-card border border-border rounded-2xl p-8 flex items-center justify-center text-muted-foreground">
+            <Loader2 className="animate-spin mr-2" size={16} /> {s.loading}
+          </div>
+        )}
+
+        {thread && (
+          <div className="space-y-2">
+            {thread.map((m) => {
+              const { name, email } = parseFromName(m.fromMe ? (m.to || "") : m.from);
+              const expanded = expandedMsgId === m.id;
+              const senderLabel = m.fromMe ? s.me : name;
+              return (
+                <div
+                  key={m.id}
+                  className={`border rounded-2xl overflow-hidden ${
+                    m.fromMe
+                      ? "bg-copper/5 border-copper/30 ml-4"
+                      : "bg-card border-border mr-4"
+                  }`}
+                >
+                  <button
+                    onClick={() => setExpandedMsgId(expanded ? null : m.id)}
+                    className="w-full text-left p-3 flex items-center justify-between gap-2"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-medium truncate">
+                        {m.fromMe && <span className="text-copper">{s.me} → </span>}
+                        {senderLabel}
+                      </div>
+                      {!expanded && (
+                        <div className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                          {m.snippet}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground shrink-0">
+                      {m.internalDate &&
+                        formatDistanceToNow(new Date(parseInt(m.internalDate)), {
+                          locale: dateLocale,
+                          addSuffix: false,
+                        })}
+                    </div>
+                  </button>
+
+                  {expanded && (
+                    <div className="border-t border-border/50">
+                      <div className="px-3 py-2 text-xs text-muted-foreground space-y-0.5">
+                        <div className="truncate">{email}</div>
+                        <div>
+                          {m.date &&
+                            format(new Date(m.date), "dd MMM yyyy HH:mm", { locale: dateLocale })}
+                        </div>
+                      </div>
+                      {m.html ? (
+                        <iframe
+                          title={`email-${m.id}`}
+                          sandbox=""
+                          srcDoc={`<!doctype html><html><head><meta charset="utf-8"><base target="_blank"><style>body{font-family:Inter,system-ui,sans-serif;color:#0D0D0D;background:#fff;padding:12px;margin:0;font-size:14px;line-height:1.5}img{max-width:100%;height:auto}a{color:#C9A46E}blockquote{border-left:3px solid #ddd;padding-left:10px;color:#666;margin:10px 0}</style></head><body>${m.html}</body></html>`}
+                          className="w-full min-h-[300px] bg-white"
+                        />
+                      ) : (
+                        <pre className="p-3 text-sm whitespace-pre-wrap font-sans bg-white text-black">
+                          {m.text || m.snippet}
+                        </pre>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {replyOpen && thread && (
+          <div className="bg-card border border-copper/40 rounded-2xl p-4 space-y-3 sticky bottom-2">
+            <div className="text-xs text-muted-foreground">
+              {s.to} · {parseFromName(thread[thread.length - 1].fromMe ? (thread[thread.length - 1].to || "") : thread[thread.length - 1].from).email}
+            </div>
             <Textarea
               autoFocus
-              rows={6}
+              rows={5}
               placeholder={s.replyPlaceholder}
               value={replyBody}
               onChange={(e) => setReplyBody(e.target.value)}
             />
             <div className="flex gap-2">
-              <Button onClick={handleReply} disabled={sending || !replyBody.trim()} className="flex-1 bg-copper hover:bg-copper/90">
-                {sending ? <Loader2 className="animate-spin" size={16} /> : s.send}
+              <Button
+                onClick={handleReply}
+                disabled={sending || !replyBody.trim()}
+                className="flex-1 bg-copper hover:bg-copper/90 text-black"
+              >
+                {sending ? <Loader2 className="animate-spin" size={16} /> : <><Send size={14} className="mr-1" /> {s.send}</>}
               </Button>
               <Button variant="ghost" onClick={() => { setReplyOpen(false); setReplyBody(""); }}>
                 {s.cancel}
@@ -296,6 +381,7 @@ const InboxView: React.FC = () => {
     );
   }
 
+  // ---------- List view ----------
   return (
     <div className="space-y-3">
       <div className="flex gap-2 items-center">
@@ -356,7 +442,7 @@ const InboxView: React.FC = () => {
           return (
             <button
               key={m.id}
-              onClick={() => openMessage(m)}
+              onClick={() => openThread(m)}
               className={`w-full text-left bg-card border border-border rounded-2xl p-3 hover:border-copper/40 transition ${
                 m.unread ? "border-l-4 border-l-copper" : ""
               }`}

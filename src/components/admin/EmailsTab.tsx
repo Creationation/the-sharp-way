@@ -139,17 +139,16 @@ const EmailsTab: React.FC = () => {
       return;
     }
     setSending(true);
-    const { error } = await supabase.functions.invoke("send-transactional-email", {
+    const { data, error } = await supabase.functions.invoke("gmail-send", {
       body: {
-        templateName: "manual-message",
-        recipientEmail: to,
-        idempotencyKey: `manual-${crypto.randomUUID()}`,
-        templateData: { subject, message },
+        to,
+        subject,
+        body: message.replace(/\n/g, "<br>"),
       },
     });
     setSending(false);
-    if (error) {
-      toast.error(`${s.sendFailed}: ${error.message}`);
+    if (error || data?.error) {
+      toast.error(`${s.sendFailed}: ${error?.message || data?.error}`);
     } else {
       toast.success(s.queued);
       setTo(""); setSubject(""); setMessage("");
@@ -257,7 +256,7 @@ const EmailsTab: React.FC = () => {
               <Send size={16} className="mr-2" />
               {sending ? s.sending : s.send}
             </Button>
-            <p className="text-xs text-muted-foreground">{s.dnsHint}</p>
+            <p className="text-xs text-muted-foreground">{lang === "de" ? "· Wird sofort über Gmail gesendet." : "· Sent immediately through Gmail."}</p>
           </div>
         </TabsContent>
 
