@@ -220,16 +220,12 @@ const InboxView: React.FC = () => {
       const subject = (last.subject || "").startsWith("Re:")
         ? last.subject
         : `Re: ${last.subject}`;
-      const refs = [last.references, last.messageIdHeader].filter(Boolean).join(" ");
-
       const { data, error } = await supabase.functions.invoke("gmail-send", {
         body: {
           to: email,
           subject,
-          body: replyBody.replace(/\n/g, "<br>"),
+          body: replyBody,
           threadId: last.threadId,
-          inReplyTo: last.messageIdHeader,
-          references: refs,
         },
       });
       if (error) throw error;
