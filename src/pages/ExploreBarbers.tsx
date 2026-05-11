@@ -52,8 +52,8 @@ const ExploreBarbers = () => {
           </div>
           <p className="text-muted-foreground text-xs leading-relaxed">
             {lang === "de"
-              ? "Unser Team aus erfahrenen Barbieren steht für Präzision, Stil und erstklassigen Service. Jeder Schnitt ist eine Kunstarbeit — abgestimmt auf deinen persönlichen Look."
-              : "Our team of experienced barbers stands for precision, style and top-notch service. Every cut is a work of art — tailored to your personal look."}
+              ? "Unser Team aus erfahrenen Barbieren steht für Präzision, Stil und erstklassigen Service. Jeder Schnitt ist eine Kunstarbeit, abgestimmt auf deinen persönlichen Look."
+              : "Our team of experienced barbers stands for precision, style and top-notch service. Every cut is a work of art, tailored to your personal look."}
           </p>
         </div>
       </div>

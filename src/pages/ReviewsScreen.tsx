@@ -5,7 +5,7 @@ import barber1 from "@/assets/barber-1.jpg";
 import barber2 from "@/assets/barber-2.jpg";
 
 const reviews = [
-  { name: "Alex M.", barber: "Ibo", barberImg: barber1, service: "Haarschnitt", stars: 5, text: { en: "Best barbershop in Vienna. Ibo nailed the fade — absolutely clean.", de: "Der beste Barbershop in Wien. Ibo hat den Schnitt perfekt getroffen — absolut sauber." }, date: { en: "2 days ago", de: "Vor 2 Tagen" } },
+  { name: "Alex M.", barber: "Ibo", barberImg: barber1, service: "Haarschnitt", stars: 5, text: { en: "Best barbershop in Vienna. Ibo nailed the fade, absolutely clean.", de: "Der beste Barbershop in Wien. Ibo hat den Schnitt perfekt getroffen, absolut sauber." }, date: { en: "2 days ago", de: "Vor 2 Tagen" } },
   { name: "Thomas R.", barber: "Ahmed", barberImg: barber2, service: "Haarschnitt + Komplett Service", stars: 5, text: { en: "These guys know their craft. I walked in scruffy and walked out looking like a different person.", de: "Die wissen was sie tun. Ich kam ungepflegt rein und sah aus wie ein anderer Mensch." }, date: { en: "1 week ago", de: "Vor 1 Woche" } },
   { name: "Stefan K.", barber: "Ibo", barberImg: barber1, service: "Moderne Bartrasur", stars: 5, text: { en: "The hot towel shave is an experience. Smooth, relaxing, and flawless.", de: "Die Bartrasur ist ein Erlebnis. Glatt, entspannend und makellos." }, date: { en: "2 weeks ago", de: "Vor 2 Wochen" } },
   { name: "Michael B.", barber: "Ahmed", barberImg: barber2, service: "Haarschnitt", stars: 4, text: { en: "Ahmed took his time to get the cut exactly right. Professional and friendly.", de: "Ahmed hat sich Zeit genommen, um den Schnitt genau richtig hinzubekommen. Professionell und freundlich." }, date: { en: "3 weeks ago", de: "Vor 3 Wochen" } },
