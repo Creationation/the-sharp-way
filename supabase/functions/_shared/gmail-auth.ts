@@ -33,8 +33,8 @@ export async function requireAdmin(req: Request): Promise<
   );
 
   const token = authHeader.replace("Bearer ", "");
-  const { data, error } = await supabase.auth.getClaims(token);
-  if (error || !data?.claims?.sub) {
+  const { data, error } = await supabase.auth.getUser(token);
+  if (error || !data?.user?.id) {
     return {
       ok: false,
       response: new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -44,7 +44,7 @@ export async function requireAdmin(req: Request): Promise<
     };
   }
 
-  const userId = data.claims.sub as string;
+  const userId = data.user.id;
   const { data: roleCheck } = await supabase.rpc("has_role", {
     _user_id: userId,
     _role: "admin",

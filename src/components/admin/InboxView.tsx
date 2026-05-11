@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -16,9 +16,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { format, formatDistanceToNow } from "date-fns";
-import { fr } from "date-fns/locale";
+import { de as deLocale, enUS } from "date-fns/locale";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface GmailMessage {
   id: string;
@@ -50,6 +50,47 @@ const FILTER_QUERIES: Record<FilterType, string> = {
   clients: "in:inbox -from:stripe.com -from:noreply",
 };
 
+const STR = {
+  en: {
+    searchPlaceholder: "Search...",
+    filters: { all: "All", unread: "Unread", stripe: "Stripe", clients: "Clients" },
+    error: "Error",
+    loading: "Loading...",
+    empty: "No emails",
+    back: "Back",
+    reply: "Reply",
+    cancel: "Cancel",
+    send: "Send",
+    archived: "Archived",
+    deleted: "Deleted",
+    replySent: "Reply sent",
+    sendFailed: "Send failed",
+    loadFailed: "Failed to load",
+    noSubject: "(no subject)",
+    to: "To",
+    replyPlaceholder: "Your reply...",
+  },
+  de: {
+    searchPlaceholder: "Suchen...",
+    filters: { all: "Alle", unread: "Ungelesen", stripe: "Stripe", clients: "Kunden" },
+    error: "Fehler",
+    loading: "Laden...",
+    empty: "Keine E-Mails",
+    back: "Zurück",
+    reply: "Antworten",
+    cancel: "Abbrechen",
+    send: "Senden",
+    archived: "Archiviert",
+    deleted: "Gelöscht",
+    replySent: "Antwort gesendet",
+    sendFailed: "Senden fehlgeschlagen",
+    loadFailed: "Laden fehlgeschlagen",
+    noSubject: "(kein Betreff)",
+    to: "An",
+    replyPlaceholder: "Ihre Antwort...",
+  },
+};
+
 const parseFromName = (from: string) => {
   const match = from.match(/^"?([^"<]+?)"?\s*<(.+)>$/);
   if (match) return { name: match[1].trim(), email: match[2].trim() };
@@ -57,6 +98,10 @@ const parseFromName = (from: string) => {
 };
 
 const InboxView: React.FC = () => {
+  const { lang } = useLanguage();
+  const s = STR[lang];
+  const dateLocale = lang === "de" ? deLocale : enUS;
+
   const [messages, setMessages] = useState<GmailMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +128,7 @@ const InboxView: React.FC = () => {
       if (data?.error) throw new Error(data.error);
       setMessages(data?.messages ?? []);
     } catch (e: any) {
-      setError(e.message ?? "Erreur de chargement");
+      setError(e.message ?? s.loadFailed);
     } finally {
       setLoading(false);
     }
@@ -105,7 +150,6 @@ const InboxView: React.FC = () => {
       if (data?.error) throw new Error(data.error);
       setSelected(data);
 
-      // Mark as read in background
       if (m.unread) {
         supabase.functions
           .invoke("gmail-modify", { body: { id: m.id, action: "markRead" } })
@@ -116,7 +160,7 @@ const InboxView: React.FC = () => {
           });
       }
     } catch (e: any) {
-      toast.error(e.message ?? "Erreur de chargement");
+      toast.error(e.message ?? s.loadFailed);
       setSelected(null);
     } finally {
       setLoadingDetail(false);
@@ -127,8 +171,8 @@ const InboxView: React.FC = () => {
     const { error } = await supabase.functions.invoke("gmail-modify", {
       body: { id, action: "archive" },
     });
-    if (error) return toast.error("Erreur");
-    toast.success("Archivé");
+    if (error) return toast.error(s.error);
+    toast.success(s.archived);
     setSelected(null);
     setMessages((prev) => prev.filter((x) => x.id !== id));
   };
@@ -137,8 +181,8 @@ const InboxView: React.FC = () => {
     const { error } = await supabase.functions.invoke("gmail-modify", {
       body: { id, action: "trash" },
     });
-    if (error) return toast.error("Erreur");
-    toast.success("Supprimé");
+    if (error) return toast.error(s.error);
+    toast.success(s.deleted);
     setSelected(null);
     setMessages((prev) => prev.filter((x) => x.id !== id));
   };
@@ -167,24 +211,23 @@ const InboxView: React.FC = () => {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      toast.success("Réponse envoyée");
+      toast.success(s.replySent);
       setReplyOpen(false);
       setReplyBody("");
     } catch (e: any) {
-      toast.error(e.message ?? "Échec d'envoi");
+      toast.error(e.message ?? s.sendFailed);
     } finally {
       setSending(false);
     }
   };
 
-  // Detail overlay
   if (selected) {
     const { name, email } = parseFromName(selected.from);
     return (
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2">
           <Button variant="ghost" size="sm" onClick={() => { setSelected(null); setReplyOpen(false); setReplyBody(""); }}>
-            <ArrowLeft size={16} className="mr-1" /> Retour
+            <ArrowLeft size={16} className="mr-1" /> {s.back}
           </Button>
           <div className="flex gap-1">
             <Button variant="ghost" size="icon" onClick={() => handleArchive(selected.id)}>
@@ -194,20 +237,20 @@ const InboxView: React.FC = () => {
               <Trash2 size={16} className="text-red-500" />
             </Button>
             <Button size="sm" className="bg-copper hover:bg-copper/90" onClick={() => setReplyOpen(true)}>
-              <Reply size={14} className="mr-1" /> Répondre
+              <Reply size={14} className="mr-1" /> {s.reply}
             </Button>
           </div>
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-4 space-y-2">
-          <h2 className="font-bold text-lg leading-tight">{selected.subject || "(sans sujet)"}</h2>
+          <h2 className="font-bold text-lg leading-tight">{selected.subject || s.noSubject}</h2>
           <div className="flex items-center justify-between text-sm">
             <div className="min-w-0">
               <div className="font-medium truncate">{name}</div>
               <div className="text-xs text-muted-foreground truncate">{email}</div>
             </div>
             <div className="text-xs text-muted-foreground shrink-0 ml-2">
-              {selected.date && format(new Date(selected.date), "dd MMM yyyy HH:mm", { locale: fr })}
+              {selected.date && format(new Date(selected.date), "dd MMM yyyy HH:mm", { locale: dateLocale })}
             </div>
           </div>
         </div>
@@ -215,7 +258,7 @@ const InboxView: React.FC = () => {
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
           {loadingDetail ? (
             <div className="p-8 flex items-center justify-center text-muted-foreground">
-              <Loader2 className="animate-spin mr-2" size={16} /> Chargement...
+              <Loader2 className="animate-spin mr-2" size={16} /> {s.loading}
             </div>
           ) : selected.html ? (
             <iframe
@@ -231,20 +274,20 @@ const InboxView: React.FC = () => {
 
         {replyOpen && (
           <div className="bg-card border border-copper/40 rounded-2xl p-4 space-y-3">
-            <div className="text-xs text-muted-foreground">À · {email}</div>
+            <div className="text-xs text-muted-foreground">{s.to} · {email}</div>
             <Textarea
               autoFocus
               rows={6}
-              placeholder="Ta réponse..."
+              placeholder={s.replyPlaceholder}
               value={replyBody}
               onChange={(e) => setReplyBody(e.target.value)}
             />
             <div className="flex gap-2">
               <Button onClick={handleReply} disabled={sending || !replyBody.trim()} className="flex-1 bg-copper hover:bg-copper/90">
-                {sending ? <Loader2 className="animate-spin" size={16} /> : "Envoyer"}
+                {sending ? <Loader2 className="animate-spin" size={16} /> : s.send}
               </Button>
               <Button variant="ghost" onClick={() => { setReplyOpen(false); setReplyBody(""); }}>
-                Annuler
+                {s.cancel}
               </Button>
             </div>
           </div>
@@ -253,14 +296,13 @@ const InboxView: React.FC = () => {
     );
   }
 
-  // List view
   return (
     <div className="space-y-3">
       <div className="flex gap-2 items-center">
         <div className="flex-1 relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Rechercher..."
+            placeholder={s.searchPlaceholder}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") setSearch(searchInput); }}
@@ -283,10 +325,7 @@ const InboxView: React.FC = () => {
                 : "bg-card border-border text-muted-foreground hover:text-foreground"
             }`}
           >
-            {f === "all" && "Tous"}
-            {f === "unread" && "Non lus"}
-            {f === "stripe" && "Stripe"}
-            {f === "clients" && "Clients"}
+            {s.filters[f]}
           </button>
         ))}
       </div>
@@ -295,7 +334,7 @@ const InboxView: React.FC = () => {
         <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-3 flex items-start gap-2 text-sm">
           <AlertCircle size={16} className="text-red-500 shrink-0 mt-0.5" />
           <div className="flex-1">
-            <div className="text-red-500 font-medium">Erreur</div>
+            <div className="text-red-500 font-medium">{s.error}</div>
             <div className="text-xs text-muted-foreground break-all">{error}</div>
           </div>
         </div>
@@ -304,12 +343,12 @@ const InboxView: React.FC = () => {
       <div className="space-y-2">
         {loading && messages.length === 0 && (
           <div className="text-center py-8 text-muted-foreground text-sm flex items-center justify-center gap-2">
-            <Loader2 className="animate-spin" size={14} /> Chargement...
+            <Loader2 className="animate-spin" size={14} /> {s.loading}
           </div>
         )}
         {!loading && messages.length === 0 && !error && (
           <div className="text-center py-8 text-muted-foreground text-sm">
-            Aucun email
+            {s.empty}
           </div>
         )}
         {messages.map((m) => {
@@ -335,11 +374,11 @@ const InboxView: React.FC = () => {
                 </div>
                 <span className="text-xs text-muted-foreground shrink-0">
                   {m.internalDate &&
-                    formatDistanceToNow(new Date(parseInt(m.internalDate)), { locale: fr, addSuffix: false })}
+                    formatDistanceToNow(new Date(parseInt(m.internalDate)), { locale: dateLocale, addSuffix: false })}
                 </span>
               </div>
               <div className={`text-sm truncate ${m.unread ? "font-semibold" : ""}`}>
-                {m.subject || "(sans sujet)"}
+                {m.subject || s.noSubject}
               </div>
               <div className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
                 {m.snippet}
