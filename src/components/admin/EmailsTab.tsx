@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Mail, Send, Inbox, RefreshCw, AlertCircle, Search } from "lucide-react";
+import { Mail, Send, RefreshCw, AlertCircle, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import InboxView from "./InboxView";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface LogRow {
   id: string;
@@ -20,14 +21,71 @@ interface LogRow {
   created_at: string;
 }
 
+const STR = {
+  en: {
+    title: "Emails",
+    tabs: { history: "History", compose: "Compose", inbox: "Inbox" },
+    loadError: "Failed to load",
+    fillAll: "Fill in all fields",
+    sendFailed: "Failed",
+    queued: "Email queued",
+    stats: { total: "Total", sent: "Sent", pending: "Queued", failed: "Failed" },
+    searchPlaceholder: "Search email or template...",
+    statusAll: "All",
+    statusSent: "Sent",
+    statusPending: "Queued",
+    statusDlq: "Failed",
+    statusSuppressed: "Suppressed",
+    loading: "Loading...",
+    empty: "No emails",
+    from: "From",
+    to: "To",
+    subject: "Subject",
+    subjectPh: "Email subject",
+    message: "Message",
+    messagePh: "Type your message here...",
+    send: "Send",
+    sending: "Sending...",
+    dnsHint: "· Once DNS is verified (up to 72h), the email will be sent automatically.",
+  },
+  de: {
+    title: "E-Mails",
+    tabs: { history: "Verlauf", compose: "Verfassen", inbox: "Posteingang" },
+    loadError: "Laden fehlgeschlagen",
+    fillAll: "Alle Felder ausfüllen",
+    sendFailed: "Fehler",
+    queued: "E-Mail in Warteschlange",
+    stats: { total: "Gesamt", sent: "Gesendet", pending: "Warteschlange", failed: "Fehler" },
+    searchPlaceholder: "E-Mail oder Vorlage suchen...",
+    statusAll: "Alle",
+    statusSent: "Gesendet",
+    statusPending: "Warteschlange",
+    statusDlq: "Fehler",
+    statusSuppressed: "Unterdrückt",
+    loading: "Laden...",
+    empty: "Keine E-Mails",
+    from: "Von",
+    to: "An",
+    subject: "Betreff",
+    subjectPh: "E-Mail-Betreff",
+    message: "Nachricht",
+    messagePh: "Nachricht hier eingeben...",
+    send: "Senden",
+    sending: "Senden...",
+    dnsHint: "· Sobald DNS verifiziert ist (bis zu 72h), wird die E-Mail automatisch gesendet.",
+  },
+};
+
 const EmailsTab: React.FC = () => {
+  const { lang } = useLanguage();
+  const s = STR[lang];
+
   const [view, setView] = useState<"history" | "compose" | "inbox">("history");
   const [logs, setLogs] = useState<LogRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
 
-  // Composer
   const [to, setTo] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
@@ -41,9 +99,8 @@ const EmailsTab: React.FC = () => {
       .order("created_at", { ascending: false })
       .limit(500);
     if (error) {
-      toast.error("Erreur de chargement");
+      toast.error(s.loadError);
     } else {
-      // Deduplicate by message_id (keep most recent)
       const seen = new Set<string>();
       const dedup: LogRow[] = [];
       for (const row of (data as LogRow[]) || []) {
@@ -78,7 +135,7 @@ const EmailsTab: React.FC = () => {
 
   const handleSend = async () => {
     if (!to || !subject || !message) {
-      toast.error("Remplis tous les champs");
+      toast.error(s.fillAll);
       return;
     }
     setSending(true);
@@ -92,26 +149,26 @@ const EmailsTab: React.FC = () => {
     });
     setSending(false);
     if (error) {
-      toast.error(`Échec: ${error.message}`);
+      toast.error(`${s.sendFailed}: ${error.message}`);
     } else {
-      toast.success("Email envoyé · en file d'attente");
+      toast.success(s.queued);
       setTo(""); setSubject(""); setMessage("");
       setTimeout(loadLogs, 1500);
     }
   };
 
-  const statusColor = (s: string) => {
-    if (s === "sent") return "bg-green-500/15 text-green-500 border-green-500/30";
-    if (s === "pending") return "bg-yellow-500/15 text-yellow-500 border-yellow-500/30";
-    if (["dlq", "failed", "bounced", "complained"].includes(s)) return "bg-red-500/15 text-red-500 border-red-500/30";
-    if (s === "suppressed") return "bg-orange-500/15 text-orange-500 border-orange-500/30";
+  const statusColor = (st: string) => {
+    if (st === "sent") return "bg-green-500/15 text-green-500 border-green-500/30";
+    if (st === "pending") return "bg-yellow-500/15 text-yellow-500 border-yellow-500/30";
+    if (["dlq", "failed", "bounced", "complained"].includes(st)) return "bg-red-500/15 text-red-500 border-red-500/30";
+    if (st === "suppressed") return "bg-orange-500/15 text-orange-500 border-orange-500/30";
     return "bg-muted text-muted-foreground";
   };
 
   return (
     <div className="px-5 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold flex items-center gap-2"><Mail className="text-copper" size={20} /> Emails</h2>
+        <h2 className="text-xl font-bold flex items-center gap-2"><Mail className="text-copper" size={20} /> {s.title}</h2>
         <Button variant="ghost" size="sm" onClick={loadLogs} disabled={loading}>
           <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
         </Button>
@@ -119,39 +176,38 @@ const EmailsTab: React.FC = () => {
 
       <Tabs value={view} onValueChange={(v) => setView(v as any)}>
         <TabsList className="grid grid-cols-3 w-full">
-          <TabsTrigger value="history">Historique</TabsTrigger>
-          <TabsTrigger value="compose">Composer</TabsTrigger>
-          <TabsTrigger value="inbox">Réception</TabsTrigger>
+          <TabsTrigger value="history">{s.tabs.history}</TabsTrigger>
+          <TabsTrigger value="compose">{s.tabs.compose}</TabsTrigger>
+          <TabsTrigger value="inbox">{s.tabs.inbox}</TabsTrigger>
         </TabsList>
 
-        {/* HISTORY */}
         <TabsContent value="history" className="space-y-3 mt-4">
           <div className="grid grid-cols-4 gap-2">
-            <StatCard label="Total" value={stats.total} />
-            <StatCard label="Envoyés" value={stats.sent} accent="text-green-500" />
-            <StatCard label="En file" value={stats.pending} accent="text-yellow-500" />
-            <StatCard label="Échecs" value={stats.failed} accent="text-red-500" />
+            <StatCard label={s.stats.total} value={stats.total} />
+            <StatCard label={s.stats.sent} value={stats.sent} accent="text-green-500" />
+            <StatCard label={s.stats.pending} value={stats.pending} accent="text-yellow-500" />
+            <StatCard label={s.stats.failed} value={stats.failed} accent="text-red-500" />
           </div>
 
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Rechercher email ou template..." value={search} onChange={e => setSearch(e.target.value)} className="pl-8" />
+              <Input placeholder={s.searchPlaceholder} value={search} onChange={e => setSearch(e.target.value)} className="pl-8" />
             </div>
             <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
               className="bg-background border border-border rounded-md px-2 text-sm">
-              <option value="all">Tous</option>
-              <option value="sent">Envoyés</option>
-              <option value="pending">En file</option>
-              <option value="dlq">Échecs</option>
-              <option value="suppressed">Supprimés</option>
+              <option value="all">{s.statusAll}</option>
+              <option value="sent">{s.statusSent}</option>
+              <option value="pending">{s.statusPending}</option>
+              <option value="dlq">{s.statusDlq}</option>
+              <option value="suppressed">{s.statusSuppressed}</option>
             </select>
           </div>
 
           <div className="space-y-2">
             {filtered.length === 0 && (
               <div className="text-center py-8 text-muted-foreground text-sm">
-                {loading ? "Chargement..." : "Aucun email"}
+                {loading ? s.loading : s.empty}
               </div>
             )}
             {filtered.map(log => (
@@ -179,36 +235,32 @@ const EmailsTab: React.FC = () => {
           </div>
         </TabsContent>
 
-        {/* COMPOSE */}
         <TabsContent value="compose" className="space-y-3 mt-4">
           <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
             <div>
-              <label className="text-xs text-muted-foreground">De</label>
+              <label className="text-xs text-muted-foreground">{s.from}</label>
               <Input value="hello@sitdownvienna.app" disabled />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground">À</label>
+              <label className="text-xs text-muted-foreground">{s.to}</label>
               <Input type="email" placeholder="client@example.com" value={to} onChange={e => setTo(e.target.value)} />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground">Sujet</label>
-              <Input placeholder="Sujet de l'email" value={subject} onChange={e => setSubject(e.target.value)} />
+              <label className="text-xs text-muted-foreground">{s.subject}</label>
+              <Input placeholder={s.subjectPh} value={subject} onChange={e => setSubject(e.target.value)} />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground">Message</label>
-              <Textarea rows={8} placeholder="Tape ton message ici..." value={message} onChange={e => setMessage(e.target.value)} />
+              <label className="text-xs text-muted-foreground">{s.message}</label>
+              <Textarea rows={8} placeholder={s.messagePh} value={message} onChange={e => setMessage(e.target.value)} />
             </div>
             <Button onClick={handleSend} disabled={sending} className="w-full bg-copper hover:bg-copper/90">
               <Send size={16} className="mr-2" />
-              {sending ? "Envoi..." : "Envoyer"}
+              {sending ? s.sending : s.send}
             </Button>
-            <p className="text-xs text-muted-foreground">
-              · Une fois le DNS vérifié (jusqu'à 72h), l'email partira automatiquement.
-            </p>
+            <p className="text-xs text-muted-foreground">{s.dnsHint}</p>
           </div>
         </TabsContent>
 
-        {/* INBOX */}
         <TabsContent value="inbox" className="mt-4">
           <InboxView />
         </TabsContent>
