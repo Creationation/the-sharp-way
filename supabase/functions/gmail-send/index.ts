@@ -76,26 +76,56 @@ serve(async (req) => {
         .insert({ email: recipientEmail, token: unsubscribeToken });
     }
 
-    await sendLovableEmail(
-      {
-        to: cleanHeader(body.to),
-        from: cleanHeader(body.from || DEFAULT_FROM),
-        sender_domain: SENDER_DOMAIN,
-        subject: cleanHeader(body.subject),
-        html: `<div style="white-space:pre-wrap;font-family:Arial,sans-serif;font-size:14px;line-height:1.5">${escapeHtml(text)}</div>`,
-        text,
-        purpose: "transactional",
-        label: "admin-reply",
-        idempotency_key: crypto.randomUUID(),
-        unsubscribe_token: unsubscribeToken,
-      },
-      { apiKey },
-    );
+    const messageId = crypto.randomUUID();
+    const templateLabel = body.threadId ? "admin-reply" : "manual-message";
 
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    // Log "pending" so the Verlauf tab shows the email immediately
+    await supabase.from("email_send_log").insert({
+      message_id: messageId,
+      template_name: templateLabel,
+      recipient_email: recipientEmail,
+      status: "pending",
     });
+
+    try {
+      await sendLovableEmail(
+        {
+          to: cleanHeader(body.to),
+          from: cleanHeader(body.from || DEFAULT_FROM),
+          sender_domain: SENDER_DOMAIN,
+          subject: cleanHeader(body.subject),
+          html: `<div style="white-space:pre-wrap;font-family:Arial,sans-serif;font-size:14px;line-height:1.5">${escapeHtml(text)}</div>`,
+          text,
+          purpose: "transactional",
+          label: templateLabel,
+          idempotency_key: messageId,
+          unsubscribe_token: unsubscribeToken,
+        },
+        { apiKey },
+      );
+
+      await supabase.from("email_send_log").insert({
+        message_id: messageId,
+        template_name: templateLabel,
+        recipient_email: recipientEmail,
+        status: "sent",
+      });
+
+      return new Response(JSON.stringify({ success: true, messageId }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    } catch (sendErr) {
+      const errMsg = sendErr instanceof Error ? sendErr.message : "Unknown send error";
+      await supabase.from("email_send_log").insert({
+        message_id: messageId,
+        template_name: templateLabel,
+        recipient_email: recipientEmail,
+        status: "failed",
+        error_message: errMsg.slice(0, 500),
+      });
+      throw sendErr;
+    }
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     return new Response(JSON.stringify({ error: msg }), {
