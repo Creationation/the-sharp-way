@@ -181,7 +181,7 @@ const EmailsTab: React.FC = () => {
         </TabsList>
 
         <TabsContent value="history" className="space-y-3 mt-4">
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <StatCard label={s.stats.total} value={stats.total} />
             <StatCard label={s.stats.sent} value={stats.sent} accent="text-green-500" />
             <StatCard label={s.stats.pending} value={stats.pending} accent="text-yellow-500" />
