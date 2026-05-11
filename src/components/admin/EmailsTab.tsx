@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import InboxView from "./InboxView";
 
 interface LogRow {
   id: string;
@@ -209,26 +210,7 @@ const EmailsTab: React.FC = () => {
 
         {/* INBOX */}
         <TabsContent value="inbox" className="mt-4">
-          <div className="bg-card border border-border rounded-2xl p-6 text-center space-y-3">
-            <Inbox className="mx-auto text-copper" size={36} />
-            <h3 className="font-bold">Boîte de réception</h3>
-            <p className="text-sm text-muted-foreground">
-              Lovable Emails ne stocke que les envois. Pour <strong>recevoir</strong> les réponses sur
-              <code className="mx-1 px-1.5 py-0.5 bg-muted rounded text-xs">hello@sitdownvienna.app</code>
-              (ou les emails Stripe), il faut configurer un transfert vers une adresse Gmail.
-            </p>
-            <div className="text-xs text-left bg-muted/50 rounded-xl p-3 space-y-2">
-              <p><strong>Étapes :</strong></p>
-              <ol className="list-decimal pl-5 space-y-1 text-muted-foreground">
-                <li>Crée un compte Gmail gratuit (ex: <code>sitdownvienna@gmail.com</code>)</li>
-                <li>Une fois le DNS du domaine d'envoi propagé, configure un MX + forwarding sur <code>hello@sitdownvienna.app</code></li>
-                <li>Utilise Stripe avec <code>hello@sitdownvienna.app</code> · les notifications arriveront sur ton Gmail</li>
-              </ol>
-              <p className="text-muted-foreground pt-1">
-                Demande-moi quand tu es prêt et je te guide étape par étape.
-              </p>
-            </div>
-          </div>
+          <InboxView />
         </TabsContent>
       </Tabs>
     </div>
