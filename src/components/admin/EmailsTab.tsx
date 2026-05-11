@@ -143,7 +143,7 @@ const EmailsTab: React.FC = () => {
       body: {
         to,
         subject,
-        body: message.replace(/\n/g, "<br>"),
+        body: message,
       },
     });
     setSending(false);
