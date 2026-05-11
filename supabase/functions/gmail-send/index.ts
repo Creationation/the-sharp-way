@@ -54,6 +54,28 @@ serve(async (req) => {
     }
 
     const text = body.body.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+    // Get or create unsubscribe token for this recipient (required by Lovable Email API)
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+    const recipientEmail = cleanHeader(body.to).toLowerCase();
+    let unsubscribeToken: string;
+    const { data: existing } = await supabase
+      .from("email_unsubscribe_tokens")
+      .select("token")
+      .eq("email", recipientEmail)
+      .maybeSingle();
+    if (existing?.token) {
+      unsubscribeToken = existing.token;
+    } else {
+      unsubscribeToken = crypto.randomUUID();
+      await supabase
+        .from("email_unsubscribe_tokens")
+        .insert({ email: recipientEmail, token: unsubscribeToken });
+    }
+
     await sendLovableEmail(
       {
         to: cleanHeader(body.to),
@@ -65,6 +87,7 @@ serve(async (req) => {
         purpose: "transactional",
         label: "admin-reply",
         idempotency_key: crypto.randomUUID(),
+        unsubscribe_token: unsubscribeToken,
       },
       { apiKey },
     );
