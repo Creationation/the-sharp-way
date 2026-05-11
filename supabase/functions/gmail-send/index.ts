@@ -1,8 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { sendLovableEmail } from "npm:@lovable.dev/email-js";
 import {
   corsHeaders,
-  GATEWAY_BASE,
-  gatewayHeaders,
   requireAdmin,
 } from "../_shared/gmail-auth.ts";
 
@@ -19,39 +18,19 @@ interface SendBody {
 }
 
 const DEFAULT_FROM = "Sitdown Vienna <hello@sitdownvienna.app>";
-
-function utf8ToB64(str: string): string {
-  const bytes = new TextEncoder().encode(str);
-  let bin = "";
-  for (const b of bytes) bin += String.fromCharCode(b);
-  return btoa(bin);
-}
-
-function b64UrlEncode(input: string): string {
-  return utf8ToB64(input).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
+const SENDER_DOMAIN = "notify.sitdownvienna.app";
 
 function cleanHeader(value: string): string {
   return value.replace(/[\r\n]+/g, " ").trim();
 }
 
-function buildRaw(body: SendBody): string {
-  const text = body.body.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-  const lines = [
-    `From: ${cleanHeader(body.from || DEFAULT_FROM)}`,
-    `To: ${cleanHeader(body.to)}`,
-    body.cc ? `Cc: ${cleanHeader(body.cc)}` : null,
-    body.bcc ? `Bcc: ${cleanHeader(body.bcc)}` : null,
-    `Subject: =?UTF-8?B?${utf8ToB64(cleanHeader(body.subject))}?=`,
-    body.inReplyTo ? `In-Reply-To: ${cleanHeader(body.inReplyTo)}` : null,
-    body.references ? `References: ${cleanHeader(body.references)}` : null,
-    "MIME-Version: 1.0",
-    'Content-Type: text/plain; charset="UTF-8"',
-    "Content-Transfer-Encoding: 8bit",
-    "",
-    text,
-  ].filter(Boolean);
-  return lines.join("\r\n");
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 serve(async (req) => {
