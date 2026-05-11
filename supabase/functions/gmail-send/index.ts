@@ -42,7 +42,7 @@ function buildRaw(body: SendBody): string {
     body.inReplyTo ? `In-Reply-To: ${body.inReplyTo}` : null,
     body.references ? `References: ${body.references}` : null,
     "MIME-Version: 1.0",
-    'Content-Type: text/html; charset="UTF-8"',
+    'Content-Type: text/plain; charset="UTF-8"',
     "Content-Transfer-Encoding: base64",
     "",
     encodedBody,

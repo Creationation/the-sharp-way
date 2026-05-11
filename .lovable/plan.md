@@ -1,48 +1,36 @@
-## Problèmes identifiés
+## Objectif
 
-**1. Erreur "Failed to send a request to the Edge Function"**
-Logs `gmail-list` :
-```
-TypeError: supabase.auth.getClaims is not a function
-  at requireAdmin (_shared/gmail-auth.ts:33)
-```
-La méthode `auth.getClaims()` n'existe pas sur la version du SDK utilisée. Il faut la remplacer par `auth.getUser(token)` qui retourne `{ data: { user: { id } } }`.
+Simplifier le bouton « Répondre » de l'inbox admin pour qu'il envoie simplement le texte saisi. Pas de threading complexe, pas de conversion HTML, pas d'alias. Juste : je tape → ça part.
 
-**2. Tout l'admin Emails est en français**
-Le projet est strictement bilingue **EN/DE** (mémoire core). Il faut router toutes les chaînes via `LanguageContext` (`t()`).
+## Constat
 
----
+Actuellement, la réponse passe par `gmail-send` avec :
+- conversion `\n` → `<br>` + Content-Type `text/html`
+- headers `In-Reply-To`, `References`, `threadId`
+- encodage base64 du body
 
-## Plan
+L'un de ces éléments fait que l'email arrive vide côté destinataire.
 
-### A. Fix edge function auth (1 fichier)
-- `supabase/functions/_shared/gmail-auth.ts` :
-  - Remplacer `supabase.auth.getClaims(token)` par `supabase.auth.getUser(token)`
-  - Récupérer `userId` depuis `data.user.id`
-- Redéployer les 4 fonctions : `gmail-list`, `gmail-get`, `gmail-modify`, `gmail-send`
+## Changements (minimaux)
 
-### B. Traduire l'UI admin Emails en EN/DE
-Ajouter les clés de traduction dans `src/lib/translations.ts` (sections `en` + `de`), puis remplacer toutes les chaînes FR codées en dur par `t('admin.emails.xxx')` dans :
+### 1. `supabase/functions/gmail-send/index.ts`
+- Repasser en `Content-Type: text/plain; charset="UTF-8"`.
+- Garder l'encodage base64 du body (nécessaire pour les accents).
+- Garder `From`, `To`, `Subject`, `threadId` optionnel.
+- Retirer `In-Reply-To` / `References` du build par défaut (ils seront optionnels mais non utilisés depuis le client pour éviter les soucis de format).
 
-- `src/components/admin/EmailsTab.tsx` (onglets : Historique / Composer / Réception, sous-titres)
-- `src/components/admin/InboxView.tsx` :
-  - Filtres : Tous / Non lus / Stripe / Clients → All / Unread / Stripe / Clients (DE: Alle / Ungelesen / Stripe / Kunden)
-  - Placeholder "Rechercher..." → Search / Suchen
-  - Boutons : Retour, Répondre, Annuler, Envoyer
-  - États : Chargement, Aucun email, Erreur, (sans sujet)
-  - Toasts : Archivé, Supprimé, Réponse envoyée, Échec d'envoi
-  - Reply : "À ·", placeholder "Ta réponse..."
-  - Préfixe sujet "Re:" reste tel quel (standard email)
-- Locale `date-fns` : utiliser `enUS` ou `de` selon `language` du `LanguageContext` au lieu de `fr`
+### 2. `src/components/admin/InboxView.tsx` — `handleReply`
+- Envoyer `replyBody` brut (pas de `.replace(/\n/g, "<br>")`).
+- Ne plus envoyer `inReplyTo` / `references` — uniquement `threadId` pour que Gmail garde la conversation groupée.
+- Garder le sujet `Re: ...`.
 
-### C. Vérification
-- Redéployer les edge functions
-- Tester la Réception en EN puis switch DE pour valider l'affichage
+### 3. Redéploiement
+- Redéployer `gmail-send` après modification.
 
----
+## Validation
+1. Ouvrir une conversation dans l'admin.
+2. Cliquer Répondre, taper un message court avec accents et saut de ligne.
+3. Vérifier dans la boîte du destinataire que le texte arrive bien (pas vide).
+4. Vérifier dans Gmail que la réponse est groupée dans le même thread.
 
-## Notes techniques
-- Aucun changement de schéma DB
-- Aucun secret à ajouter
-- Pas de modif Stripe ni ImprovMX (déjà OK)
-- Le contenu des emails reçus reste dans leur langue d'origine — seule l'UI est traduite
+Si après ça tu préfères toujours répondre depuis Gmail directement, on pourra simplement masquer le bouton Répondre.
