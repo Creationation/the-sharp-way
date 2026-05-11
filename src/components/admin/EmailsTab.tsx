@@ -34,7 +34,7 @@ const EmailsTab: React.FC = () => {
 
   const loadLogs = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from("email_send_log")
       .select("*")
       .order("created_at", { ascending: false })
