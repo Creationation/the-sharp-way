@@ -256,7 +256,7 @@ const EmailsTab: React.FC = () => {
               <Send size={16} className="mr-2" />
               {sending ? s.sending : s.send}
             </Button>
-            <p className="text-xs text-muted-foreground">{s.dnsHint}</p>
+            <p className="text-xs text-muted-foreground">{lang === "de" ? "· Wird sofort über Gmail gesendet." : "· Sent immediately through Gmail."}</p>
           </div>
         </TabsContent>
 
