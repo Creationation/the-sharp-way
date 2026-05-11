@@ -40,6 +40,9 @@ serve(async (req) => {
   if (!auth.ok) return auth.response;
 
   try {
+    const apiKey = Deno.env.get("LOVABLE_API_KEY");
+    if (!apiKey) throw new Error("LOVABLE_API_KEY not configured");
+
     const body: SendBody = await req.json();
     body.body = body.body?.trim() ?? "";
     if (!body.to || !body.subject || !body.body) {
@@ -49,25 +52,23 @@ serve(async (req) => {
       });
     }
 
-    const raw = b64UrlEncode(buildRaw(body));
-    const payload: Record<string, unknown> = { raw };
-    if (body.threadId) payload.threadId = body.threadId;
+    const text = body.body.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+    await sendLovableEmail(
+      {
+        to: cleanHeader(body.to),
+        from: cleanHeader(body.from || DEFAULT_FROM),
+        sender_domain: SENDER_DOMAIN,
+        subject: cleanHeader(body.subject),
+        html: `<div style="white-space:pre-wrap;font-family:Arial,sans-serif;font-size:14px;line-height:1.5">${escapeHtml(text)}</div>`,
+        text,
+        purpose: "transactional",
+        label: "admin-reply",
+        idempotency_key: crypto.randomUUID(),
+      },
+      { apiKey },
+    );
 
-    const headers = gatewayHeaders();
-    const r = await fetch(`${GATEWAY_BASE}/users/me/messages/send`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(payload),
-    });
-    if (!r.ok) {
-      const t = await r.text();
-      return new Response(JSON.stringify({ error: `Gmail send failed [${r.status}]: ${t}` }), {
-        status: r.status,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-    const data = await r.json();
-    return new Response(JSON.stringify({ success: true, id: data.id, threadId: data.threadId }), {
+    return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
