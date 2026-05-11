@@ -97,6 +97,8 @@ const STR = {
   },
 };
 
+const OUTBOUND_FROM = "Sitdown Vienna <hello@sitdownvienna.app>";
+
 const parseFromName = (from: string) => {
   const match = from.match(/^"?([^"<]+?)"?\s*<(.+)>$/);
   if (match) return { name: match[1].trim(), email: match[2].trim() };
@@ -231,10 +233,25 @@ const InboxView: React.FC = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       toast.success(s.replySent);
+      const now = new Date();
+      const optimisticMessage: ThreadMessage = {
+        ...last,
+        id: data?.id ?? `local-${now.getTime()}`,
+        from: OUTBOUND_FROM,
+        to: email,
+        date: now.toUTCString(),
+        internalDate: String(now.getTime()),
+        labelIds: ["SENT"],
+        unread: false,
+        fromMe: true,
+        snippet: replyBody.trim(),
+        html: "",
+        text: replyBody.trim(),
+      };
+      setThread((prev) => (prev ? [...prev, optimisticMessage] : prev));
+      setExpandedMsgId(optimisticMessage.id);
       setReplyOpen(false);
       setReplyBody("");
-      // reload thread to show the just-sent reply
-      await openThread({ ...last } as any);
     } catch (e: any) {
       toast.error(e.message ?? s.sendFailed);
     } finally {
