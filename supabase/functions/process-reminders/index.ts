@@ -202,7 +202,7 @@ serve(async (req) => {
 
     // 7d reminder
     if (settings.reminder_7d && !booking.reminder_sent_7d && diffHours >= 156 && diffHours <= 180) {
-      const { subject, html } = buildReminderEmail(name, booking.service_name, booking.barber_name, dateDE, dateEN, booking.booking_time, "7d");
+      const { subject, html } = buildReminderEmail(name, booking.service_name, booking.barber_name, dateDE, dateEN, booking.booking_time, "7d", profile.language);
       const ok = await sendEmail(email, subject, html);
       if (ok) {
         await supabase.from("bookings").update({ reminder_sent_7d: true }).eq("id", booking.id);
@@ -212,7 +212,7 @@ serve(async (req) => {
 
     // 24h reminder
     if (settings.reminder_24h && !booking.reminder_sent_24h && diffHours >= 23 && diffHours <= 25) {
-      const { subject, html } = buildReminderEmail(name, booking.service_name, booking.barber_name, dateDE, dateEN, booking.booking_time, "24h");
+      const { subject, html } = buildReminderEmail(name, booking.service_name, booking.barber_name, dateDE, dateEN, booking.booking_time, "24h", profile.language);
       const ok = await sendEmail(email, subject, html);
       if (ok) {
         await supabase.from("bookings").update({ reminder_sent_24h: true }).eq("id", booking.id);
@@ -222,7 +222,7 @@ serve(async (req) => {
 
     // 5h reminder
     if (settings.reminder_5h && !booking.reminder_sent_5h && diffHours >= 4.5 && diffHours <= 5.5) {
-      const { subject, html } = buildReminderEmail(name, booking.service_name, booking.barber_name, dateDE, dateEN, booking.booking_time, "5h");
+      const { subject, html } = buildReminderEmail(name, booking.service_name, booking.barber_name, dateDE, dateEN, booking.booking_time, "5h", profile.language);
       const ok = await sendEmail(email, subject, html);
       if (ok) {
         await supabase.from("bookings").update({ reminder_sent_5h: true }).eq("id", booking.id);
@@ -232,7 +232,7 @@ serve(async (req) => {
 
     // 2h reminder
     if (settings.reminder_2h && !booking.reminder_sent_2h && diffHours >= 1.5 && diffHours <= 2.5) {
-      const { subject, html } = buildReminderEmail(name, booking.service_name, booking.barber_name, dateDE, dateEN, booking.booking_time, "2h");
+      const { subject, html } = buildReminderEmail(name, booking.service_name, booking.barber_name, dateDE, dateEN, booking.booking_time, "2h", profile.language);
       const ok = await sendEmail(email, subject, html);
       if (ok) {
         await supabase.from("bookings").update({ reminder_sent_2h: true }).eq("id", booking.id);
