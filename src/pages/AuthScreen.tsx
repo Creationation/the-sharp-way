@@ -34,11 +34,15 @@ const AuthScreen = () => {
         toast.success(t.auth.resetLinkSent);
         setMode("login");
       } else if (mode === "signup") {
+        const phoneTrim = form.phone.trim();
+        if (phoneTrim.length < 6) {
+          throw new Error(t.auth.errorDefault);
+        }
         const { error } = await supabase.auth.signUp({
           email: form.email,
           password: form.password,
           options: {
-            data: { full_name: form.fullName },
+            data: { full_name: form.fullName, phone: phoneTrim },
             emailRedirectTo: window.location.origin,
           },
         });
