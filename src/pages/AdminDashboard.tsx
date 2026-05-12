@@ -24,6 +24,7 @@ import StatsTab from "@/components/admin/StatsTab";
 import ServicesTab from "@/components/admin/ServicesTab";
 import GalleryTab from "@/components/admin/GalleryTab";
 import EmailsTab from "@/components/admin/EmailsTab";
+import AdminsTab from "@/components/admin/AdminsTab";
 import { useBarbers } from "@/hooks/useBarbers";
 import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
 
