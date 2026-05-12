@@ -99,6 +99,24 @@ const AuthScreen = () => {
             </div>
           )}
 
+          {mode === "signup" && (
+            <div className="relative">
+              <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                name="phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                value={form.phone}
+                onChange={handleChange}
+                required
+                minLength={6}
+                placeholder={t.auth.phone}
+                className="w-full bg-surface border border-border rounded-xl pl-12 pr-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper transition-colors"
+              />
+            </div>
+          )}
+
           <div className="relative">
             <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
