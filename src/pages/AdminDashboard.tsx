@@ -3,7 +3,7 @@ import {
   ArrowLeft, Calendar as CalendarIcon, Clock, User, Trash2, XCircle,
   CheckCircle, ChevronLeft, ChevronRight, ToggleLeft, ToggleRight, Save,
   Menu, X, Tag, Scissors, Bell, LayoutGrid, BarChart3, Mail, Shield,
-  Search, Download, RotateCcw,
+  Search, Download, RotateCcw, BookOpen,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +25,7 @@ import ServicesTab from "@/components/admin/ServicesTab";
 import GalleryTab from "@/components/admin/GalleryTab";
 import EmailsTab from "@/components/admin/EmailsTab";
 import AdminsTab from "@/components/admin/AdminsTab";
+import ManualTab from "@/components/admin/ManualTab";
 import { useBarbers } from "@/hooks/useBarbers";
 import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
 
@@ -68,13 +69,14 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  type TabId = "bookings" | "schedule" | "stats" | "availability" | "users" | "promotions" | "barbers" | "services" | "gallery" | "codes" | "notifications" | "emails" | "admins";
+  type TabId = "manual" | "bookings" | "schedule" | "stats" | "availability" | "users" | "promotions" | "barbers" | "services" | "gallery" | "codes" | "notifications" | "emails" | "admins";
   const [tab, setTab] = useState<TabId>("bookings");
   const [menuOpen, setMenuOpen] = useState(false);
   const { barbers: dbBarbers } = useBarbers();
   const barberNames = dbBarbers.map(b => b.name);
 
   const ADMIN_TABS: { id: TabId; label: string; Icon: React.ElementType }[] = [
+    { id: "manual",        label: lang === "de" ? "Handbuch" : "Manual",           Icon: BookOpen      },
     { id: "bookings",      label: t.admin.bookings,                                 Icon: CalendarIcon  },
     { id: "schedule",      label: t.admin.scheduleTab.title,                        Icon: LayoutGrid    },
     { id: "stats",         label: t.admin.statsTab.title,                           Icon: BarChart3     },
@@ -834,6 +836,9 @@ const AdminDashboard = () => {
 
       {/* ═══════════════════ ADMINS TAB ═══════════════════ */}
       {tab === "admins" && <AdminsTab />}
+
+      {/* ═══════════════════ MANUAL TAB ═══════════════════ */}
+      {tab === "manual" && <ManualTab />}
     </div>
   );
 };
