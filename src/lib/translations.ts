@@ -894,6 +894,7 @@ const en: Translations = {
     welcomeBack: "Welcome back.",
     joinCommunity: "Join the community.",
     fullName: "Full Name",
+    phone: "Phone Number",
     email: "Email",
     password: "Password",
     loading: "Loading...",
