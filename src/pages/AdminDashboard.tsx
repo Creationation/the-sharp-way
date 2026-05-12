@@ -87,6 +87,7 @@ const AdminDashboard = () => {
     { id: "codes",         label: t.admin.promoCodesTab.title,                      Icon: Tag       },
     { id: "notifications", label: t.admin.notificationsTab.title,                   Icon: Bell      },
     { id: "emails",        label: "Emails",                                         Icon: Mail      },
+    { id: "admins",        label: lang === "de" ? "Admins" : "Admins",              Icon: Shield    },
   ];
 
   // — Bookings tab state —
