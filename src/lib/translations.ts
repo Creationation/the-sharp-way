@@ -1357,6 +1357,7 @@ const de: Translations = {
     welcomeBack: "Willkommen zurück.",
     joinCommunity: "Werde Teil der Community.",
     fullName: "Vollständiger Name",
+    phone: "Telefonnummer",
     email: "E-Mail",
     password: "Passwort",
     loading: "Laden...",
