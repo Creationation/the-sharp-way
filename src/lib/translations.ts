@@ -431,6 +431,7 @@ export interface Translations {
     welcomeBack: string;
     joinCommunity: string;
     fullName: string;
+    phone: string;
     email: string;
     password: string;
     loading: string;
