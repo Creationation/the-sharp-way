@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
   ArrowLeft, Calendar as CalendarIcon, Clock, User, Trash2, XCircle,
   CheckCircle, ChevronLeft, ChevronRight, ToggleLeft, ToggleRight, Save,
-  Menu, X, Tag, Scissors, Bell, LayoutGrid, BarChart3, Mail,
+  Menu, X, Tag, Scissors, Bell, LayoutGrid, BarChart3, Mail, Shield,
   Search, Download, RotateCcw,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +24,7 @@ import StatsTab from "@/components/admin/StatsTab";
 import ServicesTab from "@/components/admin/ServicesTab";
 import GalleryTab from "@/components/admin/GalleryTab";
 import EmailsTab from "@/components/admin/EmailsTab";
+import AdminsTab from "@/components/admin/AdminsTab";
 import { useBarbers } from "@/hooks/useBarbers";
 import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
 
@@ -67,7 +68,7 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  type TabId = "bookings" | "schedule" | "stats" | "availability" | "users" | "promotions" | "barbers" | "services" | "gallery" | "codes" | "notifications" | "emails";
+  type TabId = "bookings" | "schedule" | "stats" | "availability" | "users" | "promotions" | "barbers" | "services" | "gallery" | "codes" | "notifications" | "emails" | "admins";
   const [tab, setTab] = useState<TabId>("bookings");
   const [menuOpen, setMenuOpen] = useState(false);
   const { barbers: dbBarbers } = useBarbers();
@@ -86,6 +87,7 @@ const AdminDashboard = () => {
     { id: "codes",         label: t.admin.promoCodesTab.title,                      Icon: Tag       },
     { id: "notifications", label: t.admin.notificationsTab.title,                   Icon: Bell      },
     { id: "emails",        label: "Emails",                                         Icon: Mail      },
+    { id: "admins",        label: lang === "de" ? "Admins" : "Admins",              Icon: Shield    },
   ];
 
   // — Bookings tab state —
@@ -829,6 +831,9 @@ const AdminDashboard = () => {
 
       {/* ═══════════════════ EMAILS TAB ═══════════════════ */}
       {tab === "emails" && <EmailsTab />}
+
+      {/* ═══════════════════ ADMINS TAB ═══════════════════ */}
+      {tab === "admins" && <AdminsTab />}
     </div>
   );
 };
