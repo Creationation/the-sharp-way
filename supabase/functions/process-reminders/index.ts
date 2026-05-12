@@ -153,14 +153,18 @@ serve(async (req) => {
   }
 
   const userIds = Array.from(new Set((bookings as Booking[]).map(b => b.user_id).filter(Boolean)));
-  const profilesById: Record<string, { email: string | null; full_name: string | null }> = {};
+  const profilesById: Record<string, { email: string | null; full_name: string | null; language: "de" | "en" }> = {};
   if (userIds.length > 0) {
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("user_id, email, full_name")
+      .select("user_id, email, full_name, language")
       .in("user_id", userIds);
     for (const p of profiles || []) {
-      profilesById[p.user_id] = { email: p.email, full_name: p.full_name };
+      profilesById[p.user_id] = {
+        email: p.email,
+        full_name: p.full_name,
+        language: (p.language === "en" ? "en" : "de"),
+      };
     }
   }
 
