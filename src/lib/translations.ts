@@ -431,6 +431,7 @@ export interface Translations {
     welcomeBack: string;
     joinCommunity: string;
     fullName: string;
+    phone: string;
     email: string;
     password: string;
     loading: string;
@@ -893,6 +894,7 @@ const en: Translations = {
     welcomeBack: "Welcome back.",
     joinCommunity: "Join the community.",
     fullName: "Full Name",
+    phone: "Phone Number",
     email: "Email",
     password: "Password",
     loading: "Loading...",
@@ -1355,6 +1357,7 @@ const de: Translations = {
     welcomeBack: "Willkommen zurück.",
     joinCommunity: "Werde Teil der Community.",
     fullName: "Vollständiger Name",
+    phone: "Telefonnummer",
     email: "E-Mail",
     password: "Passwort",
     loading: "Laden...",

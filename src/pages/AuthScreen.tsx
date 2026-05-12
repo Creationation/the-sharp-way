@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Mail, Lock, User, Phone, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -11,7 +11,7 @@ const AuthScreen = () => {
   const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "", fullName: "" });
+  const [form, setForm] = useState({ email: "", password: "", fullName: "", phone: "" });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -34,11 +34,15 @@ const AuthScreen = () => {
         toast.success(t.auth.resetLinkSent);
         setMode("login");
       } else if (mode === "signup") {
+        const phoneTrim = form.phone.trim();
+        if (phoneTrim.length < 6) {
+          throw new Error(t.auth.errorDefault);
+        }
         const { error } = await supabase.auth.signUp({
           email: form.email,
           password: form.password,
           options: {
-            data: { full_name: form.fullName },
+            data: { full_name: form.fullName, phone: phoneTrim },
             emailRedirectTo: window.location.origin,
           },
         });
@@ -90,6 +94,24 @@ const AuthScreen = () => {
                 onChange={handleChange}
                 required
                 placeholder={t.auth.fullName}
+                className="w-full bg-surface border border-border rounded-xl pl-12 pr-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper transition-colors"
+              />
+            </div>
+          )}
+
+          {mode === "signup" && (
+            <div className="relative">
+              <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                name="phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                value={form.phone}
+                onChange={handleChange}
+                required
+                minLength={6}
+                placeholder={t.auth.phone}
                 className="w-full bg-surface border border-border rounded-xl pl-12 pr-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper transition-colors"
               />
             </div>
