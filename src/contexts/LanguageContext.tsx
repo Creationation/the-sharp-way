@@ -31,7 +31,7 @@ async function loadLangFromProfile(userId: string, fallbackLang: Lang, onLang: (
     if (stored && stored !== fallbackLang) {
       localStorage.setItem("sitdown_lang", stored);
       onLang(stored);
-    } else {
+    } else if (!stored) {
       await syncLangToProfile(fallbackLang, userId);
     }
   } catch {
