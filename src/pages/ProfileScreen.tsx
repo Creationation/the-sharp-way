@@ -96,8 +96,9 @@ const ProfileScreen = () => {
   const past = bookings.filter(b => b.booking_date < today || b.status === "cancelled");
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate("/home");
+    try { await signOut(); } catch {}
+    // Hard reload to clear any cached state
+    window.location.href = "/home";
   };
 
   if (authLoading || !user) return null;
