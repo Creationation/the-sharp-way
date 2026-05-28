@@ -53,18 +53,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setAdminChecked(true);
       }
+    }).catch((err) => {
+      console.error("[useAuth] getSession failed", err);
+      setLoading(false);
+      setAdminChecked(true);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   const checkAdmin = async (userId: string) => {
-    const { data } = await supabase.rpc("has_role", {
-      _user_id: userId,
-      _role: "admin",
-    });
-    setIsAdmin(!!data);
-    setAdminChecked(true);
+    try {
+      const timeout = new Promise<{ data: null; error: Error }>((resolve) =>
+        setTimeout(() => resolve({ data: null, error: new Error("has_role timeout") }), 8000)
+      );
+      const rpcCall = supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+      const { data, error } = (await Promise.race([rpcCall, timeout])) as { data: boolean | null; error: unknown };
+      if (error) console.error("[useAuth] has_role error", error);
+      setIsAdmin(!!data);
+    } catch (err) {
+      console.error("[useAuth] checkAdmin failed", err);
+      setIsAdmin(false);
+    } finally {
+      setAdminChecked(true);
+    }
   };
 
   const signOut = async () => {
