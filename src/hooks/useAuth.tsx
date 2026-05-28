@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -27,10 +27,75 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminChecked, setAdminChecked] = useState(false);
 
+  const applySession = useCallback((nextSession: Session | null) => {
+    setSession(nextSession);
+    setUser(nextSession?.user ?? null);
+    if (!nextSession?.user) {
+      setIsAdmin(false);
+      setAdminChecked(true);
+    }
+  }, []);
+
+  const checkAdmin = useCallback(async (userId: string) => {
+    try {
+      const timeout = new Promise<{ data: null; error: Error }>((resolve) =>
+        setTimeout(() => resolve({ data: null, error: new Error("admin role check timeout") }), 5000)
+      );
+      const roleQuery = supabase
+        .from("user_roles")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .limit(1);
+      const { data, error } = (await Promise.race([roleQuery, timeout])) as { data: { id: string }[] | null; error: unknown };
+      if (error) console.error("[useAuth] admin role check error", error);
+      setIsAdmin(Array.isArray(data) && data.length > 0);
+    } catch (err) {
+      console.error("[useAuth] checkAdmin failed", err);
+      setIsAdmin(false);
+    } finally {
+      setAdminChecked(true);
+    }
+  }, []);
+
+  const restoreSession = useCallback(async (showLoading = false) => {
+    if (showLoading) setLoading(true);
+    try {
+      const sessionTimeout = new Promise<{ data: { session: null } }>((resolve) =>
+        setTimeout(() => resolve({ data: { session: null } }), 7000)
+      );
+      const { data: { session: storedSession } } = await Promise.race([
+        supabase.auth.getSession(),
+        sessionTimeout,
+      ]);
+
+      let activeSession = storedSession;
+      const expiresAt = activeSession?.expires_at ? activeSession.expires_at * 1000 : 0;
+      if (activeSession && expiresAt && expiresAt - Date.now() < 60000) {
+        const refreshTimeout = new Promise<{ data: { session: Session | null }; error: Error }>((resolve) =>
+          setTimeout(() => resolve({ data: { session: activeSession }, error: new Error("session refresh timeout") }), 7000)
+        );
+        const { data, error } = await Promise.race([supabase.auth.refreshSession(), refreshTimeout]);
+        if (error) console.error("[useAuth] refreshSession error", error);
+        activeSession = data.session ?? activeSession;
+      }
+
+      applySession(activeSession ?? null);
+      if (activeSession?.user) {
+        setAdminChecked(false);
+        setTimeout(() => checkAdmin(activeSession.user.id), 0);
+      }
+    } catch (err) {
+      console.error("[useAuth] restoreSession failed", err);
+      applySession(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [applySession, checkAdmin]);
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+      applySession(session);
       setLoading(false);
 
       if (session?.user) {
@@ -38,46 +103,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setTimeout(() => {
           checkAdmin(session.user.id);
         }, 0);
-      } else {
-        setIsAdmin(false);
-        setAdminChecked(true);
       }
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-      if (session?.user) {
-        checkAdmin(session.user.id);
-      } else {
-        setAdminChecked(true);
-      }
-    }).catch((err) => {
-      console.error("[useAuth] getSession failed", err);
-      setLoading(false);
-      setAdminChecked(true);
+    restoreSession(true);
+
+    const handleResume = () => restoreSession(false);
+    window.addEventListener("focus", handleResume);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") handleResume();
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const checkAdmin = async (userId: string) => {
-    try {
-      const timeout = new Promise<{ data: null; error: Error }>((resolve) =>
-        setTimeout(() => resolve({ data: null, error: new Error("has_role timeout") }), 8000)
-      );
-      const rpcCall = supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-      const { data, error } = (await Promise.race([rpcCall, timeout])) as { data: boolean | null; error: unknown };
-      if (error) console.error("[useAuth] has_role error", error);
-      setIsAdmin(!!data);
-    } catch (err) {
-      console.error("[useAuth] checkAdmin failed", err);
-      setIsAdmin(false);
-    } finally {
-      setAdminChecked(true);
-    }
-  };
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener("focus", handleResume);
+    };
+  }, [applySession, checkAdmin, restoreSession]);
 
   const signOut = async () => {
     try {
