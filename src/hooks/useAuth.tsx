@@ -53,6 +53,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setAdminChecked(true);
       }
+    }).catch((err) => {
+      console.error("[useAuth] getSession failed", err);
+      setLoading(false);
+      setAdminChecked(true);
     });
 
     return () => subscription.unsubscribe();
