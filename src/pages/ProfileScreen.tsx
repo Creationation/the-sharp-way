@@ -58,6 +58,7 @@ const ProfileScreen = () => {
       const query = supabase
         .from("bookings")
         .select("*")
+        .eq("user_id", user.id)
         .order("booking_date", { ascending: true });
       const { data, error } = (await Promise.race([query, timeout])) as { data: Booking[] | null; error: unknown };
       if (error) {
