@@ -50,12 +50,26 @@ const ProfileScreen = () => {
   }, [user, authLoading]);
 
   const fetchBookings = async () => {
-    const { data } = await supabase
-      .from("bookings")
-      .select("*")
-      .order("booking_date", { ascending: true });
-    setBookings((data as Booking[]) || []);
-    setLoading(false);
+    setLoading(true);
+    try {
+      const timeout = new Promise<{ data: null; error: Error }>((resolve) =>
+        setTimeout(() => resolve({ data: null, error: new Error("bookings fetch timeout") }), 10000)
+      );
+      const query = supabase
+        .from("bookings")
+        .select("*")
+        .order("booking_date", { ascending: true });
+      const { data, error } = (await Promise.race([query, timeout])) as { data: Booking[] | null; error: unknown };
+      if (error) {
+        console.error("[Profile] fetchBookings error", error);
+        toast.error(lang === "de" ? "Buchungen konnten nicht geladen werden" : "Could not load bookings");
+      }
+      setBookings((data as Booking[]) || []);
+    } catch (err) {
+      console.error("[Profile] fetchBookings exception", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const cancelBooking = async (id: string) => {
@@ -82,8 +96,9 @@ const ProfileScreen = () => {
   const past = bookings.filter(b => b.booking_date < today || b.status === "cancelled");
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate("/home");
+    try { await signOut(); } catch {}
+    // Hard reload to clear any cached state
+    window.location.href = "/home";
   };
 
   if (authLoading || !user) return null;

@@ -80,7 +80,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      const timeout = new Promise<void>((resolve) => setTimeout(resolve, 4000));
+      await Promise.race([supabase.auth.signOut(), timeout]);
+    } catch (err) {
+      console.error("[useAuth] signOut error", err);
+    }
+    try {
+      Object.keys(localStorage).forEach((k) => {
+        if (k.startsWith("sb-") || k.includes("supabase.auth")) localStorage.removeItem(k);
+      });
+    } catch {}
     setUser(null);
     setSession(null);
     setIsAdmin(false);
