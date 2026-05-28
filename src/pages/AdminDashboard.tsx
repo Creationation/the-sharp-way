@@ -136,35 +136,48 @@ const AdminDashboard = () => {
   }, isAdmin);
 
   const fetchBookings = async () => {
-    const { data, error } = await supabase
-      .from("bookings")
-      .select("*")
-      .order("booking_date", { ascending: false })
-      .order("booking_time", { ascending: true });
+    setLoadingBookings(true);
+    try {
+      const timeout = new Promise<{ data: null; error: Error }>((resolve) =>
+        setTimeout(() => resolve({ data: null, error: new Error("admin bookings timeout") }), 10000)
+      );
+      const query = supabase
+        .from("bookings")
+        .select("*")
+        .order("booking_date", { ascending: false })
+        .order("booking_time", { ascending: true });
+      const { data, error } = (await Promise.race([query, timeout])) as { data: Booking[] | null; error: unknown };
 
-    if (error) {
-      toast.error(t.admin.loadFailed);
-      setLoadingBookings(false);
-      return;
-    }
-
-    const bookingsData = (data as unknown as Booking[]) || [];
-    setBookings(bookingsData);
-
-    const userIds = [...new Set(bookingsData.map(b => b.user_id))];
-    if (userIds.length > 0) {
-      const { data: profilesData } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, email, phone")
-        .in("user_id", userIds);
-
-      if (profilesData) {
-        const profileMap = new Map<string, Profile>();
-        (profilesData as Profile[]).forEach(p => profileMap.set(p.user_id, p));
-        setProfiles(profileMap);
+      if (error) {
+        console.error("[Admin] fetchBookings error", error);
+        toast.error(t.admin.loadFailed);
+        return;
       }
+
+      const bookingsData = (data as unknown as Booking[]) || [];
+      setBookings(bookingsData);
+
+      const userIds = [...new Set(bookingsData.map(b => b.user_id))];
+      if (userIds.length > 0) {
+        const profilesTimeout = new Promise<{ data: null; error: Error }>((resolve) =>
+          setTimeout(() => resolve({ data: null, error: new Error("admin profiles timeout") }), 10000)
+        );
+        const profilesQuery = supabase
+          .from("profiles")
+          .select("user_id, full_name, email, phone")
+          .in("user_id", userIds);
+        const { data: profilesData, error: profilesError } = (await Promise.race([profilesQuery, profilesTimeout])) as { data: Profile[] | null; error: unknown };
+
+        if (profilesError) console.error("[Admin] fetchProfiles error", profilesError);
+        const profileMap = new Map<string, Profile>();
+        (profilesData || []).forEach(p => profileMap.set(p.user_id, p));
+        setProfiles(profileMap);
+      } else {
+        setProfiles(new Map());
+      }
+    } finally {
+      setLoadingBookings(false);
     }
-    setLoadingBookings(false);
   };
 
   const fetchAvailability = useCallback(async () => {
