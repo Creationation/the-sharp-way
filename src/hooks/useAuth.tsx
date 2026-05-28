@@ -109,14 +109,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     restoreSession(true);
 
     const handleResume = () => restoreSession(false);
-    window.addEventListener("focus", handleResume);
-    document.addEventListener("visibilitychange", () => {
+    const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") handleResume();
-    });
+    };
+    window.addEventListener("focus", handleResume);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       subscription.unsubscribe();
       window.removeEventListener("focus", handleResume);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [applySession, checkAdmin, restoreSession]);
 
