@@ -21,6 +21,8 @@ serve(async (req) => {
 
     const CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID");
     if (!CHAT_ID) throw new Error("TELEGRAM_CHAT_ID is not configured");
+    const CHAT_ID_2 = Deno.env.get("TELEGRAM_CHAT_ID_2");
+    const CHAT_IDS = [CHAT_ID, CHAT_ID_2].filter((id): id is string => !!id && id.trim().length > 0);
 
     const { type, data } = await req.json();
 
@@ -69,27 +71,38 @@ serve(async (req) => {
       throw new Error("Unknown notification type");
     }
 
-    const response = await fetch(`${GATEWAY_URL}/sendMessage`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-        "X-Connection-Api-Key": TELEGRAM_API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text,
-        parse_mode: "HTML",
-      }),
-    });
+    const results = await Promise.allSettled(
+      CHAT_IDS.map(async (chatId) => {
+        const response = await fetch(`${GATEWAY_URL}/sendMessage`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "X-Connection-Api-Key": TELEGRAM_API_KEY,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text,
+            parse_mode: "HTML",
+          }),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          console.error(`[telegram] API error for chat ${chatId}:`, JSON.stringify(result));
+          throw new Error(`Telegram API failed [${response.status}] for chat ${chatId}`);
+        }
+        return result;
+      })
+    );
 
-    const result = await response.json();
-    if (!response.ok) {
-      console.error("[telegram] API error:", JSON.stringify(result));
-      throw new Error(`Telegram API failed [${response.status}]`);
+    const sent = results.filter((r) => r.status === "fulfilled").length;
+    const failed = results.filter((r) => r.status === "rejected").length;
+
+    if (sent === 0) {
+      throw new Error("All Telegram recipients failed");
     }
 
-    return new Response(JSON.stringify({ ok: true }), {
+    return new Response(JSON.stringify({ ok: true, sent, failed, recipients: CHAT_IDS.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
