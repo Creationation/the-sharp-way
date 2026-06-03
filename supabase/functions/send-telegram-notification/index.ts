@@ -21,6 +21,8 @@ serve(async (req) => {
 
     const CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID");
     if (!CHAT_ID) throw new Error("TELEGRAM_CHAT_ID is not configured");
+    const CHAT_ID_2 = Deno.env.get("TELEGRAM_CHAT_ID_2");
+    const CHAT_IDS = [CHAT_ID, CHAT_ID_2].filter((id): id is string => !!id && id.trim().length > 0);
 
     const { type, data } = await req.json();
 
