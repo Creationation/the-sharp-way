@@ -48,11 +48,11 @@ serve(async (req) => {
 
       let chargeInfo: string;
       if (data.already_charged) {
-        chargeInfo = "💰 5€ Kaution einbehalten · bereits abgebucht (nicht erstattbar · <24h)";
+        chargeInfo = "💰 5€ Kaution einbehalten · bereits abgebucht (nicht erstattbar · weniger als 24h)";
       } else if (data.charged) {
-        chargeInfo = "💰 5€ Kaution einbehalten · jetzt abgebucht (nicht erstattbar · <24h)";
+        chargeInfo = "💰 5€ Kaution einbehalten · jetzt abgebucht (nicht erstattbar · weniger als 24h)";
       } else if (data.payment_status === "released") {
-        chargeInfo = "💰 Keine Gebühr · Karte freigegeben (>24h vorher)";
+        chargeInfo = "💰 Keine Gebühr · Karte freigegeben (mehr als 24h vorher)";
       } else {
         chargeInfo = "💰 Keine Gebühr";
       }
