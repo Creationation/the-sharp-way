@@ -18,6 +18,17 @@ interface PendingBooking {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // Internal/cron-only: require service-role bearer token
+  const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const auth = req.headers.get("Authorization") || "";
+  if (!SERVICE_ROLE_KEY || auth !== `Bearer ${SERVICE_ROLE_KEY}`) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
