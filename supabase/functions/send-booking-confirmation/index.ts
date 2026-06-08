@@ -122,6 +122,17 @@ serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  // Internal-only: require service-role bearer token
+  const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const authHeader = req.headers.get("Authorization") || "";
+  if (!SERVICE_ROLE || authHeader !== `Bearer ${SERVICE_ROLE}`) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+
   try {
     const payload: BookingPayload = await req.json();
     const isDE = payload.lang === "de";

@@ -116,6 +116,38 @@ function buildReminderEmail(
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // Allow either service-role (cron) or an authenticated admin user
+  const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+  const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+  const authHeader = req.headers.get("Authorization") || "";
+  const token = authHeader.replace("Bearer ", "");
+
+  let authorized = false;
+  if (token && token === SERVICE_ROLE_KEY) {
+    authorized = true;
+  } else if (token) {
+    try {
+      const sbUser = createClient(SUPABASE_URL, ANON_KEY, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: claims } = await sbUser.auth.getClaims(token);
+      const uid = claims?.claims?.sub;
+      if (uid) {
+        const sbAdmin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+        const { data: isAdmin } = await sbAdmin.rpc("has_role", { _user_id: uid, _role: "admin" });
+        if (isAdmin === true) authorized = true;
+      }
+    } catch (_) { /* fall through */ }
+  }
+  if (!authorized) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   if (!RESEND_API_KEY) {
     return new Response(JSON.stringify({ error: "RESEND_API_KEY not set" }), { status: 500, headers: corsHeaders });
