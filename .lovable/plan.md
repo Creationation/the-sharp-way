@@ -1,39 +1,38 @@
 ## Objectif
-Limiter le dernier créneau réservable en fonction du type de service choisi, sans toucher aux horaires d'ouverture du barbier (qui restent corrects côté backend).
+Affiner les plafonds du dernier créneau réservable dans `src/pages/BookingFlow.tsx`, selon la sélection de services.
 
-## Règles (plafonds fixes)
-- Sélection contenant un service **barbe** (avec ou sans coupe) → dernier créneau **17:30**
-- Sélection contenant uniquement de la **coupe** (sans barbe) → dernier créneau **18:00**
-- Toute autre sélection (couleur, lavage, sourcils, services dames, etc.) → comportement actuel inchangé (jusqu'à 19:30 selon dispo)
+## Règles finales
 
-Fermeture salon : 19:00 (info notée, mais les plafonds ci-dessus sont appliqués tels quels, comme demandé).
+- **Femmes (Damen)** présent dans la sélection → dernier créneau **17:00** (priorité la plus forte, car ces services prennent plus de temps).
+- Sinon, **2 services ou plus** sélectionnés → dernier créneau **17:30** (combo / double manipulation).
+- Sinon, sélection solo **Hommes (Herren)** ou **Enfants (Kinder)** (y compris barbe seule, coupe seule, etc.) → dernier créneau **18:00**.
+
+Ordre d'évaluation : Damen → combo (2+) → solo.
+
+Fermeture salon : 19:00 (non modifiée, les plafonds ci-dessus priment).
 
 ## Où ça se passe
 Fichier unique : `src/pages/BookingFlow.tsx`
 
-Étapes :
-1. Ajouter deux helpers en haut du fichier :
-   - `isBeardService(name)` → vrai si le nom contient « Bart » ou « Beard » (couvre *Bart Rasur*, *Moderne Bartrasur*, *Bart Färben*, *Beard Shave*, *Modern Beard Shave*, *Beard Color*).
-   - `isCutService(name)` → vrai si le nom contient « schnitt », « Haircut », « Cut » (couvre les *Haarschnitt*, *Maschinenschnitt*, *Pensionisten Schnitt*, *Haircut + …*, *Trockenschnitt*, *Wash & Cut*, etc.) tout en excluant les noms déjà classés comme barbe.
+1. Remplacer la logique actuelle `isBeardService` / `isCutService` / `computeLastAllowedSlot` par une version basée sur **catégorie** + **nombre de services** :
+   - Récupérer les objets `Service` complets des services sélectionnés (la liste vient déjà de `useServices`, donc on a accès à `category`).
+   - `computeLastAllowedSlot(selectedServices)` :
+     - si au moins un service a `category === "damen"` → `"17:00"`
+     - sinon si `selectedServices.length >= 2` → `"17:30"`
+     - sinon → `"18:00"`
 
-2. Calculer, dans le rendu de l'étape « heure », un `lastAllowedSlot` :
-   - barbe présente → `"17:30"`
-   - sinon coupe présente → `"18:00"`
-   - sinon → `"19:30"` (= dernier de `allTimeSlots`, donc pas de changement)
+2. Conserver le `useEffect` qui réinitialise `selectedTime` si l'heure choisie dépasse le nouveau plafond après changement de sélection.
 
-3. Filtrer la liste affichée :
-   ```ts
-   const visibleSlots = allTimeSlots.filter(s => s <= lastAllowedSlot);
-   ```
-   et utiliser `visibleSlots` à la place de `allTimeSlots` dans le `.map` (ligne ~703) **et** dans le calcul `firstFree` (ligne ~452) pour la mise en avant du premier créneau libre.
-
-4. Si l'utilisateur change sa sélection de services après avoir choisi une heure désormais hors plafond, réinitialiser `selectedTime` pour forcer une nouvelle sélection valide.
+3. Conserver `visibleSlots = allTimeSlots.filter(s => s <= lastAllowedSlot)` utilisé dans le rendu et dans le calcul du premier créneau libre.
 
 ## Hors scope
-- Pas de modification de la base, des disponibilités barbier, des edge functions, du calendrier admin, ni des autres écrans.
-- Pas de changement aux durées de service ni à la logique des dépôts/rappels.
+- Pas de modification BD, edge functions, calendrier admin, durées de service, dépôts, rappels.
+- Pas de changement aux disponibilités barbier ni aux autres écrans.
 
 ## Validation
-- Choisir « Haarschnitt » seul → dernier créneau visible = 18:00.
-- Ajouter « Bart Rasur » → la liste se recoupe à 17:30 et l'heure précédemment choisie au-delà se réinitialise.
-- Choisir « Augenbrauen Zupfen » seul → la liste va jusqu'à 19:30 (inchangé).
+- « Haarschnitt » seul (Herren) → dernier créneau visible **18:00**.
+- « Bart Rasur » seul (Herren) → **18:00**.
+- « Haarschnitt » + « Bart Rasur » (Herren, 2 services) → **17:30**, l'heure précédemment choisie au-delà se réinitialise.
+- « Pensionisten Schnitt » seul (Kinder/Herren solo) → **18:00**.
+- N'importe quel service Damen (seul ou combiné) → **17:00**.
+- Une couleur Damen + un soin Damen → **17:00** (la règle Damen prime sur la règle combo).
