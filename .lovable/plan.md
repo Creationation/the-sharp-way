@@ -1,22 +1,39 @@
 ## Objectif
-Permettre au bot Telegram d'envoyer chaque notification (nouvelle réservation, annulation, etc.) à **deux destinataires en parallèle** : toi + un nouvel utilisateur.
+Limiter le dernier créneau réservable en fonction du type de service choisi, sans toucher aux horaires d'ouverture du barbier (qui restent corrects côté backend).
 
-## Étapes
+## Règles (plafonds fixes)
+- Sélection contenant un service **barbe** (avec ou sans coupe) → dernier créneau **17:30**
+- Sélection contenant uniquement de la **coupe** (sans barbe) → dernier créneau **18:00**
+- Toute autre sélection (couleur, lavage, sourcils, services dames, etc.) → comportement actuel inchangé (jusqu'à 19:30 selon dispo)
 
-### 1. Ajouter un nouveau secret
-Créer un secret `TELEGRAM_CHAT_ID_2` via l'outil sécurisé de Lovable Cloud. Tu y colleras le chat ID du nouvel utilisateur.
+Fermeture salon : 19:00 (info notée, mais les plafonds ci-dessus sont appliqués tels quels, comme demandé).
 
-> Comment l'obtenir : le nouvel utilisateur doit envoyer `/start` au bot, puis ouvrir
-> `https://api.telegram.org/bot<token>/getUpdates` — ou plus simple, parler à `@userinfobot` sur Telegram qui renvoie directement son chat ID.
+## Où ça se passe
+Fichier unique : `src/pages/BookingFlow.tsx`
 
-### 2. Modifier `supabase/functions/send-telegram-notification/index.ts`
-- Lire les deux variables : `TELEGRAM_CHAT_ID` (obligatoire) et `TELEGRAM_CHAT_ID_2` (optionnel).
-- Construire un tableau de destinataires (1 ou 2 selon ce qui est configuré).
-- Envoyer le message à chaque chat ID via `Promise.allSettled` pour qu'un échec d'un destinataire ne bloque pas l'autre.
-- Logger les éventuelles erreurs par destinataire, retourner `{ ok: true, sent: N, failed: M }`.
+Étapes :
+1. Ajouter deux helpers en haut du fichier :
+   - `isBeardService(name)` → vrai si le nom contient « Bart » ou « Beard » (couvre *Bart Rasur*, *Moderne Bartrasur*, *Bart Färben*, *Beard Shave*, *Modern Beard Shave*, *Beard Color*).
+   - `isCutService(name)` → vrai si le nom contient « schnitt », « Haircut », « Cut » (couvre les *Haarschnitt*, *Maschinenschnitt*, *Pensionisten Schnitt*, *Haircut + …*, *Trockenschnitt*, *Wash & Cut*, etc.) tout en excluant les noms déjà classés comme barbe.
 
-### 3. Rien d'autre à toucher
-Les fonctions qui appellent `send-telegram-notification` (`cancel-booking`, `send-booking-confirmation`, etc.) restent inchangées — la logique multi-destinataire est centralisée dans une seule fonction.
+2. Calculer, dans le rendu de l'étape « heure », un `lastAllowedSlot` :
+   - barbe présente → `"17:30"`
+   - sinon coupe présente → `"18:00"`
+   - sinon → `"19:30"` (= dernier de `allTimeSlots`, donc pas de changement)
 
-## Question avant de coder
-Veux-tu pouvoir **désactiver** facilement un destinataire (par ex. en vidant son secret), ou veux-tu carrément une petite table `telegram_recipients` en base pour pouvoir en ajouter/retirer plus tard sans toucher au code ? Pour 2 utilisateurs la version "secret" suffit largement ; la table devient utile à partir de 3-4.
+3. Filtrer la liste affichée :
+   ```ts
+   const visibleSlots = allTimeSlots.filter(s => s <= lastAllowedSlot);
+   ```
+   et utiliser `visibleSlots` à la place de `allTimeSlots` dans le `.map` (ligne ~703) **et** dans le calcul `firstFree` (ligne ~452) pour la mise en avant du premier créneau libre.
+
+4. Si l'utilisateur change sa sélection de services après avoir choisi une heure désormais hors plafond, réinitialiser `selectedTime` pour forcer une nouvelle sélection valide.
+
+## Hors scope
+- Pas de modification de la base, des disponibilités barbier, des edge functions, du calendrier admin, ni des autres écrans.
+- Pas de changement aux durées de service ni à la logique des dépôts/rappels.
+
+## Validation
+- Choisir « Haarschnitt » seul → dernier créneau visible = 18:00.
+- Ajouter « Bart Rasur » → la liste se recoupe à 17:30 et l'heure précédemment choisie au-delà se réinitialise.
+- Choisir « Augenbrauen Zupfen » seul → la liste va jusqu'à 19:30 (inchangé).
