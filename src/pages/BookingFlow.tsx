@@ -718,7 +718,7 @@ const BookingFlow = () => {
           </div>
         ) : (
           <div className="grid grid-cols-4 gap-2">
-            {allTimeSlots.map(slot => {
+            {visibleSlots.map(slot => {
               const taken = takenSlots.includes(slot);
               const selected = selectedTime === slot;
               return (
