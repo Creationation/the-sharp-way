@@ -418,7 +418,10 @@ const BookingFlow = () => {
     toast.success(t.booking.promoApplied);
   };
   const totalDuration = selectedServices.reduce((sum, s) => sum + parseInt(s.duration), 0);
-  const lastAllowedSlot = computeLastAllowedSlot(selectedServices.map(s => s.name));
+  const categoryByName = new Map<string, string>(
+    dbServices.map(s => [lang === "en" ? (s.name_en || s.name) : s.name, s.category])
+  );
+  const lastAllowedSlot = computeLastAllowedSlot(selectedServices, categoryByName);
   const visibleSlots = allTimeSlots.filter(s => s <= lastAllowedSlot);
 
   useEffect(() => {
