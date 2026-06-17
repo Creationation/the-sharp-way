@@ -467,7 +467,7 @@ const BookingFlow = () => {
 
     // Reset time selection if now taken
     if ([...bookedTimes, ...blocked].includes(selectedTime) || isOff) {
-      const firstFree = allTimeSlots.find(s => ![...bookedTimes, ...blocked].includes(s));
+      const firstFree = visibleSlots.find(s => ![...bookedTimes, ...blocked].includes(s));
       if (firstFree) setSelectedTime(firstFree);
     }
     setLoadingSlots(false);
