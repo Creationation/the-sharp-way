@@ -50,6 +50,16 @@ for (let h = 10; h <= 19; h++) {
   allTimeSlots.push(`${h.toString().padStart(2, "0")}:30`);
 }
 
+const isBeardService = (name: string) => /bart|beard/i.test(name);
+const isCutService = (name: string) =>
+  !isBeardService(name) && /schnitt|haircut|\bcut\b/i.test(name);
+
+const computeLastAllowedSlot = (serviceNames: string[]): string => {
+  if (serviceNames.some(isBeardService)) return "17:30";
+  if (serviceNames.some(isCutService)) return "18:00";
+  return "19:30";
+};
+
 const DRAFT_KEY = "booking_draft";
 
 async function scheduleReminders(
