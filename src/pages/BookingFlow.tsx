@@ -50,6 +50,16 @@ for (let h = 10; h <= 19; h++) {
   allTimeSlots.push(`${h.toString().padStart(2, "0")}:30`);
 }
 
+const isBeardService = (name: string) => /bart|beard/i.test(name);
+const isCutService = (name: string) =>
+  !isBeardService(name) && /schnitt|haircut|\bcut\b/i.test(name);
+
+const computeLastAllowedSlot = (serviceNames: string[]): string => {
+  if (serviceNames.some(isBeardService)) return "17:30";
+  if (serviceNames.some(isCutService)) return "18:00";
+  return "19:30";
+};
+
 const DRAFT_KEY = "booking_draft";
 
 async function scheduleReminders(
@@ -408,6 +418,14 @@ const BookingFlow = () => {
     toast.success(t.booking.promoApplied);
   };
   const totalDuration = selectedServices.reduce((sum, s) => sum + parseInt(s.duration), 0);
+  const lastAllowedSlot = computeLastAllowedSlot(selectedServices.map(s => s.name));
+  const visibleSlots = allTimeSlots.filter(s => s <= lastAllowedSlot);
+
+  useEffect(() => {
+    if (selectedTime && selectedTime > lastAllowedSlot) {
+      setSelectedTime("");
+    }
+  }, [lastAllowedSlot, selectedTime]);
 
   const [takenSlots, setTakenSlots] = useState<string[]>([]);
   const [dayOff, setDayOff] = useState(false);
@@ -449,7 +467,7 @@ const BookingFlow = () => {
 
     // Reset time selection if now taken
     if ([...bookedTimes, ...blocked].includes(selectedTime) || isOff) {
-      const firstFree = allTimeSlots.find(s => ![...bookedTimes, ...blocked].includes(s));
+      const firstFree = visibleSlots.find(s => ![...bookedTimes, ...blocked].includes(s));
       if (firstFree) setSelectedTime(firstFree);
     }
     setLoadingSlots(false);
@@ -700,7 +718,7 @@ const BookingFlow = () => {
           </div>
         ) : (
           <div className="grid grid-cols-4 gap-2">
-            {allTimeSlots.map(slot => {
+            {visibleSlots.map(slot => {
               const taken = takenSlots.includes(slot);
               const selected = selectedTime === slot;
               return (
