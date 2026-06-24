@@ -1,49 +1,42 @@
-# Migration des emails Resend → Gmail (hello@sitdownvienna.app)
+## Migration Stripe · ce que le client doit te fournir
 
-## Objectif
+Le compte Stripe du client est déjà créé et son IBAN est connecté · parfait. Il ne reste qu'à récupérer **3 informations** depuis son Dashboard Stripe, puis je m'occupe du reste.
 
-Tous les emails transactionnels (confirmations, rappels, contact, reset, admin) partent depuis la vraie boîte **`hello@sitdownvienna.app`** via le connecteur Google Mail déjà lié au projet. Les réponses clients arrivent directement dans cette boîte Gmail — visible aussi dans l'Admin Panel → Inbox.
+### Ce que le client doit t'envoyer
 
-## Ce qui change
+Toutes ces valeurs se trouvent dans son Dashboard Stripe (https://dashboard.stripe.com) · **en mode Live** (toggle en haut à droite · pas "Test mode").
 
-### 1. Nouveau helper partagé
-**`supabase/functions/_shared/gmail-sender.ts`** — fonction unique `sendGmail(...)` qui :
-- Encode le message au format RFC 2822 en base64url (HTML + texte, support `cc`, `bcc`, `reply_to`)
-- Appelle `POST https://connector-gateway.lovable.dev/google_mail/gmail/v1/users/me/messages/send`
-- Headers : `Authorization: Bearer ${LOVABLE_API_KEY}` + `X-Connection-Api-Key: ${GOOGLE_MAIL_API_KEY}`
-- `From` figé à **`Sitdown Vienna <hello@sitdownvienna.app>`**
-- Logue dans `email_send_log` (status `pending` → `sent`/`failed`) pour cohérence avec le dashboard existant
+| # | Info | Où la trouver | Format |
+|---|---|---|---|
+| 1 | **Secret key** | Développeurs → Clés API → "Secret key" (cliquer "Reveal live key") | `sk_live_...` |
+| 2 | **Publishable key** | Même page · "Publishable key" | `pk_live_...` |
+| 3 | **Webhook signing secret** | Développeurs → Webhooks → créer un endpoint (voir étape ci-dessous) | `whsec_...` |
 
-### 2. Migration des 7 edge functions
-Dans chaque fichier, je remplace l'appel `fetch("https://api.resend.com/emails", ...)` par `sendGmail(...)`. Le HTML, la logique métier et les déclencheurs restent **inchangés**.
+#### Détail pour le webhook (étape 3)
 
-| Fonction | Rôle |
-|---|---|
-| `send-booking-confirmation` | Confirmation de réservation au client |
-| `process-reminders` | Rappels 24h / 5h / 2h avant rendez-vous |
-| `send-contact-message` | Formulaire contact (destinataire interne) |
-| `send-password-reset` | Reset mot de passe |
-| `verify-setup` | Email de test admin |
-| `process-attendance` | Notification d'absence/no-show |
-| `send-all-test-emails` | Bouton "envoyer tous les tests" admin |
+Une fois que tu m'auras donné les 2 premières clés, je te donnerai **l'URL exacte du webhook** à coller dans Stripe. Le client devra :
 
-### 3. Ce qui ne change PAS
-- **Auth emails** (signup, magic link, recovery via Supabase) restent sur **Lovable Emails** (`noreply@sitdownvienna.app`) — c'est plus fiable pour les emails système et déjà fonctionnel ✅
-- **Admin Inbox** (`InboxView` + `gmail-list/get/thread/modify`) déjà branchée sur la même boîte → continue de fonctionner sans modification ✅
-- **`gmail-send`** (réponses admin depuis l'Inbox) reste sur `sendLovableEmail` — hors scope de ta demande
-- **`RESEND_API_KEY`** laissée en place (suppression manuelle plus tard si tu veux)
+1. Aller dans Développeurs → Webhooks → **Add endpoint**
+2. Coller l'URL que je lui fournis
+3. Sélectionner les événements : `setup_intent.succeeded`, `setup_intent.setup_failed`, `payment_intent.succeeded`, `payment_intent.payment_failed`, `charge.refunded`
+4. Sauvegarder · puis cliquer sur le webhook créé → **Signing secret** → "Reveal" → copier le `whsec_...`
 
-## Détails techniques
+### Ce que je fais ensuite de mon côté
 
-- **Encodage RFC 2822** : headers `From`, `To`, `Subject` (UTF-8 base64 si non-ASCII), `Reply-To`, `MIME-Version: 1.0`, `Content-Type: multipart/alternative` avec parts `text/plain` + `text/html`
-- **Gestion d'erreur** : si la passerelle renvoie 401/403 (scope/token), on log dans `email_send_log` avec `status=failed` et `error_message` — pas de retry automatique
-- **Aucune migration DB** requise
-- **Aucun changement DNS** requis (le domaine racine est déjà géré par Google Workspace)
-- **Aucun nouveau secret** requis (`LOVABLE_API_KEY` et `GOOGLE_MAIL_API_KEY` déjà présents)
+1. Mettre à jour `STRIPE_SECRET_KEY` avec la nouvelle `sk_live_...`
+2. Remplacer la `pk_live_...` dans le code frontend (composants de paiement de l'acompte)
+3. Ajouter / mettre à jour `STRIPE_WEBHOOK_SECRET` avec le `whsec_...`
+4. Vérifier les 3 edge functions Stripe : `create-setup-intent`, `charge-daily-deposits`, `verify-setup`
+5. **Test bout-en-bout** : créer une vraie réservation < 24h, valider que l'acompte de 5€ apparaît bien dans le Dashboard Stripe du client (puis annuler / rembourser pour le test)
 
-## Vérification après build
+### Points importants à vérifier côté client
 
-1. Tester `verify-setup` depuis l'admin → email arrive depuis `hello@sitdownvienna.app`
-2. Créer une réservation test → confirmation reçue avec bon expéditeur
-3. Vérifier le log dans `email_send_log` (statut `sent`)
-4. Répondre à l'email reçu → la réponse apparaît dans Admin Panel → Inbox
+- Compte bien **activé en Live** (sinon les vraies cartes seront refusées)
+- IBAN ajouté **et vérifié** pour recevoir les virements
+- Méthodes de paiement activées : **Cards** au minimum · activer **SEPA / Apple Pay / Google Pay** si souhaité (Settings → Payment methods)
+- Devise par défaut : **EUR**
+- Adresse de l'entreprise renseignée (obligatoire pour les reçus)
+
+### Question avant de continuer
+
+**Dis-moi quand tu as les 2 premières clés** (`sk_live_...` et `pk_live_...`) · je les intègre et je te donne l'URL du webhook à transmettre au client dans la foulée.
