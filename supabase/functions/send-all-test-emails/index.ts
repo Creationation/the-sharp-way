@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { sendGmail } from "../_shared/gmail-sender.ts";
+
 
 
 const corsHeaders = {
@@ -197,11 +199,6 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-  if (!RESEND_API_KEY) {
-    return new Response(JSON.stringify({ error: "RESEND_API_KEY missing" }), { status: 500, headers: corsHeaders });
-  }
-
   let to = "creationation.at@gmail.com";
   let lang: "de" | "en" = "de";
   try {
@@ -223,20 +220,10 @@ serve(async (req) => {
     { subject: lang === "de" ? "[TEST] Passwort zurücksetzen" : "[TEST] Password reset", html: passwordResetHtml(lang) },
   ];
 
-  const results: any[] = [];
+  const results: { subject: string; ok: boolean; status: number; messageId?: string; error?: string }[] = [];
   for (const e of emails) {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${RESEND_API_KEY}` },
-      body: JSON.stringify({
-        from: "Sitdown Wien <info@ugcpanel.app>",
-        to: [to],
-        subject: e.subject,
-        html: e.html,
-      }),
-    });
-    const data = await res.json().catch(() => ({}));
-    results.push({ subject: e.subject, ok: res.ok, status: res.status, data });
+    const r = await sendGmail({ to, subject: e.subject, html: e.html });
+    results.push({ subject: e.subject, ok: r.ok, status: r.status, messageId: r.messageId, error: r.error });
     await new Promise(r => setTimeout(r, 250));
   }
 

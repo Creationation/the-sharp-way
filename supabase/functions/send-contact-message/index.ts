@@ -1,11 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { sendGmail } from "../_shared/gmail-sender.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const SHOP_EMAIL = "info@ugcpanel.app";
+const SHOP_EMAIL = "hello@sitdownvienna.app";
 const BRAND = "#C9A46E";
 const BG = "#0D0D0D";
 const SURFACE = "#161616";
@@ -69,33 +70,16 @@ ${phone ? `<div style="font-size:13px;color:${MUTED};margin-bottom:4px;">${isDE 
 </table>
 </td></tr></table></body></html>`;
 
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    if (!RESEND_API_KEY) {
-      return new Response(JSON.stringify({ error: "Email service not configured" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "Sitdown Wien <info@ugcpanel.app>",
-        to: [SHOP_EMAIL],
-        reply_to: email,
-        subject,
-        html,
-      }),
+    const result = await sendGmail({
+      to: SHOP_EMAIL,
+      replyTo: email,
+      subject,
+      html,
     });
 
-    const data = await res.json();
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: res.ok ? 200 : 500,
+      status: result.ok ? 200 : 500,
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err) }), {

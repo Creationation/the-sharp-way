@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { sendGmail } from "../_shared/gmail-sender.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -97,14 +98,6 @@ serve(async (req) => {
     const isDE = lang === "de";
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-
-    if (!RESEND_API_KEY) {
-      return new Response(JSON.stringify({ error: "Email service not configured" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
       auth: { autoRefreshToken: false, persistSession: false },
@@ -132,24 +125,15 @@ serve(async (req) => {
     const html = buildEmail(data.properties.action_link, isDE);
     const subject = isDE ? "Sitdown Wien · Passwort zurücksetzen" : "Sitdown Wien · Reset your password";
 
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "Sitdown Wien <info@ugcpanel.app>",
-        to: [email],
-        subject,
-        html,
-      }),
+    const result = await sendGmail({
+      to: email,
+      subject,
+      html,
     });
 
-    const body = await res.json();
-    return new Response(JSON.stringify({ ok: res.ok, body }), {
+    return new Response(JSON.stringify({ ok: result.ok, body: result }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: res.ok ? 200 : 500,
+      status: result.ok ? 200 : 500,
     });
   } catch (err) {
     console.error(err);

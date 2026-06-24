@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { sendGmail } from "../_shared/gmail-sender.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -29,7 +30,6 @@ serve(async (req) => {
   }
 
 
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -86,7 +86,7 @@ serve(async (req) => {
   }
 
   // Send admin summary email if anything was auto-stamped
-  if (autoStamped.length > 0 && RESEND_API_KEY) {
+  if (autoStamped.length > 0) {
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
       <div style="font-family:sans-serif;max-width:520px;margin:auto;background:#0f0f0f;color:#f5f0e8;padding:32px;border-radius:16px;">
         <h2 style="color:#b8935a;margin-bottom:4px;">✂️ Auto-Stempel vergeben</h2>
@@ -111,18 +111,10 @@ serve(async (req) => {
       </div>
     </body></html>`;
 
-    await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "Sitdown Wien <info@ugcpanel.app>",
-        to: ["info@ugcpanel.app"],
-        subject: `✂️ ${autoStamped.length} Auto-Stempel vergeben — Sitdown Wien`,
-        html,
-      }),
+    await sendGmail({
+      to: "hello@sitdownvienna.app",
+      subject: `✂️ ${autoStamped.length} Auto-Stempel vergeben — Sitdown Wien`,
+      html,
     }).catch(() => {});
   }
 
