@@ -70,33 +70,16 @@ ${phone ? `<div style="font-size:13px;color:${MUTED};margin-bottom:4px;">${isDE 
 </table>
 </td></tr></table></body></html>`;
 
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    if (!RESEND_API_KEY) {
-      return new Response(JSON.stringify({ error: "Email service not configured" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "Sitdown Wien <info@ugcpanel.app>",
-        to: [SHOP_EMAIL],
-        reply_to: email,
-        subject,
-        html,
-      }),
+    const result = await sendGmail({
+      to: SHOP_EMAIL,
+      replyTo: email,
+      subject,
+      html,
     });
 
-    const data = await res.json();
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: res.ok ? 200 : 500,
+      status: result.ok ? 200 : 500,
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err) }), {
