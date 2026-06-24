@@ -116,9 +116,8 @@ serve(async (req) => {
       }).catch((err: any) => console.error("[verify-setup] Email error:", err));
     }
 
-    // Admin notification email
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    if (RESEND_API_KEY) {
+    // Admin notification email (always sent — uses Gmail connector, no key check needed)
+    {
       const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
         <div style="font-family:sans-serif;max-width:520px;margin:auto;background:#0f0f0f;color:#f5f0e8;padding:32px;border-radius:16px;">
           <h2 style="color:#b8935a;margin-bottom:4px;">✂️ Neuer Termin gebucht</h2>
@@ -145,18 +144,10 @@ serve(async (req) => {
         </div>
       </body></html>`;
 
-      await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${RESEND_API_KEY}`,
-        },
-        body: JSON.stringify({
-          from: "Sitdown Wien <info@ugcpanel.app>",
-          to: ["info@ugcpanel.app"],
-          subject: `✂️ Neuer Termin: ${meta.client_name} – ${meta.booking_date} ${meta.booking_time}`,
-          html,
-        }),
+      await sendGmail({
+        to: "hello@sitdownvienna.app",
+        subject: `✂️ Neuer Termin: ${meta.client_name} – ${meta.booking_date} ${meta.booking_time}`,
+        html,
       }).catch(() => {});
     }
 
