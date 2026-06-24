@@ -1,11 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { sendGmail } from "../_shared/gmail-sender.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const SHOP_EMAIL = "info@ugcpanel.app";
+const SHOP_EMAIL = "hello@sitdownvienna.app";
 const BRAND = "#C9A46E";
 const BG = "#0D0D0D";
 const SURFACE = "#161616";
