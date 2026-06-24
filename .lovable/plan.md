@@ -1,38 +1,49 @@
+# Migration des emails Resend → Gmail (hello@sitdownvienna.app)
+
 ## Objectif
-Affiner les plafonds du dernier créneau réservable dans `src/pages/BookingFlow.tsx`, selon la sélection de services.
 
-## Règles finales
+Tous les emails transactionnels (confirmations, rappels, contact, reset, admin) partent depuis la vraie boîte **`hello@sitdownvienna.app`** via le connecteur Google Mail déjà lié au projet. Les réponses clients arrivent directement dans cette boîte Gmail — visible aussi dans l'Admin Panel → Inbox.
 
-- **Femmes (Damen)** présent dans la sélection → dernier créneau **17:00** (priorité la plus forte, car ces services prennent plus de temps).
-- Sinon, **2 services ou plus** sélectionnés → dernier créneau **17:30** (combo / double manipulation).
-- Sinon, sélection solo **Hommes (Herren)** ou **Enfants (Kinder)** (y compris barbe seule, coupe seule, etc.) → dernier créneau **18:00**.
+## Ce qui change
 
-Ordre d'évaluation : Damen → combo (2+) → solo.
+### 1. Nouveau helper partagé
+**`supabase/functions/_shared/gmail-sender.ts`** — fonction unique `sendGmail(...)` qui :
+- Encode le message au format RFC 2822 en base64url (HTML + texte, support `cc`, `bcc`, `reply_to`)
+- Appelle `POST https://connector-gateway.lovable.dev/google_mail/gmail/v1/users/me/messages/send`
+- Headers : `Authorization: Bearer ${LOVABLE_API_KEY}` + `X-Connection-Api-Key: ${GOOGLE_MAIL_API_KEY}`
+- `From` figé à **`Sitdown Vienna <hello@sitdownvienna.app>`**
+- Logue dans `email_send_log` (status `pending` → `sent`/`failed`) pour cohérence avec le dashboard existant
 
-Fermeture salon : 19:00 (non modifiée, les plafonds ci-dessus priment).
+### 2. Migration des 7 edge functions
+Dans chaque fichier, je remplace l'appel `fetch("https://api.resend.com/emails", ...)` par `sendGmail(...)`. Le HTML, la logique métier et les déclencheurs restent **inchangés**.
 
-## Où ça se passe
-Fichier unique : `src/pages/BookingFlow.tsx`
+| Fonction | Rôle |
+|---|---|
+| `send-booking-confirmation` | Confirmation de réservation au client |
+| `process-reminders` | Rappels 24h / 5h / 2h avant rendez-vous |
+| `send-contact-message` | Formulaire contact (destinataire interne) |
+| `send-password-reset` | Reset mot de passe |
+| `verify-setup` | Email de test admin |
+| `process-attendance` | Notification d'absence/no-show |
+| `send-all-test-emails` | Bouton "envoyer tous les tests" admin |
 
-1. Remplacer la logique actuelle `isBeardService` / `isCutService` / `computeLastAllowedSlot` par une version basée sur **catégorie** + **nombre de services** :
-   - Récupérer les objets `Service` complets des services sélectionnés (la liste vient déjà de `useServices`, donc on a accès à `category`).
-   - `computeLastAllowedSlot(selectedServices)` :
-     - si au moins un service a `category === "damen"` → `"17:00"`
-     - sinon si `selectedServices.length >= 2` → `"17:30"`
-     - sinon → `"18:00"`
+### 3. Ce qui ne change PAS
+- **Auth emails** (signup, magic link, recovery via Supabase) restent sur **Lovable Emails** (`noreply@sitdownvienna.app`) — c'est plus fiable pour les emails système et déjà fonctionnel ✅
+- **Admin Inbox** (`InboxView` + `gmail-list/get/thread/modify`) déjà branchée sur la même boîte → continue de fonctionner sans modification ✅
+- **`gmail-send`** (réponses admin depuis l'Inbox) reste sur `sendLovableEmail` — hors scope de ta demande
+- **`RESEND_API_KEY`** laissée en place (suppression manuelle plus tard si tu veux)
 
-2. Conserver le `useEffect` qui réinitialise `selectedTime` si l'heure choisie dépasse le nouveau plafond après changement de sélection.
+## Détails techniques
 
-3. Conserver `visibleSlots = allTimeSlots.filter(s => s <= lastAllowedSlot)` utilisé dans le rendu et dans le calcul du premier créneau libre.
+- **Encodage RFC 2822** : headers `From`, `To`, `Subject` (UTF-8 base64 si non-ASCII), `Reply-To`, `MIME-Version: 1.0`, `Content-Type: multipart/alternative` avec parts `text/plain` + `text/html`
+- **Gestion d'erreur** : si la passerelle renvoie 401/403 (scope/token), on log dans `email_send_log` avec `status=failed` et `error_message` — pas de retry automatique
+- **Aucune migration DB** requise
+- **Aucun changement DNS** requis (le domaine racine est déjà géré par Google Workspace)
+- **Aucun nouveau secret** requis (`LOVABLE_API_KEY` et `GOOGLE_MAIL_API_KEY` déjà présents)
 
-## Hors scope
-- Pas de modification BD, edge functions, calendrier admin, durées de service, dépôts, rappels.
-- Pas de changement aux disponibilités barbier ni aux autres écrans.
+## Vérification après build
 
-## Validation
-- « Haarschnitt » seul (Herren) → dernier créneau visible **18:00**.
-- « Bart Rasur » seul (Herren) → **18:00**.
-- « Haarschnitt » + « Bart Rasur » (Herren, 2 services) → **17:30**, l'heure précédemment choisie au-delà se réinitialise.
-- « Pensionisten Schnitt » seul (Kinder/Herren solo) → **18:00**.
-- N'importe quel service Damen (seul ou combiné) → **17:00**.
-- Une couleur Damen + un soin Damen → **17:00** (la règle Damen prime sur la règle combo).
+1. Tester `verify-setup` depuis l'admin → email arrive depuis `hello@sitdownvienna.app`
+2. Créer une réservation test → confirmation reçue avec bon expéditeur
+3. Vérifier le log dans `email_send_log` (statut `sent`)
+4. Répondre à l'email reçu → la réponse apparaît dans Admin Panel → Inbox
