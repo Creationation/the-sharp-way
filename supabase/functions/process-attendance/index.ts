@@ -30,7 +30,6 @@ serve(async (req) => {
   }
 
 
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
