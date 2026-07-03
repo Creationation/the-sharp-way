@@ -754,14 +754,41 @@ const BookingFlow = () => {
       {/* Service selection */}
       <div className="px-5 mb-5">
         <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">{t.booking.selectService}</h3>
-        <div className="space-y-2">
-          {services.map(s => {
+
+        {/* Gender segmented toggle */}
+        <div className="relative bg-surface border border-copper/20 rounded-full p-1 mb-4 flex overflow-hidden">
+          <div
+            className="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full gradient-copper shadow-[0_4px_16px_-6px_hsl(var(--copper)/0.6)]"
+            style={{
+              transform: activeGender === "damen" ? "translateX(100%)" : "translateX(0)",
+              transition: "transform 400ms cubic-bezier(0.22, 1, 0.36, 1)",
+            }}
+          />
+          {(["herren", "damen"] as const).map(g => (
+            <button
+              key={g}
+              onClick={() => setActiveGender(g)}
+              className={`relative z-10 flex-1 py-2.5 text-xs font-heading tracking-widest uppercase transition-colors duration-300 active:scale-[0.98] ${
+                activeGender === g ? "text-primary-foreground" : "text-muted-foreground"
+              }`}
+            >
+              {g === "herren" ? t.services.catHerren : t.services.catDamen}
+            </button>
+          ))}
+        </div>
+
+        <div key={activeGender} className="space-y-2">
+          {visibleServices.length === 0 && (
+            <p className="text-muted-foreground text-xs text-center py-6">—</p>
+          )}
+          {visibleServices.map((s, i) => {
             const isSelected = selectedServices.some(sel => sel.name === s.name);
             return (
               <button
                 key={s.name}
                 onClick={() => toggleService(s)}
-                className={`w-full card-app p-4 flex items-center justify-between transition-all ${
+                style={{ animationDelay: `${i * 30}ms`, animationFillMode: "backwards" }}
+                className={`w-full card-app p-4 flex items-center justify-between transition-all animate-fade-in ${
                   isSelected ? "border-copper" : ""
                 }`}
               >
