@@ -27,6 +27,7 @@ import ResetPassword from "@/pages/ResetPassword";
 import AdminDashboard from "@/pages/AdminDashboard";
 import ExploreBarbers from "@/pages/ExploreBarbers";
 import NotFound from "@/pages/NotFound";
+import LegalScreen from "@/pages/LegalScreen";
 
 const queryClient = new QueryClient();
 
