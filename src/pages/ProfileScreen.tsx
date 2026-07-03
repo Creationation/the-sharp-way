@@ -252,6 +252,9 @@ const ProfileScreen = () => {
         {[
           { label: t.profile.reviews, action: () => navigate("/reviews") },
           { label: t.profile.contact, action: () => navigate("/contact") },
+          { label: lang === "de" ? "Impressum" : "Legal notice", action: () => navigate("/legal?tab=impressum") },
+          { label: lang === "de" ? "Datenschutz" : "Privacy", action: () => navigate("/legal?tab=datenschutz") },
+          { label: "AGB", action: () => navigate("/legal?tab=agb") },
           { label: t.profile.replayIntro, action: () => { localStorage.removeItem("sitdown_visited"); navigate("/"); } },
         ].map(item => (
           <button
