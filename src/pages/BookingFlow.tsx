@@ -10,7 +10,7 @@ import { useServices } from "@/hooks/useServices";
 import { toast } from "sonner";
 import PaymentExplanation from "@/components/PaymentExplanation";
 
-type ServiceItem = { name: string; price: string; duration: string };
+type ServiceItem = { name: string; price: string; duration: string; category?: "herren" | "damen" | "kinder" };
 
 const DAY_ABBR: Record<string, string[]> = {
   en: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
