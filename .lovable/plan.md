@@ -1,42 +1,72 @@
-## Migration Stripe · ce que le client doit te fournir
+# Sélecteur Hommes / Femmes premium dans le flow de réservation
 
-Le compte Stripe du client est déjà créé et son IBAN est connecté · parfait. Il ne reste qu'à récupérer **3 informations** depuis son Dashboard Stripe, puis je m'occupe du reste.
+## Objectif
 
-### Ce que le client doit t'envoyer
+Remplacer la liste plate de services par un **toggle segmenté** (Herren / Damen) au-dessus de la liste. Chaque catégorie a son propre menu de prestations. La transition entre les deux est fluide et premium.
 
-Toutes ces valeurs se trouvent dans son Dashboard Stripe (https://dashboard.stripe.com) · **en mode Live** (toggle en haut à droite · pas "Test mode").
+## Où
 
-| # | Info | Où la trouver | Format |
-|---|---|---|---|
-| 1 | **Secret key** | Développeurs → Clés API → "Secret key" (cliquer "Reveal live key") | `sk_live_...` |
-| 2 | **Publishable key** | Même page · "Publishable key" | `pk_live_...` |
-| 3 | **Webhook signing secret** | Développeurs → Webhooks → créer un endpoint (voir étape ci-dessous) | `whsec_...` |
+**Fichier** : `src/pages/BookingFlow.tsx` · bloc "Service selection" (~lignes 751-781).
+**Fichier** : `src/lib/translations.ts` · 2 clés ajoutées.
 
-#### Détail pour le webhook (étape 3)
+## UI
 
-Une fois que tu m'auras donné les 2 premières clés, je te donnerai **l'URL exacte du webhook** à coller dans Stripe. Le client devra :
+```text
+   WÄHLE DEINE LEISTUNG
 
-1. Aller dans Développeurs → Webhooks → **Add endpoint**
-2. Coller l'URL que je lui fournis
-3. Sélectionner les événements : `setup_intent.succeeded`, `setup_intent.setup_failed`, `payment_intent.succeeded`, `payment_intent.payment_failed`, `charge.refunded`
-4. Sauvegarder · puis cliquer sur le webhook créé → **Signing secret** → "Reveal" → copier le `whsec_...`
+  ┌───────────────────────────────┐
+  │  ● Herren      ○ Damen        │  ← toggle segmenté (pill)
+  └───────────────────────────────┘
+       ↑ indicateur copper glissant
 
-### Ce que je fais ensuite de mon côté
+  [ Haarschnitt              20€ ]
+  [ Maschinenschnitt         15€ ]
+  [ … prestations de la catégorie active ]
+```
 
-1. Mettre à jour `STRIPE_SECRET_KEY` avec la nouvelle `sk_live_...`
-2. Remplacer la `pk_live_...` dans le code frontend (composants de paiement de l'acompte)
-3. Ajouter / mettre à jour `STRIPE_WEBHOOK_SECRET` avec le `whsec_...`
-4. Vérifier les 3 edge functions Stripe : `create-setup-intent`, `charge-daily-deposits`, `verify-setup`
-5. **Test bout-en-bout** : créer une vraie réservation < 24h, valider que l'acompte de 5€ apparaît bien dans le Dashboard Stripe du client (puis annuler / rembourser pour le test)
+### Toggle segmenté
+- Container `bg-surface` arrondi (rounded-full, p-1, border copper/20)
+- 2 boutons plein largeur (50/50)
+- Indicateur : pastille interne `gradient-copper` qui **glisse** de gauche à droite via `transform: translateX` (transition 400ms `cubic-bezier(0.22, 1, 0.36, 1)` — courbe premium/spring-like)
+- Label actif : `text-primary-foreground` · label inactif : `text-muted-foreground`
+- Feedback tactile : léger `active:scale-[0.98]`
 
-### Points importants à vérifier côté client
+### Transition de la liste
+- Quand on switch, la liste actuelle sort en `fade-out + translate-x` (opposé au sens du switch : Herren→Damen = sortie vers la gauche, entrée depuis la droite) sur 250ms
+- Nouvelle liste entre en `fade-in + translate-x` avec `stagger` de 30ms par carte (effet cascade doux)
+- Implémentation : clé React sur le container = catégorie active, combinée avec `animate-fade-in` déjà présent dans Tailwind config + `animation-delay` inline par index
 
-- Compte bien **activé en Live** (sinon les vraies cartes seront refusées)
-- IBAN ajouté **et vérifié** pour recevoir les virements
-- Méthodes de paiement activées : **Cards** au minimum · activer **SEPA / Apple Pay / Google Pay** si souhaité (Settings → Payment methods)
-- Devise par défaut : **EUR**
-- Adresse de l'entreprise renseignée (obligatoire pour les reçus)
+## Comportement
 
-### Question avant de continuer
+- Catégorie par défaut à l'ouverture : **Herren**
+- Un seul menu visible à la fois
+- La sélection multi-services persiste quand on switch de catégorie (le client peut cocher Herren, switcher, cocher Damen, la carte récap en bas montre tout)
+- La carte récapitulative sous la liste continue d'afficher **toutes** les prestations sélectionnées (les deux catégories confondues), inchangée
+- Si une catégorie est vide → son bouton reste visible mais la liste affiche un message discret "Aucune prestation" (edge case, aujourd'hui les deux ont des services)
 
-**Dis-moi quand tu as les 2 premières clés** (`sk_live_...` et `pk_live_...`) · je les intègre et je te donne l'URL du webhook à transmettre au client dans la foulée.
+## Détails techniques
+
+```tsx
+const [activeGender, setActiveGender] = useState<"herren" | "damen">("herren");
+
+const services = dbServices.map(s => ({ ...map local, category: s.category }));
+const visibleServices = services.filter(s => s.category === activeGender);
+```
+
+- Container liste : `<div key={activeGender} className="animate-fade-in">`
+- Cartes : `style={{ animationDelay: \`${i * 30}ms\` }}` sur `animate-fade-in`
+- Toggle indicator : `<div className="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full gradient-copper transition-transform duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)]" style={{ transform: activeGender === 'damen' ? 'translateX(100%)' : 'translateX(0)' }} />`
+
+## Traductions (src/lib/translations.ts)
+
+Réutilise les clés existantes `t.services.catHerren` / `t.services.catDamen` (déjà DE = "Herren"/"Damen", EN = "Men"/"Women"). Aucune nouvelle clé requise.
+
+## Sélection par défaut
+
+Le `useEffect` actuel qui pré-sélectionne `services[0]` reste. Si `services[0]` est Herren (c'est le cas · `sort_order=1`), le comportement initial est identique.
+
+## Hors périmètre
+
+- Pas de changement BDD, admin, ServicesScreen, ServicesSection
+- Pas de changement de la logique de créneaux, prix, plafonds horaires
+- La catégorie `kinder` n'est pas exposée dans le toggle (aucun service actif). Si besoin plus tard, ajouter un 3ᵉ segment.
