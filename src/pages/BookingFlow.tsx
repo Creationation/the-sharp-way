@@ -141,7 +141,10 @@ const BookingFlow = () => {
     name: lang === "en" ? (s.name_en || s.name) : s.name,
     price: s.is_from_price ? `${t.services.fromPrefix} €${s.price}` : `€${s.price}`,
     duration: `${s.duration_min}min`,
+    category: s.category,
   }));
+  const [activeGender, setActiveGender] = useState<"herren" | "damen">("herren");
+  const visibleServices = services.filter(s => s.category === activeGender);
 
   const [customDate, setCustomDate] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
