@@ -135,22 +135,27 @@ const Impressum = ({ lang }: { lang: "de" | "en" }) => {
       <P>Information according to § 5 E-Commerce Act (ECG) and § 25 Media Act (Austria).</P>
       <H>Provider</H>
       <P>
-        <Placeholder>Company / Owner name</Placeholder><br />
-        Lavaterstrasse 2<br />
+        Immotime Immobilienverwertungs GmbH<br />
+        Trading as: Sitdown Gentlemens Barber<br />
+        Erzherzog-Karl-Straße 7A/DG<br />
         1220 Vienna<br />
         Austria
       </P>
       <H>Contact</H>
-      <P>Email: hello@sitdownvienna.app<br />Web: www.sitdownvienna.app</P>
+      <P>
+        Email: hello@sitdownvienna.app<br />
+        Phone: +43 664 8515753<br />
+        Web: www.sitdownvienna.app
+      </P>
       <H>Business</H>
       <P>Hairdressing and barber services.</P>
       <H>Legal form & registration</H>
       <P>
-        Legal form: <Placeholder>e.U. / GmbH / Sole proprietor</Placeholder><br />
-        Commercial register no.: <Placeholder>FN number</Placeholder><br />
-        Court: <Placeholder>Commercial Court Vienna</Placeholder><br />
-        GISA no.: <Placeholder>GISA number</Placeholder><br />
-        VAT ID: <Placeholder>ATU number</Placeholder>
+        Legal form: Limited liability company (GmbH)<br />
+        Commercial register no.: FN 543898 a<br />
+        Court: Commercial Court Vienna<br />
+        Tax number: 09 386/7604<br />
+        VAT ID: ATU77119823
       </P>
       <H>Supervisory authority</H>
       <P>
