@@ -187,8 +187,8 @@ const Datenschutz = ({ lang }: { lang: "de" | "en" }) => {
       <div className="card-app p-5">
         <H>1. Verantwortlicher</H>
         <P>
-          <Placeholder>Firmenname / Inhaber</Placeholder>, Lavaterstrasse 2, 1220 Wien, Österreich.
-          Kontakt: hello@sitdownvienna.app.
+          Immotime Immobilienverwertungs GmbH (Sitdown Gentlemens Barber), Erzherzog-Karl-Straße 7A/DG,
+          1220 Wien, Österreich. Kontakt: hello@sitdownvienna.app.
         </P>
 
         <H>2. Verarbeitete Daten</H>
