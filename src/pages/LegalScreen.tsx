@@ -239,8 +239,8 @@ const Datenschutz = ({ lang }: { lang: "de" | "en" }) => {
     <div className="card-app p-5">
       <H>1. Controller</H>
       <P>
-        <Placeholder>Company / Owner name</Placeholder>, Lavaterstrasse 2, 1220 Vienna, Austria.
-        Contact: hello@sitdownvienna.app.
+        Immotime Immobilienverwertungs GmbH (Sitdown Gentlemens Barber), Erzherzog-Karl-Straße 7A/DG,
+        1220 Vienna, Austria. Contact: hello@sitdownvienna.app.
       </P>
       <H>2. Data we process</H>
       <P>
