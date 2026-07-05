@@ -79,8 +79,9 @@ const Impressum = ({ lang }: { lang: "de" | "en" }) => {
 
         <H>Diensteanbieter</H>
         <P>
-          <Placeholder>Firmenname / Inhaber</Placeholder><br />
-          Lavaterstrasse 2<br />
+          Immotime Immobilienverwertungs GmbH<br />
+          Betrieb: Sitdown Gentlemens Barber<br />
+          Erzherzog-Karl-Straße 7A/DG<br />
           1220 Wien<br />
           Österreich
         </P>
@@ -88,6 +89,7 @@ const Impressum = ({ lang }: { lang: "de" | "en" }) => {
         <H>Kontakt</H>
         <P>
           E-Mail: hello@sitdownvienna.app<br />
+          Telefon: +43 664 8515753<br />
           Web: www.sitdownvienna.app
         </P>
 
@@ -96,11 +98,11 @@ const Impressum = ({ lang }: { lang: "de" | "en" }) => {
 
         <H>Rechtsform & Registrierung</H>
         <P>
-          Rechtsform: <Placeholder>e.U. / GmbH / Einzelunternehmen</Placeholder><br />
-          Firmenbuchnummer: <Placeholder>FN-Nummer</Placeholder><br />
-          Firmenbuchgericht: <Placeholder>Handelsgericht Wien</Placeholder><br />
-          GISA-Zahl: <Placeholder>GISA-Nummer</Placeholder><br />
-          UID-Nummer: <Placeholder>ATU-Nummer</Placeholder>
+          Rechtsform: Gesellschaft mit beschränkter Haftung (GmbH)<br />
+          Firmenbuchnummer: FN 543898 a<br />
+          Firmenbuchgericht: Handelsgericht Wien<br />
+          Steuernummer: 09 386/7604<br />
+          UID-Nummer: ATU77119823
         </P>
 
         <H>Aufsichtsbehörde / Kammer</H>
