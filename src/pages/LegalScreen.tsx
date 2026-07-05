@@ -79,8 +79,9 @@ const Impressum = ({ lang }: { lang: "de" | "en" }) => {
 
         <H>Diensteanbieter</H>
         <P>
-          <Placeholder>Firmenname / Inhaber</Placeholder><br />
-          Lavaterstrasse 2<br />
+          Immotime Immobilienverwertungs GmbH<br />
+          Betrieb: Sitdown Gentlemens Barber<br />
+          Erzherzog-Karl-Straße 7A/DG<br />
           1220 Wien<br />
           Österreich
         </P>
@@ -88,6 +89,7 @@ const Impressum = ({ lang }: { lang: "de" | "en" }) => {
         <H>Kontakt</H>
         <P>
           E-Mail: hello@sitdownvienna.app<br />
+          Telefon: +43 664 8515753<br />
           Web: www.sitdownvienna.app
         </P>
 
@@ -96,11 +98,11 @@ const Impressum = ({ lang }: { lang: "de" | "en" }) => {
 
         <H>Rechtsform & Registrierung</H>
         <P>
-          Rechtsform: <Placeholder>e.U. / GmbH / Einzelunternehmen</Placeholder><br />
-          Firmenbuchnummer: <Placeholder>FN-Nummer</Placeholder><br />
-          Firmenbuchgericht: <Placeholder>Handelsgericht Wien</Placeholder><br />
-          GISA-Zahl: <Placeholder>GISA-Nummer</Placeholder><br />
-          UID-Nummer: <Placeholder>ATU-Nummer</Placeholder>
+          Rechtsform: Gesellschaft mit beschränkter Haftung (GmbH)<br />
+          Firmenbuchnummer: FN 543898 a<br />
+          Firmenbuchgericht: Handelsgericht Wien<br />
+          Steuernummer: 09 386/7604<br />
+          UID-Nummer: ATU77119823
         </P>
 
         <H>Aufsichtsbehörde / Kammer</H>
@@ -133,22 +135,27 @@ const Impressum = ({ lang }: { lang: "de" | "en" }) => {
       <P>Information according to § 5 E-Commerce Act (ECG) and § 25 Media Act (Austria).</P>
       <H>Provider</H>
       <P>
-        <Placeholder>Company / Owner name</Placeholder><br />
-        Lavaterstrasse 2<br />
+        Immotime Immobilienverwertungs GmbH<br />
+        Trading as: Sitdown Gentlemens Barber<br />
+        Erzherzog-Karl-Straße 7A/DG<br />
         1220 Vienna<br />
         Austria
       </P>
       <H>Contact</H>
-      <P>Email: hello@sitdownvienna.app<br />Web: www.sitdownvienna.app</P>
+      <P>
+        Email: hello@sitdownvienna.app<br />
+        Phone: +43 664 8515753<br />
+        Web: www.sitdownvienna.app
+      </P>
       <H>Business</H>
       <P>Hairdressing and barber services.</P>
       <H>Legal form & registration</H>
       <P>
-        Legal form: <Placeholder>e.U. / GmbH / Sole proprietor</Placeholder><br />
-        Commercial register no.: <Placeholder>FN number</Placeholder><br />
-        Court: <Placeholder>Commercial Court Vienna</Placeholder><br />
-        GISA no.: <Placeholder>GISA number</Placeholder><br />
-        VAT ID: <Placeholder>ATU number</Placeholder>
+        Legal form: Limited liability company (GmbH)<br />
+        Commercial register no.: FN 543898 a<br />
+        Court: Commercial Court Vienna<br />
+        Tax number: 09 386/7604<br />
+        VAT ID: ATU77119823
       </P>
       <H>Supervisory authority</H>
       <P>
@@ -180,8 +187,8 @@ const Datenschutz = ({ lang }: { lang: "de" | "en" }) => {
       <div className="card-app p-5">
         <H>1. Verantwortlicher</H>
         <P>
-          <Placeholder>Firmenname / Inhaber</Placeholder>, Lavaterstrasse 2, 1220 Wien, Österreich.
-          Kontakt: hello@sitdownvienna.app.
+          Immotime Immobilienverwertungs GmbH (Sitdown Gentlemens Barber), Erzherzog-Karl-Straße 7A/DG,
+          1220 Wien, Österreich. Kontakt: hello@sitdownvienna.app.
         </P>
 
         <H>2. Verarbeitete Daten</H>
@@ -232,8 +239,8 @@ const Datenschutz = ({ lang }: { lang: "de" | "en" }) => {
     <div className="card-app p-5">
       <H>1. Controller</H>
       <P>
-        <Placeholder>Company / Owner name</Placeholder>, Lavaterstrasse 2, 1220 Vienna, Austria.
-        Contact: hello@sitdownvienna.app.
+        Immotime Immobilienverwertungs GmbH (Sitdown Gentlemens Barber), Erzherzog-Karl-Straße 7A/DG,
+        1220 Vienna, Austria. Contact: hello@sitdownvienna.app.
       </P>
       <H>2. Data we process</H>
       <P>
@@ -281,7 +288,7 @@ const AGB = ({ lang }: { lang: "de" | "en" }) => {
         <P>
           Diese Allgemeinen Geschäftsbedingungen gelten für alle über die App oder Website{" "}
           sitdownvienna.app gebuchten Dienstleistungen von{" "}
-          <Placeholder>Firmenname / Inhaber</Placeholder> (nachfolgend „Salon").
+          Immotime Immobilienverwertungs GmbH, betrieben als Sitdown Gentlemens Barber (nachfolgend „Salon").
         </P>
 
         <H>2. Terminbuchung</H>
@@ -332,7 +339,7 @@ const AGB = ({ lang }: { lang: "de" | "en" }) => {
       <H>1. Scope</H>
       <P>
         These Terms apply to all services booked through the app or website sitdownvienna.app
-        provided by <Placeholder>Company / Owner name</Placeholder> ("the Salon").
+        provided by Immotime Immobilienverwertungs GmbH, trading as Sitdown Gentlemens Barber ("the Salon").
       </P>
       <H>2. Booking</H>
       <P>
