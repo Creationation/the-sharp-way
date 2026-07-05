@@ -288,7 +288,7 @@ const AGB = ({ lang }: { lang: "de" | "en" }) => {
         <P>
           Diese Allgemeinen Geschäftsbedingungen gelten für alle über die App oder Website{" "}
           sitdownvienna.app gebuchten Dienstleistungen von{" "}
-          <Placeholder>Firmenname / Inhaber</Placeholder> (nachfolgend „Salon").
+          Immotime Immobilienverwertungs GmbH, betrieben als Sitdown Gentlemens Barber (nachfolgend „Salon").
         </P>
 
         <H>2. Terminbuchung</H>
