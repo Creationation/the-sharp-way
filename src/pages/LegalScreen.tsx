@@ -339,7 +339,7 @@ const AGB = ({ lang }: { lang: "de" | "en" }) => {
       <H>1. Scope</H>
       <P>
         These Terms apply to all services booked through the app or website sitdownvienna.app
-        provided by <Placeholder>Company / Owner name</Placeholder> ("the Salon").
+        provided by Immotime Immobilienverwertungs GmbH, trading as Sitdown Gentlemens Barber ("the Salon").
       </P>
       <H>2. Booking</H>
       <P>
