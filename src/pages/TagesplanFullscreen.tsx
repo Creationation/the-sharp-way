@@ -6,7 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useBarbers } from "@/hooks/useBarbers";
 import { useTagesplanMode } from "@/hooks/useTagesplanMode";
 import ScheduleTab from "@/components/admin/ScheduleTab";
-import sitdownLogo from "@/assets/sitdown-logo.png";
+const sitdownLogo = "/sitdown-logo.png";
 
 const TagesplanFullscreen = () => {
   const navigate = useNavigate();
