@@ -124,20 +124,52 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
 
   const handleSave = async () => {
     setSaving(true);
+    const newDate = format(date, "yyyy-MM-dd");
+    const newTime = time;
+    const newDuration = `${duration} min`;
+    const changes = {
+      date: newDate !== booking.booking_date,
+      time: newTime !== booking.booking_time.substring(0, 5),
+      barber: barberName !== booking.barber_name,
+      duration: newDuration !== booking.service_duration,
+    };
+
     const { error } = await supabase
       .from("bookings")
       .update({
         barber_name: barberName,
-        booking_date: format(date, "yyyy-MM-dd"),
-        booking_time: time,
-        service_duration: `${duration} min`,
+        booking_date: newDate,
+        booking_time: newTime,
+        service_duration: newDuration,
       })
       .eq("id", booking.id);
-    setSaving(false);
     if (error) {
+      setSaving(false);
       toast({ title: t.error, description: error.message, variant: "destructive" });
       return;
     }
+
+    if (changes.date || changes.time || changes.barber || changes.duration) {
+      const results = await Promise.allSettled([
+        supabase.functions.invoke("send-booking-update", {
+          body: {
+            booking_id: booking.id,
+            changes,
+            new_values: {
+              date: newDate,
+              time: newTime,
+              barber: barberName,
+              duration: newDuration,
+            },
+          },
+        }),
+      ]);
+      results.forEach((r) => {
+        if (r.status === "rejected") console.error("[booking-update] notify failed:", r.reason);
+      });
+    }
+
+    setSaving(false);
     toast({ title: t.saved });
     onChanged();
     onOpenChange(false);
