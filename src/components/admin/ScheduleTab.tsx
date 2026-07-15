@@ -8,6 +8,7 @@ import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import ExcelJS from "exceljs";
+import BookingDetailSheet, { BookingDetail } from "./BookingDetailSheet";
 
 interface Barber {
   id: string;
@@ -16,9 +17,12 @@ interface Barber {
 }
 
 interface Booking {
+  id: string;
+  user_id: string;
   barber_name: string;
   booking_time: string;
   service_name: string;
+  service_duration: string;
   booking_date: string;
   status: string;
 }
