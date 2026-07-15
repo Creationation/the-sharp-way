@@ -7,7 +7,7 @@ const BottomNav = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
 
-  if (location.pathname === "/") return null;
+  if (location.pathname === "/" || location.pathname === "/tagesplan") return null;
 
   const tabs = [
     { icon: Home, label: t.nav.home, path: "/home" },

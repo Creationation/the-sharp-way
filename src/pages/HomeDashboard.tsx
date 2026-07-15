@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Bell, Search, MapPin, Star, ChevronRight, X, Calendar, Clock } from "lucide-react";
+import { Bell, Search, MapPin, Star, ChevronRight, X, Calendar, Clock, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useBarbers } from "@/hooks/useBarbers";
+import { useTagesplanMode } from "@/hooks/useTagesplanMode";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import barber1 from "@/assets/barber-1.jpg";
@@ -39,8 +40,16 @@ interface PromoData {
 const HomeDashboard = () => {
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
-  const { user } = useAuth();
+  const { user, isAdmin, adminChecked } = useAuth();
   const { barbers } = useBarbers();
+  const { enabled: tagesplanMode, setEnabled: setTagesplanMode } = useTagesplanMode();
+
+  // Auto-redirect admins with the mode enabled straight into the Tagesplan view
+  useEffect(() => {
+    if (adminChecked && isAdmin && tagesplanMode) {
+      navigate("/tagesplan", { replace: true });
+    }
+  }, [adminChecked, isAdmin, tagesplanMode, navigate]);
 
   const getBarberImage = (name: string) => {
     return barbers.find(b => b.name === name)?.image || barber1;
@@ -147,9 +156,24 @@ const HomeDashboard = () => {
             </div>
           </div>
         </div>
-        <button className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
-          <Bell size={18} className="text-muted-foreground" />
-        </button>
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <button
+              onClick={() => {
+                setTagesplanMode(true);
+                navigate("/tagesplan");
+              }}
+              className="flex items-center gap-1.5 h-9 px-3 rounded-full border border-copper/40 bg-copper/10 text-copper text-[11px] font-semibold active:scale-95 transition"
+              aria-label={lang === "de" ? "Tagesplan-Modus aktivieren" : "Enable daily plan mode"}
+            >
+              <ClipboardList size={13} />
+              {lang === "de" ? "Tagesplan" : "Daily plan"}
+            </button>
+          )}
+          <button className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
+            <Bell size={18} className="text-muted-foreground" />
+          </button>
+        </div>
       </div>
 
       {/* Search bar */}

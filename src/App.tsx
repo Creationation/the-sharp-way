@@ -28,6 +28,7 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import ExploreBarbers from "@/pages/ExploreBarbers";
 import NotFound from "@/pages/NotFound";
 import LegalScreen from "@/pages/LegalScreen";
+import TagesplanFullscreen from "@/pages/TagesplanFullscreen";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +74,7 @@ const App = () => {
             <Route path="/explore" element={<ExploreBarbers />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/legal" element={<LegalScreen />} />
+            <Route path="/tagesplan" element={<TagesplanFullscreen />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
