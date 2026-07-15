@@ -8,6 +8,7 @@ import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import ExcelJS from "exceljs";
+import BookingDetailSheet, { BookingDetail } from "./BookingDetailSheet";
 
 interface Barber {
   id: string;
@@ -16,9 +17,12 @@ interface Barber {
 }
 
 interface Booking {
+  id: string;
+  user_id: string;
   barber_name: string;
   booking_time: string;
   service_name: string;
+  service_duration: string;
   booking_date: string;
   status: string;
 }
@@ -69,13 +73,15 @@ const ScheduleTab = ({ t, barbers }: Props) => {
   const [date, setDate] = useState<Date>(new Date());
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBooking, setSelectedBooking] = useState<BookingDetail | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
     const dateStr = format(date, "yyyy-MM-dd");
     const { data } = await supabase
       .from("bookings")
-      .select("barber_name, booking_time, service_name, booking_date, status")
+      .select("id, user_id, barber_name, booking_time, service_name, service_duration, booking_date, status")
       .eq("booking_date", dateStr);
     setBookings((data as Booking[]) || []);
     setLoading(false);
@@ -317,8 +323,13 @@ const ScheduleTab = ({ t, barbers }: Props) => {
                     return (
                       <td key={b.id} className="py-2.5 px-2 text-center">
                         {booking ? (
-                          <div
-                            className={`rounded-lg px-2 py-1.5 text-[10px] font-medium leading-tight border ${statusStyle!.border}`}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedBooking(booking as BookingDetail);
+                              setSheetOpen(true);
+                            }}
+                            className={`w-full rounded-lg px-2 py-1.5 text-[10px] font-medium leading-tight border ${statusStyle!.border} active:scale-[0.97] transition-transform`}
                             style={{
                               backgroundColor: b.color + "18",
                             }}
@@ -330,7 +341,7 @@ const ScheduleTab = ({ t, barbers }: Props) => {
                             <span className={`text-[9px] font-semibold ${statusStyle!.text}`}>
                               {STATUS_LABELS[booking.status]?.[lang] || booking.status}
                             </span>
-                          </div>
+                          </button>
                         ) : (
                           <span className="text-muted-foreground/30">—</span>
                         )}
@@ -343,6 +354,14 @@ const ScheduleTab = ({ t, barbers }: Props) => {
           </table>
         </div>
       )}
+
+      <BookingDetailSheet
+        booking={selectedBooking}
+        barbers={barbers}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onChanged={fetchBookings}
+      />
     </div>
   );
 };
