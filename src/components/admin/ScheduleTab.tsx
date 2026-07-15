@@ -323,8 +323,13 @@ const ScheduleTab = ({ t, barbers }: Props) => {
                     return (
                       <td key={b.id} className="py-2.5 px-2 text-center">
                         {booking ? (
-                          <div
-                            className={`rounded-lg px-2 py-1.5 text-[10px] font-medium leading-tight border ${statusStyle!.border}`}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedBooking(booking as BookingDetail);
+                              setSheetOpen(true);
+                            }}
+                            className={`w-full rounded-lg px-2 py-1.5 text-[10px] font-medium leading-tight border ${statusStyle!.border} active:scale-[0.97] transition-transform`}
                             style={{
                               backgroundColor: b.color + "18",
                             }}
@@ -336,7 +341,7 @@ const ScheduleTab = ({ t, barbers }: Props) => {
                             <span className={`text-[9px] font-semibold ${statusStyle!.text}`}>
                               {STATUS_LABELS[booking.status]?.[lang] || booking.status}
                             </span>
-                          </div>
+                          </button>
                         ) : (
                           <span className="text-muted-foreground/30">—</span>
                         )}
