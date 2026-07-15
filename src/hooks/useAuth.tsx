@@ -60,34 +60,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const restoreSession = useCallback(async (showLoading = false) => {
     if (showLoading) setLoading(true);
+    let timedOut = false;
     try {
-      const sessionTimeout = new Promise<{ data: { session: null } }>((resolve) =>
-        setTimeout(() => resolve({ data: { session: null } }), 7000)
+      const sessionTimeout = new Promise<{ data: { session: null }; __timeout: true }>((resolve) =>
+        setTimeout(() => resolve({ data: { session: null }, __timeout: true }), 10000)
       );
-      const { data: { session: storedSession } } = await Promise.race([
+      const raced = await Promise.race([
         supabase.auth.getSession(),
         sessionTimeout,
-      ]);
+      ]) as { data: { session: Session | null }; __timeout?: boolean };
+      timedOut = raced.__timeout === true;
+      const storedSession = raced.data.session;
 
       let activeSession = storedSession;
       const expiresAt = activeSession?.expires_at ? activeSession.expires_at * 1000 : 0;
-      if (activeSession && expiresAt && expiresAt - Date.now() < 60000) {
-        const refreshTimeout = new Promise<{ data: { session: Session | null }; error: Error }>((resolve) =>
-          setTimeout(() => resolve({ data: { session: activeSession }, error: new Error("session refresh timeout") }), 7000)
-        );
-        const { data, error } = await Promise.race([supabase.auth.refreshSession(), refreshTimeout]);
-        if (error) console.error("[useAuth] refreshSession error", error);
-        activeSession = data.session ?? activeSession;
+      if (activeSession && expiresAt && expiresAt - Date.now() < 5 * 60 * 1000) {
+        try {
+          const refreshTimeout = new Promise<{ data: { session: Session | null }; error: Error | null }>((resolve) =>
+            setTimeout(() => resolve({ data: { session: activeSession }, error: new Error("session refresh timeout") }), 10000)
+          );
+          const { data, error } = await Promise.race([supabase.auth.refreshSession(), refreshTimeout]);
+          if (error) console.error("[useAuth] refreshSession error", error);
+          activeSession = data.session ?? activeSession;
+        } catch (err) {
+          // transient refresh error — keep the existing session, autoRefresh will retry
+          console.error("[useAuth] refreshSession threw", err);
+        }
       }
 
-      applySession(activeSession ?? null);
-      if (activeSession?.user) {
-        setAdminChecked(false);
-        setTimeout(() => checkAdmin(activeSession.user.id), 0);
+      // Only apply a session change when we actually got a definitive answer.
+      // On timeout / transient error, keep whatever session we already have.
+      if (!timedOut) {
+        applySession(activeSession ?? null);
+        if (activeSession?.user) {
+          setAdminChecked(false);
+          setTimeout(() => checkAdmin(activeSession.user.id), 0);
+        }
       }
     } catch (err) {
-      console.error("[useAuth] restoreSession failed", err);
-      applySession(null);
+      // Transient error (network, tab wake-up). NEVER force sign-out here —
+      // the user only gets logged out when they explicitly call signOut().
+      console.error("[useAuth] restoreSession failed (keeping existing session)", err);
     } finally {
       setLoading(false);
     }
