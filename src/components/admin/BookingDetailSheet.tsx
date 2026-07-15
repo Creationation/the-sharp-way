@@ -188,11 +188,26 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
       .from("bookings")
       .update({ status: "cancelled" })
       .eq("id", booking.id);
-    setSaving(false);
     if (error) {
+      setSaving(false);
       toast({ title: t.error, description: error.message, variant: "destructive" });
       return;
     }
+
+    const results = await Promise.allSettled([
+      supabase.functions.invoke("send-booking-update", {
+        body: {
+          booking_id: booking.id,
+          changes: { cancelled: true },
+          new_values: {},
+        },
+      }),
+    ]);
+    results.forEach((r) => {
+      if (r.status === "rejected") console.error("[booking-cancel] notify failed:", r.reason);
+    });
+
+    setSaving(false);
     toast({ title: t.cancelled });
     onChanged();
     onOpenChange(false);
