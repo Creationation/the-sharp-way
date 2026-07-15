@@ -79,7 +79,7 @@ const ScheduleTab = ({ t, barbers }: Props) => {
     const dateStr = format(date, "yyyy-MM-dd");
     const { data } = await supabase
       .from("bookings")
-      .select("barber_name, booking_time, service_name, booking_date, status")
+      .select("id, user_id, barber_name, booking_time, service_name, service_duration, booking_date, status")
       .eq("booking_date", dateStr);
     setBookings((data as Booking[]) || []);
     setLoading(false);
