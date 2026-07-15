@@ -156,9 +156,24 @@ const HomeDashboard = () => {
             </div>
           </div>
         </div>
-        <button className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
-          <Bell size={18} className="text-muted-foreground" />
-        </button>
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <button
+              onClick={() => {
+                setTagesplanMode(true);
+                navigate("/tagesplan");
+              }}
+              className="flex items-center gap-1.5 h-9 px-3 rounded-full border border-copper/40 bg-copper/10 text-copper text-[11px] font-semibold active:scale-95 transition"
+              aria-label={lang === "de" ? "Tagesplan-Modus aktivieren" : "Enable daily plan mode"}
+            >
+              <ClipboardList size={13} />
+              {lang === "de" ? "Tagesplan" : "Daily plan"}
+            </button>
+          )}
+          <button className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
+            <Bell size={18} className="text-muted-foreground" />
+          </button>
+        </div>
       </div>
 
       {/* Search bar */}
