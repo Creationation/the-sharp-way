@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Bell, Search, MapPin, Star, ChevronRight, X, Calendar, Clock } from "lucide-react";
+import { Bell, Search, MapPin, Star, ChevronRight, X, Calendar, Clock, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useBarbers } from "@/hooks/useBarbers";
+import { useTagesplanMode } from "@/hooks/useTagesplanMode";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import barber1 from "@/assets/barber-1.jpg";
@@ -39,8 +40,16 @@ interface PromoData {
 const HomeDashboard = () => {
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
-  const { user } = useAuth();
+  const { user, isAdmin, adminChecked } = useAuth();
   const { barbers } = useBarbers();
+  const { enabled: tagesplanMode, setEnabled: setTagesplanMode } = useTagesplanMode();
+
+  // Auto-redirect admins with the mode enabled straight into the Tagesplan view
+  useEffect(() => {
+    if (adminChecked && isAdmin && tagesplanMode) {
+      navigate("/tagesplan", { replace: true });
+    }
+  }, [adminChecked, isAdmin, tagesplanMode, navigate]);
 
   const getBarberImage = (name: string) => {
     return barbers.find(b => b.name === name)?.image || barber1;
