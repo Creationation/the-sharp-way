@@ -354,6 +354,14 @@ const ScheduleTab = ({ t, barbers }: Props) => {
           </table>
         </div>
       )}
+
+      <BookingDetailSheet
+        booking={selectedBooking}
+        barbers={barbers}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onChanged={fetchBookings}
+      />
     </div>
   );
 };
