@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Calendar } from "lucide-react";
 
-const barbers = ["Ibo", "Ahmed", "Cetin"];
+const barbers = ["Ibo", "Ahmed"];
 const services = [
   "Classic Haircut (€25)",
   "Fade & Taper (€30)",

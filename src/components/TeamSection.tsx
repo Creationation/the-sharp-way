@@ -1,11 +1,9 @@
 import barber1 from "@/assets/barber-1.jpg";
 import barber2 from "@/assets/barber-2.jpg";
-import barber3 from "@/assets/barber-3.jpg";
 
 const barbers = [
   { name: "Ibo", specialty: "Classic Cuts & Hot Towel Shaves", years: 12, image: barber1 },
   { name: "Ahmed", specialty: "Fades, Tapers & Modern Styles", years: 7, image: barber2 },
-  { name: "Cetin", specialty: "Beard Sculpting & Design", years: 9, image: barber3 },
 ];
 
 const TeamSection = () => {
@@ -24,7 +22,7 @@ const TeamSection = () => {
                 <img
                   src={barber.image}
                   alt={`${barber.name} - barber at Sitdown Wien`}
-                  className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${barber.name === "Cetin" ? "object-[center_30%]" : ""}`}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />

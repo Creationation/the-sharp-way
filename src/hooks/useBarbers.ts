@@ -2,13 +2,11 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import barber1 from "@/assets/barber-1.jpg";
 import barber2 from "@/assets/barber-2.jpg";
-import barber3 from "@/assets/barber-3.jpg";
 
 // Map DB image_url to local assets
 const IMAGE_MAP: Record<string, string> = {
   "/barber-1": barber1,
   "/barber-2": barber2,
-  "/barber-3": barber3,
 };
 
 export interface Barber {
@@ -37,11 +35,13 @@ export function useBarbers() {
       .order("sort_order");
     if (data) {
       setBarbers(
-        data.map((b: any) => ({
-          ...b,
-          rating: Number(b.rating),
-          image: b.image_url?.startsWith("http") ? b.image_url : (IMAGE_MAP[b.image_url] || barber1),
-        }))
+        data
+          .filter((b: any) => b.name?.toLowerCase() !== "cetin")
+          .map((b: any) => ({
+            ...b,
+            rating: Number(b.rating),
+            image: b.image_url?.startsWith("http") ? b.image_url : (IMAGE_MAP[b.image_url] || barber1),
+          }))
       );
     }
     setLoading(false);

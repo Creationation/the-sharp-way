@@ -115,7 +115,7 @@ const HomeDashboard = () => {
   const hasResults = filteredBarbers.length > 0 || filteredServices.length > 0;
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-40">
       {/* Announcement strip */}
       {bannerPromo && (
         <div className="bg-surface border-b border-border pt-[env(safe-area-inset-top)] overflow-hidden">
@@ -386,6 +386,7 @@ const HomeDashboard = () => {
           </div>
         </>
       )}
+    <div className="h-16" />
     </div>
   );
 };
