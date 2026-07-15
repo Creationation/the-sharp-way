@@ -1,0 +1,1 @@
+DELETE FROM public.barbers WHERE name ILIKE '%cetin%';

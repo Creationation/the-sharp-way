@@ -5,12 +5,10 @@ import { toast } from "sonner";
 import { useConfirm } from "@/hooks/useConfirm";
 import barber1 from "@/assets/barber-1.jpg";
 import barber2 from "@/assets/barber-2.jpg";
-import barber3 from "@/assets/barber-3.jpg";
 
 const IMAGE_MAP: Record<string, string> = {
   "/barber-1": barber1,
   "/barber-2": barber2,
-  "/barber-3": barber3,
 };
 
 interface BarberRow {
@@ -56,7 +54,6 @@ interface Props {
 const IMAGES = [
   { label: "Ibo", value: "/barber-1" },
   { label: "Ahmed", value: "/barber-2" },
-  { label: "Cetin", value: "/barber-3" },
 ];
 
 const BarbersTab = ({ t }: Props) => {
