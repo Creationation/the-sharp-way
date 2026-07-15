@@ -73,6 +73,8 @@ const ScheduleTab = ({ t, barbers }: Props) => {
   const [date, setDate] = useState<Date>(new Date());
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBooking, setSelectedBooking] = useState<BookingDetail | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
