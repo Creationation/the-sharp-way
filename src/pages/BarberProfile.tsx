@@ -2,6 +2,7 @@ import { ArrowLeft, Star, MapPin, Share2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useBarbers } from "@/hooks/useBarbers";
+import { useBarberPhotos } from "@/hooks/useBarberPhotos";
 import gallery1 from "@/assets/gallery-1.jpg";
 import gallery2 from "@/assets/gallery-2.jpg";
 import gallery3 from "@/assets/gallery-3.jpg";
@@ -19,7 +20,10 @@ const BarberProfile = () => {
   const { id } = useParams();
   const { t, lang } = useLanguage();
   const { barbers, loading } = useBarbers();
-  const recentWork = [gallery1, gallery2, gallery3];
+  const fallbackWork = [gallery1, gallery2, gallery3];
+
+  const barber = barbers.find(b => b.id === id) || barbers[0];
+  const { photos } = useBarberPhotos(barber?.id);
 
   if (loading || barbers.length === 0) {
     return (
@@ -29,8 +33,12 @@ const BarberProfile = () => {
     );
   }
 
-  const barber = barbers.find(b => b.id === id) || barbers[0];
   const specialty = lang === "de" ? barber.specialty_de : barber.specialty_en;
+  const recentWork = photos.length > 0
+    ? photos.map(p => p.image_url)
+    : fallbackWork;
+
+
 
   return (
     <div className="min-h-screen bg-background pb-28">
