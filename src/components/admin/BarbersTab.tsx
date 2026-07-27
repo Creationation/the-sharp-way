@@ -5,11 +5,13 @@ import { toast } from "sonner";
 import { useConfirm } from "@/hooks/useConfirm";
 import barber1 from "@/assets/barber-1.jpg";
 import barber2 from "@/assets/barber-2.jpg";
+import BarberPhotosManager from "./BarberPhotosManager";
 
 const IMAGE_MAP: Record<string, string> = {
   "/barber-1": barber1,
   "/barber-2": barber2,
 };
+
 
 interface BarberRow {
   id: string;
@@ -332,8 +334,12 @@ const BarbersTab = ({ t }: Props) => {
               <Trash2 size={14} className="text-destructive" />
             </button>
           </div>
+
+          {/* Photos manager */}
+          <BarberPhotosManager barberId={barber.id} barberName={barber.name} />
         </div>
       ))}
+
 
       {/* Add barber button */}
       <button

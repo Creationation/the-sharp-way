@@ -2,6 +2,7 @@ import { ArrowLeft, Star, MapPin, Share2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useBarbers } from "@/hooks/useBarbers";
+import { useBarberPhotos } from "@/hooks/useBarberPhotos";
 import gallery1 from "@/assets/gallery-1.jpg";
 import gallery2 from "@/assets/gallery-2.jpg";
 import gallery3 from "@/assets/gallery-3.jpg";
@@ -19,7 +20,8 @@ const BarberProfile = () => {
   const { id } = useParams();
   const { t, lang } = useLanguage();
   const { barbers, loading } = useBarbers();
-  const recentWork = [gallery1, gallery2, gallery3];
+  const fallbackWork = [gallery1, gallery2, gallery3];
+
 
   if (loading || barbers.length === 0) {
     return (

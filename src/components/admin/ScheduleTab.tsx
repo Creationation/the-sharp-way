@@ -77,6 +77,8 @@ const ScheduleTab = ({ t, barbers }: Props) => {
   const [loading, setLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState<BookingDetail | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
@@ -278,14 +280,24 @@ const ScheduleTab = ({ t, barbers }: Props) => {
         </div>
       </div>
 
-      {/* Export button */}
-      <button
-        onClick={exportXlsx}
-        className="w-full mb-4 card-app p-3 flex items-center justify-center gap-2 text-copper font-semibold text-sm hover:bg-copper/5 active:scale-[0.98] transition-all"
-      >
-        <Download size={16} />
-        {lang === "de" ? "Als Excel exportieren" : "Export as Excel"}
-      </button>
+      {/* Actions row */}
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        <button
+          onClick={() => setCreateOpen(true)}
+          className="card-app p-3 flex items-center justify-center gap-2 text-copper font-semibold text-sm hover:bg-copper/5 active:scale-[0.98] transition-all border-copper/30"
+        >
+          <Plus size={16} />
+          {lang === "de" ? "Neuer Termin" : "New appointment"}
+        </button>
+        <button
+          onClick={exportXlsx}
+          className="card-app p-3 flex items-center justify-center gap-2 text-copper font-semibold text-sm hover:bg-copper/5 active:scale-[0.98] transition-all"
+        >
+          <Download size={16} />
+          {lang === "de" ? "Excel Export" : "Excel export"}
+        </button>
+      </div>
+
 
       {/* Legend */}
       <div className="flex flex-wrap gap-3 mb-4">
@@ -364,8 +376,25 @@ const ScheduleTab = ({ t, barbers }: Props) => {
         onOpenChange={setSheetOpen}
         onChanged={fetchBookings}
       />
+
+      <AdminBookingCreateSheet
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={fetchBookings}
+        defaultDate={date}
+      />
+
+      {/* Floating action button */}
+      <button
+        onClick={() => setCreateOpen(true)}
+        aria-label={lang === "de" ? "Neuer Termin" : "New appointment"}
+        className="fixed bottom-24 right-5 z-30 w-14 h-14 rounded-full gradient-copper shadow-copper flex items-center justify-center active:scale-95 transition"
+      >
+        <Plus size={24} className="text-primary-foreground" />
+      </button>
     </div>
   );
 };
 
 export default ScheduleTab;
+
