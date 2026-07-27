@@ -3,8 +3,9 @@ import {
   ArrowLeft, Calendar as CalendarIcon, Clock, User, Trash2, XCircle,
   CheckCircle, ChevronLeft, ChevronRight, ToggleLeft, ToggleRight, Save,
   Menu, X, Tag, Scissors, Bell, LayoutGrid, BarChart3, Mail, Shield,
-  Search, Download, RotateCcw, BookOpen,
+  Search, Download, RotateCcw, BookOpen, Plus,
 } from "lucide-react";
+
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
