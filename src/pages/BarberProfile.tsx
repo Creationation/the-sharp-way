@@ -33,6 +33,11 @@ const BarberProfile = () => {
 
   const barber = barbers.find(b => b.id === id) || barbers[0];
   const specialty = lang === "de" ? barber.specialty_de : barber.specialty_en;
+  const { photos } = useBarberPhotos(barber?.id);
+  const recentWork = photos.length > 0
+    ? photos.map(p => p.image_url)
+    : fallbackWork;
+
 
   return (
     <div className="min-h-screen bg-background pb-28">
