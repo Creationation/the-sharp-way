@@ -26,8 +26,10 @@ import GalleryTab from "@/components/admin/GalleryTab";
 import EmailsTab from "@/components/admin/EmailsTab";
 import AdminsTab from "@/components/admin/AdminsTab";
 import ManualTab from "@/components/admin/ManualTab";
+import AdminBookingCreateSheet from "@/components/admin/AdminBookingCreateSheet";
 import { useBarbers } from "@/hooks/useBarbers";
 import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
+
 
 interface Booking {
   id: string;
@@ -103,6 +105,8 @@ const AdminDashboard = () => {
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [createBookingOpen, setCreateBookingOpen] = useState(false);
+
 
   // — Availability tab state —
   const [avBarber, setAvBarber] = useState("");
@@ -450,6 +454,13 @@ const AdminDashboard = () => {
 
             <div className="flex gap-2 flex-wrap">
               <button
+                onClick={() => setCreateBookingOpen(true)}
+                className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full bg-copper text-bg-base font-semibold hover:opacity-90"
+              >
+                <Plus size={12} /> {lang === "de" ? "Neuer Termin" : "New appointment"}
+              </button>
+              <button
+
                 onClick={() => setShowAdvanced(v => !v)}
                 className={`flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full border ${
                   showAdvanced || dateFrom || dateTo
