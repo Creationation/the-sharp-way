@@ -864,8 +864,15 @@ const AdminDashboard = () => {
 
       {/* ═══════════════════ MANUAL TAB ═══════════════════ */}
       {tab === "manual" && <ManualTab />}
+
+      <AdminBookingCreateSheet
+        open={createBookingOpen}
+        onOpenChange={setCreateBookingOpen}
+        onCreated={fetchBookings}
+      />
     </div>
   );
 };
+
 
 export default AdminDashboard;
