@@ -425,7 +425,7 @@ const BookingFlow = () => {
     dbServices.map(s => [lang === "en" ? (s.name_en || s.name) : s.name, s.category])
   );
   const lastAllowedSlot = computeLastAllowedSlot(selectedServices, categoryByName);
-  const visibleSlots = allTimeSlots.filter(s => s <= lastAllowedSlot);
+  const baseVisibleSlots = allTimeSlots.filter(s => s <= lastAllowedSlot);
 
   useEffect(() => {
     if (selectedTime && selectedTime > lastAllowedSlot) {
@@ -435,7 +435,13 @@ const BookingFlow = () => {
 
   const [takenSlots, setTakenSlots] = useState<string[]>([]);
   const [dayOff, setDayOff] = useState(false);
+  const [workWindow, setWorkWindow] = useState<{ start: string; end: string } | null>(null);
   const [loadingSlots, setLoadingSlots] = useState(false);
+
+  const visibleSlots = workWindow
+    ? baseVisibleSlots.filter(s => s >= workWindow.start && s < workWindow.end)
+    : baseVisibleSlots;
+
 
   const selectedDate = availableDates[selectedDayIdx];
   const dayAbbr = DAY_ABBR[lang] ?? DAY_ABBR.en;
