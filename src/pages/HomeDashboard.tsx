@@ -354,14 +354,14 @@ const HomeDashboard = () => {
               </button>
             </div>
             <div className="overflow-x-auto scrollbar-hide">
-              <div className="flex gap-3 px-5 pb-2" style={{ width: "max-content" }}>
+              <div className="flex gap-3 px-5 pb-2 items-stretch" style={{ width: "max-content" }}>
                 {barbers.map((b) => (
                   <div
                     key={b.id}
                     onClick={() => navigate(`/barber/${b.id}`)}
-                    className="w-44 flex-shrink-0 card-app overflow-hidden cursor-pointer group"
+                    className="w-44 flex-shrink-0 card-app overflow-hidden cursor-pointer group flex flex-col"
                   >
-                    <div className="relative h-36">
+                    <div className="relative h-36 flex-shrink-0">
                       <img src={b.image} alt={b.name} className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
                       <div className="absolute top-3 right-3 flex items-center gap-1 bg-background/70 backdrop-blur-sm rounded-full px-2 py-0.5">
@@ -369,19 +369,20 @@ const HomeDashboard = () => {
                         <span className="text-[9px] text-foreground font-medium">{b.available ? t.home.available : t.home.busy}</span>
                       </div>
                     </div>
-                    <div className="p-3">
+                    <div className="p-3 flex flex-col flex-1">
                       <p className="text-foreground font-semibold text-sm">{b.name}</p>
-                      <p className="text-muted-foreground text-[11px] mb-2">{lang === "de" ? b.specialty_de : b.specialty_en}</p>
+                      <p className="text-muted-foreground text-[11px] mb-2 line-clamp-2 min-h-[2rem]">{lang === "de" ? b.specialty_de : b.specialty_en}</p>
                       <div className="flex items-center gap-1 mb-3">
                         <Star size={12} className="text-copper fill-copper" />
                         <span className="text-foreground text-xs font-medium">{b.rating}</span>
                       </div>
-                      <button className="w-full gradient-copper text-primary-foreground text-[11px] font-semibold py-1.5 rounded-full">
+                      <button className="mt-auto w-full gradient-copper text-primary-foreground text-[11px] font-semibold py-1.5 rounded-full">
                         {t.home.bookNow} →
                       </button>
                     </div>
                   </div>
                 ))}
+
               </div>
             </div>
           </div>
