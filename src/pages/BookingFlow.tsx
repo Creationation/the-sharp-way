@@ -10,7 +10,7 @@ import { useServices } from "@/hooks/useServices";
 import { toast } from "sonner";
 import PaymentExplanation from "@/components/PaymentExplanation";
 
-type ServiceItem = { name: string; price: string; duration: string; category?: "herren" | "damen" | "kinder" };
+type ServiceItem = { id?: string; name: string; price: string; duration: string; category?: "herren" | "damen" | "kinder" };
 
 const DAY_ABBR: Record<string, string[]> = {
   en: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
@@ -148,13 +148,13 @@ const BookingFlow = () => {
   const { barbers, loading: barbersLoading } = useBarbers();
   const { services: dbServices } = useServices({ onlyActive: true });
   const services: ServiceItem[] = dbServices.map(s => ({
+    id: s.id,
     name: lang === "en" ? (s.name_en || s.name) : s.name,
     price: s.is_from_price ? `${t.services.fromPrefix} €${s.price}` : `€${s.price}`,
     duration: `${s.duration_min}min`,
     category: s.category,
   }));
   const [activeGender, setActiveGender] = useState<"herren" | "damen">("herren");
-  const visibleServices = services.filter(s => s.category === activeGender);
 
   const [customDate, setCustomDate] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -164,11 +164,23 @@ const BookingFlow = () => {
   const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
   const [selectedServices, setSelectedServices] = useState<ServiceItem[]>([]);
 
-  // Default-select first service once services load (only if user has nothing selected)
+  // Preselect the service coming from the services list (?service=<id>),
+  // otherwise default-select the first service once services load.
+  const preselectDone = useRef(false);
   useEffect(() => {
-    if (services.length > 0 && selectedServices.length === 0) {
-      setSelectedServices([services[0]]);
+    if (services.length === 0 || preselectDone.current) return;
+    const preselectId = searchParams.get("service");
+    if (preselectId) {
+      const found = services.find(s => s.id === preselectId);
+      if (found) {
+        preselectDone.current = true;
+        setSelectedServices([found]);
+        setActiveGender(found.category === "damen" ? "damen" : "herren");
+        return;
+      }
     }
+    preselectDone.current = true;
+    if (selectedServices.length === 0) setSelectedServices([services[0]]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [services.length]);
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
@@ -327,7 +339,7 @@ const BookingFlow = () => {
         const restoredSvcs = (draft.serviceNames as string[])
           .map((name: string) => services.find(s => s.name === name))
           .filter(Boolean) as ServiceItem[];
-        if (restoredSvcs.length > 0) setSelectedServices(restoredSvcs);
+        if (restoredSvcs.length > 0 && !searchParams.get("service")) setSelectedServices(restoredSvcs);
         if (draft.customDateISO) setCustomDate(new Date(draft.customDateISO));
         if (typeof draft.selectedDayIdx === "number") setSelectedDayIdx(draft.selectedDayIdx);
         if (draft.selectedTime) setSelectedTime(draft.selectedTime);
