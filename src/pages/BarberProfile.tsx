@@ -102,6 +102,73 @@ const BarberProfile = () => {
         </div>
       </div>
 
+      {/* Arbeitstage & Abwesenheiten */}
+      <div className="px-5 mb-6 space-y-3">
+        <div className="card-app p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <CalendarDays size={16} className="text-copper" />
+            <h3 className="font-heading text-base text-foreground">
+              {de ? "Arbeitstage" : "Working days"}
+            </h3>
+          </div>
+          {hours.length === 0 ? (
+            <p className="text-muted-foreground text-xs">
+              {de ? "Zeiten auf Anfrage" : "Hours on request"}
+            </p>
+          ) : (
+            <div className="space-y-1.5">
+              {weekOrder.map(wd => {
+                const h = hourFor(wd);
+                const open = h?.active;
+                return (
+                  <div key={wd} className="flex items-center justify-between text-xs">
+                    <span className={open ? "text-foreground" : "text-muted-foreground"}>
+                      {DAY_LABELS[wd]}
+                    </span>
+                    <span className={open ? "text-mint font-medium" : "text-muted-foreground"}>
+                      {open
+                        ? `${hhmm(h!.start_time)} · ${hhmm(h!.end_time)}`
+                        : de ? "Frei" : "Off"}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="card-app p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Plane size={16} className="text-copper" />
+            <h3 className="font-heading text-base text-foreground">
+              {de ? "Nächste Abwesenheiten" : "Upcoming time off"}
+            </h3>
+          </div>
+          {absences.length === 0 ? (
+            <p className="text-muted-foreground text-xs">
+              {de ? "Keine Abwesenheiten geplant" : "No time off planned"}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {absences.map(a => (
+                <div key={a.id} className="flex items-start justify-between gap-3 text-xs">
+                  <span className="text-foreground">
+                    {a.start_date === a.end_date
+                      ? fmtDate(a.start_date)
+                      : `${fmtDate(a.start_date)} · ${fmtDate(a.end_date)}`}
+                  </span>
+                  {a.reason && (
+                    <span className="text-muted-foreground text-right">{a.reason}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+
+
       {/* Services */}
       <div className="px-5 mb-6">
         <h3 className="font-heading text-lg text-foreground mb-3">{t.barber.services}</h3>
