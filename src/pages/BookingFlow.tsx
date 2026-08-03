@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo, useLayoutEffect } from "react";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { ArrowLeft, Star, Check, CalendarDays, X } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -403,6 +403,41 @@ const BookingFlow = () => {
       return exists ? prev.filter(p => p.name !== s.name) : [...prev, s];
     });
   };
+
+  // Selected services always visible and pinned to the top (smooth FLIP reorder)
+  const visibleServices = useMemo(() => {
+    const selectedNames = new Set(selectedServices.map(s => s.name));
+    const selectedItems = services.filter(s => selectedNames.has(s.name));
+    const rest = services.filter(s => s.category === activeGender && !selectedNames.has(s.name));
+    return [...selectedItems, ...rest];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dbServices, lang, activeGender, selectedServices]);
+
+  const serviceItemRefs = useRef<Map<string, HTMLElement>>(new Map());
+  const servicePrevRects = useRef<Map<string, DOMRect>>(new Map());
+  useLayoutEffect(() => {
+    const seen = new Set<string>();
+    serviceItemRefs.current.forEach((el, key) => {
+      seen.add(key);
+      const next = el.getBoundingClientRect();
+      const prev = servicePrevRects.current.get(key);
+      if (prev) {
+        const dy = prev.top - next.top;
+        if (Math.abs(dy) > 1) {
+          el.style.transition = "none";
+          el.style.transform = `translateY(${dy}px)`;
+          requestAnimationFrame(() => {
+            el.style.transition = "transform 320ms cubic-bezier(0.22, 1, 0.36, 1)";
+            el.style.transform = "";
+          });
+        }
+      }
+      servicePrevRects.current.set(key, next);
+    });
+    servicePrevRects.current.forEach((_, key) => {
+      if (!seen.has(key)) servicePrevRects.current.delete(key);
+    });
+  }, [visibleServices]);
 
   const totalPrice = selectedServices.reduce((sum, s) => sum + parseInt(s.price.replace("€", "")), 0);
 
@@ -829,7 +864,7 @@ const BookingFlow = () => {
           ))}
         </div>
 
-        <div key={activeGender} className="space-y-2">
+        <div className="space-y-2">
           {visibleServices.length === 0 && (
             <p className="text-muted-foreground text-xs text-center py-6">—</p>
           )}
@@ -838,6 +873,10 @@ const BookingFlow = () => {
             return (
               <button
                 key={s.name}
+                ref={(el) => {
+                  if (el) serviceItemRefs.current.set(s.name, el);
+                  else serviceItemRefs.current.delete(s.name);
+                }}
                 onClick={() => toggleService(s)}
                 style={{ animationDelay: `${i * 30}ms`, animationFillMode: "backwards" }}
                 className={`w-full card-app p-4 flex items-center justify-between transition-all animate-fade-in ${
