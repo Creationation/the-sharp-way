@@ -50,15 +50,25 @@ for (let h = 10; h <= 19; h++) {
   allTimeSlots.push(`${h.toString().padStart(2, "0")}:30`);
 }
 
+const shiftSlot = (slot: string, minutes: number): string => {
+  const [h, m] = slot.split(":").map(Number);
+  const total = h * 60 + m + minutes;
+  return `${Math.floor(total / 60).toString().padStart(2, "0")}:${(total % 60).toString().padStart(2, "0")}`;
+};
+
 const computeLastAllowedSlot = (
   selected: { name: string }[],
   categoryByName: Map<string, string>,
+  isSaturday = false,
 ): string => {
-  if (selected.length === 0) return "19:30";
-  if (selected.some(s => categoryByName.get(s.name) === "damen")) return "17:00";
-  if (selected.length >= 2) return "17:30";
-  return "18:00";
+  // Sa: Shop schließt um 18:00 statt 19:00 · letzter Slot eine Stunde früher
+  const offset = isSaturday ? -60 : 0;
+  if (selected.length === 0) return shiftSlot("19:30", offset);
+  if (selected.some(s => categoryByName.get(s.name) === "damen")) return shiftSlot("17:00", offset);
+  if (selected.length >= 2) return shiftSlot("17:30", offset);
+  return shiftSlot("18:00", offset);
 };
+
 
 const DRAFT_KEY = "booking_draft";
 
