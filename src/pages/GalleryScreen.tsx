@@ -3,6 +3,7 @@ import { ArrowLeft, Bookmark, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useGalleryImages } from "@/hooks/useGalleryImages";
+import { useAllBarberPhotos } from "@/hooks/useAllBarberPhotos";
 import fade1 from "@/assets/fade-1.jpg";
 import fade2 from "@/assets/fade-2.jpg";
 import fade3 from "@/assets/fade-3.jpg";
@@ -51,17 +52,43 @@ const GalleryScreen = () => {
   const [activeFilter, setActiveFilter] = useState(0);
   const [lightbox, setLightbox] = useState<string | null>(null);
   const { images: dbImages, loading } = useGalleryImages({ onlyActive: true });
+  const { photos: barberPhotos, loading: loadingBarberPhotos } = useAllBarberPhotos();
+  const [activeBarber, setActiveBarber] = useState<string | null>(null);
 
   const filters = t.gallery.filters;
 
+  type GalleryItem = {
+    src: string;
+    tagIndex: number;
+    saved: boolean;
+    barberId?: string;
+    barberName?: string;
+  };
+
   // Use DB images if any exist, otherwise fallback to bundled photos
-  const galleryImages = dbImages.length > 0
+  const baseImages: GalleryItem[] = dbImages.length > 0
     ? dbImages.map(img => ({ src: img.image_url, tagIndex: img.category, saved: false }))
     : fallbackImages;
 
-  const filtered = activeFilter === 0
-    ? galleryImages
-    : galleryImages.filter(img => img.tagIndex === activeFilter);
+  const barberItems: GalleryItem[] = barberPhotos.map(p => ({
+    src: p.image_url,
+    tagIndex: 0,
+    saved: false,
+    barberId: p.barber_id,
+    barberName: p.barber_name,
+  }));
+
+  const barberTabs = Array.from(
+    new Map(barberPhotos.map(p => [p.barber_id, p.barber_name])).entries()
+  ).map(([id, name]) => ({ id, name }));
+
+  const galleryImages: GalleryItem[] = [...barberItems, ...baseImages];
+
+  const filtered = activeBarber
+    ? galleryImages.filter(img => img.barberId === activeBarber)
+    : activeFilter === 0
+      ? galleryImages
+      : galleryImages.filter(img => img.tagIndex === activeFilter);
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -77,7 +104,7 @@ const GalleryScreen = () => {
           {filters.map((f, i) => (
             <button
               key={f}
-              onClick={() => setActiveFilter(i)}
+              onClick={() => { setActiveFilter(i); setActiveBarber(null); }}
               className={`px-4 py-2 rounded-full text-sm font-medium flex-shrink-0 transition-all ${
                 activeFilter === i
                   ? "gradient-copper text-primary-foreground"
@@ -90,7 +117,48 @@ const GalleryScreen = () => {
         </div>
       </div>
 
-      {loading ? (
+      {barberTabs.length > 0 && (
+        <div className="px-5 mb-5">
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
+            {t.gallery.byBarber}
+          </p>
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+            <button
+              onClick={() => setActiveBarber(null)}
+              className={`px-4 py-2 rounded-full text-sm font-medium flex-shrink-0 transition-all ${
+                activeBarber === null
+                  ? "bg-copper/20 border border-copper text-copper"
+                  : "bg-surface border border-border text-muted-foreground"
+              }`}
+            >
+              {t.gallery.allBarbers}
+            </button>
+            {barberTabs.map(b => (
+              <button
+                key={b.id}
+                onClick={() => { setActiveBarber(b.id); setActiveFilter(0); }}
+                className={`px-4 py-2 rounded-full text-sm font-medium flex-shrink-0 transition-all ${
+                  activeBarber === b.id
+                    ? "bg-copper/20 border border-copper text-copper"
+                    : "bg-surface border border-border text-muted-foreground"
+                }`}
+              >
+                {b.name}
+              </button>
+            ))}
+          </div>
+          {activeBarber && (
+            <button
+              onClick={() => navigate(`/barber/${activeBarber}`)}
+              className="mt-3 text-xs text-copper underline underline-offset-4"
+            >
+              {t.gallery.viewProfile}
+            </button>
+          )}
+        </div>
+      )}
+
+      {loading || loadingBarberPhotos ? (
         <div className="flex justify-center py-12">
           <div className="w-8 h-8 border-2 border-copper border-t-transparent rounded-full animate-spin" />
         </div>
@@ -104,17 +172,26 @@ const GalleryScreen = () => {
             >
               <img
                 src={img.src}
-                alt={filters[img.tagIndex]}
+                alt={img.barberName ? `${img.barberName} · Sitdown Vienna` : filters[img.tagIndex]}
                 className={`w-full object-cover ${i % 3 === 0 ? "h-56" : "h-44"}`}
                 loading="lazy"
               />
               <div className="absolute top-2.5 right-2.5">
                 <Bookmark size={18} className={img.saved ? "text-copper fill-copper" : "text-foreground/70"} />
               </div>
-              <div className="absolute bottom-2.5 left-2.5">
-                <span className="bg-background/70 backdrop-blur-sm text-foreground text-[10px] font-medium px-2 py-1 rounded-full">
-                  {filters[img.tagIndex]}
-                </span>
+              <div className="absolute bottom-2.5 left-2.5 flex gap-1.5">
+                {img.barberName ? (
+                  <span
+                    onClick={(e) => { e.stopPropagation(); navigate(`/barber/${img.barberId}`); }}
+                    className="bg-copper/90 backdrop-blur-sm text-primary-foreground text-[10px] font-semibold px-2 py-1 rounded-full"
+                  >
+                    {img.barberName}
+                  </span>
+                ) : (
+                  <span className="bg-background/70 backdrop-blur-sm text-foreground text-[10px] font-medium px-2 py-1 rounded-full">
+                    {filters[img.tagIndex]}
+                  </span>
+                )}
               </div>
             </div>
           ))}

@@ -110,6 +110,9 @@ export interface Translations {
   gallery: {
     title: string;
     filters: string[];
+    byBarber: string;
+    allBarbers: string;
+    viewProfile: string;
   };
   reviews: {
     title: string;
@@ -578,6 +581,9 @@ const en: Translations = {
   gallery: {
     title: "The Art of the Cut",
     filters: ["All", "Fades", "Beards", "Classic", "Women", "Design"],
+    byBarber: "By barber",
+    allBarbers: "All barbers",
+    viewProfile: "View profile",
   },
   reviews: {
     title: "Reviews",
@@ -1046,6 +1052,9 @@ const de: Translations = {
   gallery: {
     title: "Die Kunst des Schnitts",
     filters: ["Alle", "Fades", "Bärte", "Klassisch", "Frauen", "Design"],
+    byBarber: "Nach Barbier",
+    allBarbers: "Alle Barbiere",
+    viewProfile: "Profil ansehen",
   },
   reviews: {
     title: "Bewertungen",
