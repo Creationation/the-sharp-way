@@ -434,7 +434,11 @@ const BookingFlow = () => {
   const categoryByName = new Map<string, string>(
     dbServices.map(s => [lang === "en" ? (s.name_en || s.name) : s.name, s.category])
   );
-  const lastAllowedSlot = computeLastAllowedSlot(selectedServices, categoryByName);
+  const lastAllowedSlot = computeLastAllowedSlot(
+    selectedServices,
+    categoryByName,
+    availableDates[selectedDayIdx]?.getDay() === 6,
+  );
   const baseVisibleSlots = allTimeSlots.filter(s => s <= lastAllowedSlot);
 
   useEffect(() => {
