@@ -629,6 +629,36 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_hours: {
+        Row: {
+          close_time: string
+          created_at: string
+          id: string
+          is_open: boolean
+          open_time: string
+          updated_at: string
+          weekday: number
+        }
+        Insert: {
+          close_time?: string
+          created_at?: string
+          id?: string
+          is_open?: boolean
+          open_time?: string
+          updated_at?: string
+          weekday: number
+        }
+        Update: {
+          close_time?: string
+          created_at?: string
+          id?: string
+          is_open?: boolean
+          open_time?: string
+          updated_at?: string
+          weekday?: number
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
