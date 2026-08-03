@@ -838,69 +838,6 @@ const BookingFlow = () => {
         )}
       </div>
 
-      {/* Service selection */}
-      <div className="px-5 mb-5">
-        <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">{t.booking.selectService}</h3>
-
-        {/* Gender segmented toggle */}
-        <div className="relative bg-surface border border-copper/20 rounded-full p-1 mb-4 flex overflow-hidden">
-          <div
-            className="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full gradient-copper shadow-[0_4px_16px_-6px_hsl(var(--copper)/0.6)]"
-            style={{
-              transform: activeGender === "damen" ? "translateX(100%)" : "translateX(0)",
-              transition: "transform 400ms cubic-bezier(0.22, 1, 0.36, 1)",
-            }}
-          />
-          {(["herren", "damen"] as const).map(g => (
-            <button
-              key={g}
-              onClick={() => setActiveGender(g)}
-              className={`relative z-10 flex-1 py-2.5 text-xs font-heading tracking-widest uppercase transition-colors duration-300 active:scale-[0.98] ${
-                activeGender === g ? "text-primary-foreground" : "text-muted-foreground"
-              }`}
-            >
-              {g === "herren" ? t.services.catHerren : t.services.catDamen}
-            </button>
-          ))}
-        </div>
-
-        <div className="space-y-2">
-          {visibleServices.length === 0 && (
-            <p className="text-muted-foreground text-xs text-center py-6">—</p>
-          )}
-          {visibleServices.map((s, i) => {
-            const isSelected = selectedServices.some(sel => sel.name === s.name);
-            return (
-              <button
-                key={s.name}
-                ref={(el) => {
-                  if (el) serviceItemRefs.current.set(s.name, el);
-                  else serviceItemRefs.current.delete(s.name);
-                }}
-                onClick={() => toggleService(s)}
-                style={{ animationDelay: `${i * 30}ms`, animationFillMode: "backwards" }}
-                className={`w-full card-app p-4 flex items-center justify-between transition-all animate-fade-in ${
-                  isSelected ? "border-copper" : ""
-                }`}
-              >
-                <div className="text-left">
-                  <p className="text-foreground text-sm font-medium">{s.name}</p>
-                  <p className="text-muted-foreground text-xs">{s.duration}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-copper font-semibold text-sm">{s.price}</span>
-                  {isSelected && (
-                    <div className="w-5 h-5 rounded-full gradient-copper flex items-center justify-center">
-                      <Check size={12} className="text-primary-foreground" />
-                    </div>
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       {/* Summary */}
       <div className="px-5 mb-6">
         <div className="card-app p-4 border-copper/30">
@@ -974,6 +911,69 @@ const BookingFlow = () => {
           </div>
         </div>
       </div>
+      {/* Service selection */}
+      <div className="px-5 mb-5">
+        <h3 className="font-heading text-sm text-muted-foreground mb-3 tracking-widest">{t.booking.selectService}</h3>
+
+        {/* Gender segmented toggle */}
+        <div className="relative bg-surface border border-copper/20 rounded-full p-1 mb-4 flex overflow-hidden">
+          <div
+            className="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full gradient-copper shadow-[0_4px_16px_-6px_hsl(var(--copper)/0.6)]"
+            style={{
+              transform: activeGender === "damen" ? "translateX(100%)" : "translateX(0)",
+              transition: "transform 400ms cubic-bezier(0.22, 1, 0.36, 1)",
+            }}
+          />
+          {(["herren", "damen"] as const).map(g => (
+            <button
+              key={g}
+              onClick={() => setActiveGender(g)}
+              className={`relative z-10 flex-1 py-2.5 text-xs font-heading tracking-widest uppercase transition-colors duration-300 active:scale-[0.98] ${
+                activeGender === g ? "text-primary-foreground" : "text-muted-foreground"
+              }`}
+            >
+              {g === "herren" ? t.services.catHerren : t.services.catDamen}
+            </button>
+          ))}
+        </div>
+
+        <div className="space-y-2">
+          {visibleServices.length === 0 && (
+            <p className="text-muted-foreground text-xs text-center py-6">—</p>
+          )}
+          {visibleServices.map((s, i) => {
+            const isSelected = selectedServices.some(sel => sel.name === s.name);
+            return (
+              <button
+                key={s.name}
+                ref={(el) => {
+                  if (el) serviceItemRefs.current.set(s.name, el);
+                  else serviceItemRefs.current.delete(s.name);
+                }}
+                onClick={() => toggleService(s)}
+                style={{ animationDelay: `${i * 30}ms`, animationFillMode: "backwards" }}
+                className={`w-full card-app p-4 flex items-center justify-between transition-all animate-fade-in ${
+                  isSelected ? "border-copper" : ""
+                }`}
+              >
+                <div className="text-left">
+                  <p className="text-foreground text-sm font-medium">{s.name}</p>
+                  <p className="text-muted-foreground text-xs">{s.duration}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-copper font-semibold text-sm">{s.price}</span>
+                  {isSelected && (
+                    <div className="w-5 h-5 rounded-full gradient-copper flex items-center justify-center">
+                      <Check size={12} className="text-primary-foreground" />
+                    </div>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
 
       {/* Payment Explanation */}
       <div className="px-5 mb-6">
