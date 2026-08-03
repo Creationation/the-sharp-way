@@ -5,6 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useBarbers } from "@/hooks/useBarbers";
 import { useTagesplanMode } from "@/hooks/useTagesplanMode";
+import { useNextAvailability, formatAvailability } from "@/hooks/useNextAvailability";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import barber1 from "@/assets/barber-1.jpg";
@@ -42,6 +43,7 @@ const HomeDashboard = () => {
   const { t, lang } = useLanguage();
   const { user, isAdmin, adminChecked } = useAuth();
   const { barbers } = useBarbers();
+  const availability = useNextAvailability(barbers);
   const { enabled: tagesplanMode, setEnabled: setTagesplanMode } = useTagesplanMode();
 
   // Auto-redirect admins with the mode enabled straight into the Tagesplan view
@@ -371,7 +373,7 @@ const HomeDashboard = () => {
                     </div>
                     <div className="p-3 flex flex-col flex-1">
                       <p className="text-foreground font-semibold text-sm">{b.name}</p>
-                      <p className="text-muted-foreground text-[11px] mb-2 line-clamp-2 min-h-[2rem]">{lang === "de" ? b.specialty_de : b.specialty_en}</p>
+                      <p className="text-muted-foreground text-[11px] mb-2 line-clamp-2 min-h-[2rem]">{formatAvailability(availability[b.id], lang)}</p>
                       <div className="flex items-center gap-1 mb-3">
                         <Star size={12} className="text-copper fill-copper" />
                         <span className="text-foreground text-xs font-medium">{b.rating}</span>
