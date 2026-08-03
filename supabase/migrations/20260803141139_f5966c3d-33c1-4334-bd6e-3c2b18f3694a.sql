@@ -1,0 +1,1 @@
+UPDATE public.barbers SET image_url = 'https://ogijqobntknjlkxejvmu.supabase.co/storage/v1/object/public/barber-photos/profiles%2Foemer-v3.jpg?v=3', updated_at = now() WHERE name = 'Ömer';
