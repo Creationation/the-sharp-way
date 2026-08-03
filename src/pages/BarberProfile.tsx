@@ -1,11 +1,14 @@
-import { ArrowLeft, Star, MapPin, Share2 } from "lucide-react";
+import { ArrowLeft, Star, MapPin, Share2, CalendarDays, Plane } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import { format, parseISO } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useBarbers } from "@/hooks/useBarbers";
 import { useBarberPhotos } from "@/hooks/useBarberPhotos";
+import { useBarberSchedule } from "@/hooks/useBarberSchedule";
 import gallery1 from "@/assets/gallery-1.jpg";
 import gallery2 from "@/assets/gallery-2.jpg";
 import gallery3 from "@/assets/gallery-3.jpg";
+
 
 const services = [
   { name: "Classic Haircut", price: "€25" },
