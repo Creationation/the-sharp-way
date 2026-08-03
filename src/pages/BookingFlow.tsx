@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo, useLayoutEffect } from "react";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { ArrowLeft, Star, Check, CalendarDays, X } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -10,7 +10,7 @@ import { useServices } from "@/hooks/useServices";
 import { toast } from "sonner";
 import PaymentExplanation from "@/components/PaymentExplanation";
 
-type ServiceItem = { name: string; price: string; duration: string; category?: "herren" | "damen" | "kinder" };
+type ServiceItem = { id?: string; name: string; price: string; duration: string; category?: "herren" | "damen" | "kinder" };
 
 const DAY_ABBR: Record<string, string[]> = {
   en: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
@@ -148,13 +148,13 @@ const BookingFlow = () => {
   const { barbers, loading: barbersLoading } = useBarbers();
   const { services: dbServices } = useServices({ onlyActive: true });
   const services: ServiceItem[] = dbServices.map(s => ({
+    id: s.id,
     name: lang === "en" ? (s.name_en || s.name) : s.name,
     price: s.is_from_price ? `${t.services.fromPrefix} €${s.price}` : `€${s.price}`,
     duration: `${s.duration_min}min`,
     category: s.category,
   }));
   const [activeGender, setActiveGender] = useState<"herren" | "damen">("herren");
-  const visibleServices = services.filter(s => s.category === activeGender);
 
   const [customDate, setCustomDate] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -164,11 +164,23 @@ const BookingFlow = () => {
   const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
   const [selectedServices, setSelectedServices] = useState<ServiceItem[]>([]);
 
-  // Default-select first service once services load (only if user has nothing selected)
+  // Preselect the service coming from the services list (?service=<id>),
+  // otherwise default-select the first service once services load.
+  const preselectDone = useRef(false);
   useEffect(() => {
-    if (services.length > 0 && selectedServices.length === 0) {
-      setSelectedServices([services[0]]);
+    if (services.length === 0 || preselectDone.current) return;
+    const preselectId = searchParams.get("service");
+    if (preselectId) {
+      const found = services.find(s => s.id === preselectId);
+      if (found) {
+        preselectDone.current = true;
+        setSelectedServices([found]);
+        setActiveGender(found.category === "damen" ? "damen" : "herren");
+        return;
+      }
     }
+    preselectDone.current = true;
+    if (selectedServices.length === 0) setSelectedServices([services[0]]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [services.length]);
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
@@ -327,7 +339,7 @@ const BookingFlow = () => {
         const restoredSvcs = (draft.serviceNames as string[])
           .map((name: string) => services.find(s => s.name === name))
           .filter(Boolean) as ServiceItem[];
-        if (restoredSvcs.length > 0) setSelectedServices(restoredSvcs);
+        if (restoredSvcs.length > 0 && !searchParams.get("service")) setSelectedServices(restoredSvcs);
         if (draft.customDateISO) setCustomDate(new Date(draft.customDateISO));
         if (typeof draft.selectedDayIdx === "number") setSelectedDayIdx(draft.selectedDayIdx);
         if (draft.selectedTime) setSelectedTime(draft.selectedTime);
@@ -391,6 +403,41 @@ const BookingFlow = () => {
       return exists ? prev.filter(p => p.name !== s.name) : [...prev, s];
     });
   };
+
+  // Selected services always visible and pinned to the top (smooth FLIP reorder)
+  const visibleServices = useMemo(() => {
+    const selectedNames = new Set(selectedServices.map(s => s.name));
+    const selectedItems = services.filter(s => selectedNames.has(s.name));
+    const rest = services.filter(s => s.category === activeGender && !selectedNames.has(s.name));
+    return [...selectedItems, ...rest];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dbServices, lang, activeGender, selectedServices]);
+
+  const serviceItemRefs = useRef<Map<string, HTMLElement>>(new Map());
+  const servicePrevRects = useRef<Map<string, DOMRect>>(new Map());
+  useLayoutEffect(() => {
+    const seen = new Set<string>();
+    serviceItemRefs.current.forEach((el, key) => {
+      seen.add(key);
+      const next = el.getBoundingClientRect();
+      const prev = servicePrevRects.current.get(key);
+      if (prev) {
+        const dy = prev.top - next.top;
+        if (Math.abs(dy) > 1) {
+          el.style.transition = "none";
+          el.style.transform = `translateY(${dy}px)`;
+          requestAnimationFrame(() => {
+            el.style.transition = "transform 320ms cubic-bezier(0.22, 1, 0.36, 1)";
+            el.style.transform = "";
+          });
+        }
+      }
+      servicePrevRects.current.set(key, next);
+    });
+    servicePrevRects.current.forEach((_, key) => {
+      if (!seen.has(key)) servicePrevRects.current.delete(key);
+    });
+  }, [visibleServices]);
 
   const totalPrice = selectedServices.reduce((sum, s) => sum + parseInt(s.price.replace("€", "")), 0);
 
@@ -817,7 +864,7 @@ const BookingFlow = () => {
           ))}
         </div>
 
-        <div key={activeGender} className="space-y-2">
+        <div className="space-y-2">
           {visibleServices.length === 0 && (
             <p className="text-muted-foreground text-xs text-center py-6">—</p>
           )}
@@ -826,6 +873,10 @@ const BookingFlow = () => {
             return (
               <button
                 key={s.name}
+                ref={(el) => {
+                  if (el) serviceItemRefs.current.set(s.name, el);
+                  else serviceItemRefs.current.delete(s.name);
+                }}
                 onClick={() => toggleService(s)}
                 style={{ animationDelay: `${i * 30}ms`, animationFillMode: "backwards" }}
                 className={`w-full card-app p-4 flex items-center justify-between transition-all animate-fade-in ${

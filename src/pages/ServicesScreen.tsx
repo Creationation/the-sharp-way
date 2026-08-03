@@ -77,7 +77,7 @@ const ServicesScreen = () => {
                     <span>{s.duration_min}min</span>
                   </div>
                   <button
-                    onClick={() => navigate("/book")}
+                    onClick={() => navigate(`/book?service=${s.id}`)}
                     className="text-copper text-xs font-semibold border border-copper rounded-full px-4 py-1.5 hover:bg-copper hover:text-primary-foreground transition-all flex items-center gap-1"
                   >
                     {t.services.bookBtn} <ChevronRight size={12} />
