@@ -587,7 +587,7 @@ const en: Translations = {
   },
   reviews: {
     title: "Reviews",
-    count: "312 reviews",
+    count: "43 Google reviews",
   },
   contact: {
     title: "Find Us",
@@ -1058,7 +1058,7 @@ const de: Translations = {
   },
   reviews: {
     title: "Bewertungen",
-    count: "312 Bewertungen",
+    count: "43 Google-Bewertungen",
   },
   contact: {
     title: "Finde uns",
