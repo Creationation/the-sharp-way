@@ -17,6 +17,11 @@ export interface Translations {
     gallery: string;
     profile: string;
   };
+  quickLinks: {
+    gallery: string;
+    reviews: string;
+    contact: string;
+  };
   home: {
     announcement: string;
     announcementLink: string;
@@ -480,6 +485,11 @@ const en: Translations = {
     gallery: "Gallery",
     profile: "Profile",
   },
+  quickLinks: {
+    gallery: "Gallery",
+    reviews: "Reviews",
+    contact: "Contact",
+  },
   home: {
     announcement: "New: Hot Towel Shave now available",
     announcementLink: "Book Today",
@@ -942,6 +952,11 @@ const de: Translations = {
     book: "Buchen",
     gallery: "Galerie",
     profile: "Profil",
+  },
+  quickLinks: {
+    gallery: "Galerie",
+    reviews: "Bewertungen",
+    contact: "Kontakt",
   },
   home: {
     announcement: "Neu: Hot Towel Rasur jetzt verfügbar",
