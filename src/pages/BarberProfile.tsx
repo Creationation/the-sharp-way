@@ -90,7 +90,7 @@ const BarberProfile = () => {
       <div className="px-5 py-5">
         <div className="grid grid-cols-3 gap-3">
           {[
-            { value: `${barber.cuts}`, label: t.barber.cuts },
+            { value: `${barber.cuts.toLocaleString(de ? "de-DE" : "en-US")}+`, label: t.barber.cuts },
             { value: `${barber.years} ${t.barber.yrs}`, label: t.barber.experience },
             { value: t.barber.topRated, label: t.barber.status },
           ].map(s => (
