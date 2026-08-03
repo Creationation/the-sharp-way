@@ -1,33 +1,57 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, MapPin, Phone, Clock, MessageCircle, Navigation, Instagram, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const hoursData = [
-  { time: "09:00 – 19:00" }, // Montag
-  { time: "09:00 – 19:00" }, // Dienstag
-  { time: "09:00 – 19:00" }, // Mittwoch
-  { time: "09:00 – 19:00" }, // Donnerstag
-  { time: "09:00 – 19:00" }, // Freitag
-  { time: "09:00 – 19:00" }, // Samstag
-  { time: "Closed" },        // Sonntag
-];
-
-function isOpenNow(): boolean {
-  const now = new Date();
-  const day = now.getDay(); // 0=Sun, 1=Mon, 2=Tue … 6=Sat
-  // Open Mon(1) to Sat(6), closed Sun(0)
-  if (day === 0) return false;
-  const minutes = now.getHours() * 60 + now.getMinutes();
-  return minutes >= 9 * 60 && minutes < 19 * 60;
+interface ShopHour {
+  weekday: number; // 0 = Monday … 6 = Sunday
+  is_open: boolean;
+  open_time: string;
+  close_time: string;
 }
+
+const FALLBACK: ShopHour[] = Array.from({ length: 7 }, (_, weekday) => ({
+  weekday,
+  is_open: weekday !== 6,
+  open_time: "09:00",
+  close_time: "19:00",
+}));
+
+const hhmm = (v: string) => String(v).slice(0, 5);
+const toMin = (v: string) => Number(v.slice(0, 2)) * 60 + Number(v.slice(3, 5));
 
 const ContactScreen = () => {
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
-  const open = isOpenNow();
+  const [shopHours, setShopHours] = useState<ShopHour[]>(FALLBACK);
+
+  useEffect(() => {
+    supabase
+      .from("shop_hours")
+      .select("weekday, is_open, open_time, close_time")
+      .order("weekday")
+      .then(({ data }) => {
+        if (data && data.length) {
+          const byDay = new Map<number, any>(data.map((r: any) => [r.weekday, r]));
+          setShopHours(
+            FALLBACK.map(d => {
+              const row = byDay.get(d.weekday);
+              return row
+                ? { weekday: d.weekday, is_open: row.is_open, open_time: hhmm(row.open_time), close_time: hhmm(row.close_time) }
+                : d;
+            })
+          );
+        }
+      });
+  }, []);
+
+  const now = new Date();
+  const todayIdx = (now.getDay() + 6) % 7;
+  const today = shopHours.find(h => h.weekday === todayIdx);
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const open = !!today?.is_open && nowMin >= toMin(today.open_time) && nowMin < toMin(today.close_time);
   const whatsappUrl = `https://wa.me/436644686073?text=${encodeURIComponent("Hallo, ich möchte einen Termin bei Sitdown Barber vereinbaren.")}`;
 
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
@@ -57,10 +81,10 @@ const ContactScreen = () => {
     setSending(false);
   };
 
-  const hours = hoursData.map((h, i) => ({
-    day: t.contact.days[i],
-    time: h.time === "Closed" ? t.contact.closed : h.time,
-    isClosed: h.time === "Closed",
+  const hours = shopHours.map(h => ({
+    day: t.contact.days[h.weekday],
+    time: h.is_open ? `${h.open_time} – ${h.close_time}` : t.contact.closed,
+    isClosed: !h.is_open,
   }));
 
   return (
