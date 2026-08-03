@@ -6,6 +6,8 @@ import { useConfirm } from "@/hooks/useConfirm";
 import barber1 from "@/assets/barber-1.jpg";
 import barber2 from "@/assets/barber-2.jpg";
 import BarberPhotosManager from "./BarberPhotosManager";
+import BarberScheduleManager from "./BarberScheduleManager";
+
 
 const IMAGE_MAP: Record<string, string> = {
   "/barber-1": barber1,
