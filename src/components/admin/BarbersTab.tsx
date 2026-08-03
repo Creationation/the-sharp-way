@@ -337,6 +337,10 @@ const BarbersTab = ({ t }: Props) => {
 
           {/* Photos manager */}
           <BarberPhotosManager barberId={barber.id} barberName={barber.name} />
+
+          {/* Working hours & absences */}
+          <BarberScheduleManager barberId={barber.id} />
+
         </div>
       ))}
 
