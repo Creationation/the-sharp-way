@@ -27,6 +27,7 @@ import GalleryTab from "@/components/admin/GalleryTab";
 import EmailsTab from "@/components/admin/EmailsTab";
 import AdminsTab from "@/components/admin/AdminsTab";
 import ManualTab from "@/components/admin/ManualTab";
+import ShopHoursTab from "@/components/admin/ShopHoursTab";
 import AdminBookingCreateSheet from "@/components/admin/AdminBookingCreateSheet";
 import { useBarbers } from "@/hooks/useBarbers";
 import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
@@ -72,7 +73,7 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  type TabId = "manual" | "bookings" | "schedule" | "stats" | "availability" | "users" | "promotions" | "barbers" | "services" | "gallery" | "codes" | "notifications" | "emails" | "admins";
+  type TabId = "manual" | "bookings" | "schedule" | "stats" | "availability" | "shophours" | "users" | "promotions" | "barbers" | "services" | "gallery" | "codes" | "notifications" | "emails" | "admins";
   const [tab, setTab] = useState<TabId>("bookings");
   const [menuOpen, setMenuOpen] = useState(false);
   const { barbers: dbBarbers } = useBarbers();
@@ -84,6 +85,7 @@ const AdminDashboard = () => {
     { id: "schedule",      label: t.admin.scheduleTab.title,                        Icon: LayoutGrid    },
     { id: "stats",         label: t.admin.statsTab.title,                           Icon: BarChart3     },
     { id: "availability",  label: t.admin.availability,                             Icon: Clock     },
+    { id: "shophours",     label: lang === "de" ? "Öffnungszeiten" : "Opening hours", Icon: Clock     },
     { id: "users",         label: t.admin.users,                                    Icon: User      },
     { id: "promotions",    label: t.admin.promotions,                               Icon: Tag       },
     { id: "barbers",       label: t.admin.barbersTab.title,                         Icon: Scissors  },
@@ -382,7 +384,7 @@ const AdminDashboard = () => {
           {menuOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-              <div className="absolute right-0 top-11 w-52 bg-[#111] border border-border rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
+              <div className="absolute right-0 top-11 w-52 bg-[#111] border border-border rounded-2xl shadow-2xl z-50 py-2 max-h-[70vh] overflow-y-auto overscroll-contain">
                 {ADMIN_TABS.map(item => (
                   <button
                     key={item.id}
@@ -864,6 +866,8 @@ const AdminDashboard = () => {
 
       {/* ═══════════════════ MANUAL TAB ═══════════════════ */}
       {tab === "manual" && <ManualTab />}
+
+      {tab === "shophours" && <ShopHoursTab />}
 
       <AdminBookingCreateSheet
         open={createBookingOpen}
