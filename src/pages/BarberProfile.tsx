@@ -1,11 +1,14 @@
-import { ArrowLeft, Star, MapPin, Share2 } from "lucide-react";
+import { ArrowLeft, Star, MapPin, Share2, CalendarDays, Plane } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import { format, parseISO } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useBarbers } from "@/hooks/useBarbers";
 import { useBarberPhotos } from "@/hooks/useBarberPhotos";
+import { useBarberSchedule } from "@/hooks/useBarberSchedule";
 import gallery1 from "@/assets/gallery-1.jpg";
 import gallery2 from "@/assets/gallery-2.jpg";
 import gallery3 from "@/assets/gallery-3.jpg";
+
 
 const services = [
   { name: "Classic Haircut", price: "€25" },
@@ -24,6 +27,7 @@ const BarberProfile = () => {
 
   const barber = barbers.find(b => b.id === id) || barbers[0];
   const { photos } = useBarberPhotos(barber?.id);
+  const { hours, absences } = useBarberSchedule(barber?.id);
 
   if (loading || barbers.length === 0) {
     return (
@@ -33,18 +37,26 @@ const BarberProfile = () => {
     );
   }
 
-  const specialty = lang === "de" ? barber.specialty_de : barber.specialty_en;
+  const de = lang === "de";
+  const specialty = de ? barber.specialty_de : barber.specialty_en;
   const recentWork = photos.length > 0
     ? photos.map(p => p.image_url)
     : fallbackWork;
 
-
+  const DAY_LABELS = de
+    ? ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
+    : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekOrder = [1, 2, 3, 4, 5, 6, 0];
+  const hourFor = (wd: number) => hours.find(h => h.weekday === wd);
+  const hhmm = (v: string) => String(v).slice(0, 5);
+  const fmtDate = (v: string) => format(parseISO(v), "dd.MM.yyyy");
 
   return (
     <div className="min-h-screen bg-background pb-28">
       {/* Hero image */}
       <div className="relative h-[50vh]">
-        <img src={barber.image} alt={barber.name} className="w-full h-full object-cover" />
+        <img src={barber.image} alt={barber.name} className="w-full h-full object-cover object-top" />
+
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
 
         {/* Back + share */}
@@ -78,7 +90,7 @@ const BarberProfile = () => {
       <div className="px-5 py-5">
         <div className="grid grid-cols-3 gap-3">
           {[
-            { value: `${barber.cuts}`, label: t.barber.cuts },
+            { value: `${barber.cuts.toLocaleString(de ? "de-DE" : "en-US")}+`, label: t.barber.cuts },
             { value: `${barber.years} ${t.barber.yrs}`, label: t.barber.experience },
             { value: t.barber.topRated, label: t.barber.status },
           ].map(s => (
@@ -89,6 +101,73 @@ const BarberProfile = () => {
           ))}
         </div>
       </div>
+
+      {/* Arbeitstage & Abwesenheiten */}
+      <div className="px-5 mb-6 space-y-3">
+        <div className="card-app p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <CalendarDays size={16} className="text-copper" />
+            <h3 className="font-heading text-base text-foreground">
+              {de ? "Arbeitstage" : "Working days"}
+            </h3>
+          </div>
+          {hours.length === 0 ? (
+            <p className="text-muted-foreground text-xs">
+              {de ? "Zeiten auf Anfrage" : "Hours on request"}
+            </p>
+          ) : (
+            <div className="space-y-1.5">
+              {weekOrder.map(wd => {
+                const h = hourFor(wd);
+                const open = h?.active;
+                return (
+                  <div key={wd} className="flex items-center justify-between text-xs">
+                    <span className={open ? "text-foreground" : "text-muted-foreground"}>
+                      {DAY_LABELS[wd]}
+                    </span>
+                    <span className={open ? "text-mint font-medium" : "text-muted-foreground"}>
+                      {open
+                        ? `${hhmm(h!.start_time)} · ${hhmm(h!.end_time)}`
+                        : de ? "Frei" : "Off"}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="card-app p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Plane size={16} className="text-copper" />
+            <h3 className="font-heading text-base text-foreground">
+              {de ? "Nächste Abwesenheiten" : "Upcoming time off"}
+            </h3>
+          </div>
+          {absences.length === 0 ? (
+            <p className="text-muted-foreground text-xs">
+              {de ? "Keine Abwesenheiten geplant" : "No time off planned"}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {absences.map(a => (
+                <div key={a.id} className="flex items-start justify-between gap-3 text-xs">
+                  <span className="text-foreground">
+                    {a.start_date === a.end_date
+                      ? fmtDate(a.start_date)
+                      : `${fmtDate(a.start_date)} · ${fmtDate(a.end_date)}`}
+                  </span>
+                  {a.reason && (
+                    <span className="text-muted-foreground text-right">{a.reason}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+
 
       {/* Services */}
       <div className="px-5 mb-6">
