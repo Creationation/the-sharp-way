@@ -455,7 +455,7 @@ const BookingFlow = () => {
     setLoadingSlots(true);
     const dateStr = toDateStr(selectedDate);
 
-    const [bookingsRes, availRes] = await Promise.all([
+    const [bookingsRes, availRes, hoursRes, absencesRes] = await Promise.all([
       supabase
         .from("bookings")
         .select("booking_time")
@@ -468,14 +468,34 @@ const BookingFlow = () => {
         .eq("barber_name", selectedBarber.name)
         .eq("date", dateStr)
         .maybeSingle(),
+      supabase
+        .from("barber_working_hours")
+        .select("active, start_time, end_time")
+        .eq("barber_id", selectedBarber.id)
+        .eq("weekday", selectedDate.getDay())
+        .maybeSingle(),
+      supabase
+        .from("barber_absences")
+        .select("id")
+        .eq("barber_id", selectedBarber.id)
+        .lte("start_date", dateStr)
+        .gte("end_date", dateStr)
+        .limit(1),
     ]);
 
     const bookedTimes = (bookingsRes.data ?? []).map((r: { booking_time: string }) => r.booking_time);
     const blocked = availRes.data?.blocked_slots ?? [];
-    const isOff = availRes.data?.day_off ?? false;
+    const isAbsent = (absencesRes.data ?? []).length > 0;
+    const hours = hoursRes.data;
+    const inactiveDay = hours ? !hours.active : false;
+    const isOff = (availRes.data?.day_off ?? false) || isAbsent || inactiveDay;
 
+    setWorkWindow(hours && hours.active
+      ? { start: String(hours.start_time).slice(0, 5), end: String(hours.end_time).slice(0, 5) }
+      : null);
     setTakenSlots([...bookedTimes, ...blocked]);
     setDayOff(isOff);
+
 
     // Reset time selection if now taken
     if ([...bookedTimes, ...blocked].includes(selectedTime) || isOff) {
