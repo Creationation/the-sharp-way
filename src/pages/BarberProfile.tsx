@@ -111,7 +111,19 @@ const BarberProfile = () => {
         <div className="grid grid-cols-3 gap-2">
           {recentWork.map((img, i) => (
             <div key={i} className="aspect-square rounded-xl overflow-hidden">
-              <img src={img} alt="Haircut result" className="w-full h-full object-cover" />
+              {/\.(mp4|webm|mov)(\?|$)/i.test(img) ? (
+                <video
+                  src={img}
+                  className="w-full h-full object-cover"
+                  muted
+                  loop
+                  playsInline
+                  autoPlay
+                  preload="metadata"
+                />
+              ) : (
+                <img src={img} alt="Haircut result" className="w-full h-full object-cover" />
+              )}
             </div>
           ))}
         </div>

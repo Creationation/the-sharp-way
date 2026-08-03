@@ -97,7 +97,7 @@ const BarberPhotosManager = ({ barberId, barberName }: Props) => {
         </div>
         <input
           type="file"
-          accept="image/*"
+          accept="image/*,video/mp4,video/webm,video/quicktime"
           ref={fileRef}
           onChange={handleUpload}
           className="hidden"
@@ -122,7 +122,11 @@ const BarberPhotosManager = ({ barberId, barberName }: Props) => {
         <div className="grid grid-cols-3 gap-2">
           {photos.map((p) => (
             <div key={p.id} className="relative aspect-square rounded-lg overflow-hidden bg-surface border border-border group">
-              <img src={p.image_url} alt={p.caption} className="w-full h-full object-cover" loading="lazy" />
+              {/\.(mp4|webm|mov)(\?|$)/i.test(p.image_url) ? (
+                <video src={p.image_url} className="w-full h-full object-cover" muted loop playsInline preload="metadata" />
+              ) : (
+                <img src={p.image_url} alt={p.caption} className="w-full h-full object-cover" loading="lazy" />
+              )}
               <button
                 onClick={() => remove(p.id)}
                 className="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/70 flex items-center justify-center opacity-90 hover:opacity-100"
