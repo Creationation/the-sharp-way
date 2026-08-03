@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, Search, MapPin, Star, ChevronRight, X, Calendar, Clock, ClipboardList } from "lucide-react";
+import { Bell, Search, MapPin, Star, ChevronRight, X, Calendar, Clock, ClipboardList, Image as ImageIcon, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -388,6 +388,30 @@ const HomeDashboard = () => {
               </div>
             </div>
           </div>
+
+          {/* Quick links: Galerie / Bewertungen / Kontakt */}
+          <div className="px-5 mb-6">
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { to: "/gallery", icon: ImageIcon, label: t.quickLinks.gallery },
+                { to: "/reviews", icon: Star, label: t.quickLinks.reviews },
+                { to: "/contact", icon: Phone, label: t.quickLinks.contact },
+              ].map(({ to, icon: Icon, label }) => (
+                <button
+                  key={to}
+                  onClick={() => navigate(to)}
+                  className="card-app p-4 flex flex-col items-center gap-2 hover:border-copper/30 transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-copper/15 flex items-center justify-center">
+                    <Icon size={18} className="text-copper" />
+                  </div>
+                  <span className="text-xs font-semibold text-foreground">{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+
 
           {/* Quick Services */}
           <div className="px-5">
