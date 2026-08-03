@@ -27,6 +27,7 @@ const BarberProfile = () => {
 
   const barber = barbers.find(b => b.id === id) || barbers[0];
   const { photos } = useBarberPhotos(barber?.id);
+  const { hours, absences } = useBarberSchedule(barber?.id);
 
   if (loading || barbers.length === 0) {
     return (
@@ -36,18 +37,26 @@ const BarberProfile = () => {
     );
   }
 
-  const specialty = lang === "de" ? barber.specialty_de : barber.specialty_en;
+  const de = lang === "de";
+  const specialty = de ? barber.specialty_de : barber.specialty_en;
   const recentWork = photos.length > 0
     ? photos.map(p => p.image_url)
     : fallbackWork;
 
-
+  const DAY_LABELS = de
+    ? ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
+    : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekOrder = [1, 2, 3, 4, 5, 6, 0];
+  const hourFor = (wd: number) => hours.find(h => h.weekday === wd);
+  const hhmm = (v: string) => String(v).slice(0, 5);
+  const fmtDate = (v: string) => format(parseISO(v), "dd.MM.yyyy");
 
   return (
     <div className="min-h-screen bg-background pb-28">
       {/* Hero image */}
       <div className="relative h-[50vh]">
-        <img src={barber.image} alt={barber.name} className="w-full h-full object-cover" />
+        <img src={barber.image} alt={barber.name} className="w-full h-full object-cover object-top" />
+
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
 
         {/* Back + share */}
