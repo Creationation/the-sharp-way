@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      barber_absences: {
+        Row: {
+          barber_id: string
+          created_at: string
+          end_date: string
+          id: string
+          reason: string
+          start_date: string
+          updated_at: string
+        }
+        Insert: {
+          barber_id: string
+          created_at?: string
+          end_date: string
+          id?: string
+          reason?: string
+          start_date: string
+          updated_at?: string
+        }
+        Update: {
+          barber_id?: string
+          created_at?: string
+          end_date?: string
+          id?: string
+          reason?: string
+          start_date?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "barber_absences_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: false
+            referencedRelation: "barbers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       barber_availability: {
         Row: {
           barber_name: string
@@ -78,6 +116,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "barber_photos_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: false
+            referencedRelation: "barbers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      barber_working_hours: {
+        Row: {
+          active: boolean
+          barber_id: string
+          created_at: string
+          end_time: string
+          id: string
+          start_time: string
+          updated_at: string
+          weekday: number
+        }
+        Insert: {
+          active?: boolean
+          barber_id: string
+          created_at?: string
+          end_time?: string
+          id?: string
+          start_time?: string
+          updated_at?: string
+          weekday: number
+        }
+        Update: {
+          active?: boolean
+          barber_id?: string
+          created_at?: string
+          end_time?: string
+          id?: string
+          start_time?: string
+          updated_at?: string
+          weekday?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "barber_working_hours_barber_id_fkey"
             columns: ["barber_id"]
             isOneToOne: false
             referencedRelation: "barbers"
