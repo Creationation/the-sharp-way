@@ -435,6 +435,41 @@ const HomeDashboard = () => {
               ))}
             </div>
           </div>
+
+          {/* Footer: legal links + copyright + credit */}
+          <footer className="px-5 mt-10 pt-6 border-t border-border">
+            <nav className="flex items-center justify-center flex-wrap gap-x-2 gap-y-1 mb-3" aria-label={lang === "de" ? "Rechtliches" : "Legal"}>
+              {[
+                { tab: "impressum", label: lang === "de" ? "Impressum" : "Legal Notice" },
+                { tab: "datenschutz", label: lang === "de" ? "Datenschutz" : "Privacy" },
+                { tab: "agb", label: lang === "de" ? "AGB" : "Terms" },
+              ].map((l, i, arr) => (
+                <span key={l.tab} className="flex items-center gap-2">
+                  <button
+                    onClick={() => navigate(`/legal?tab=${l.tab}`)}
+                    className="text-muted-foreground hover:text-copper transition-colors text-xs"
+                  >
+                    {l.label}
+                  </button>
+                  {i < arr.length - 1 && <span className="text-muted-foreground/40 text-xs">·</span>}
+                </span>
+              ))}
+            </nav>
+            <p className="text-center text-muted-foreground/70 text-xs">
+              © 2026 {lang === "de" ? "Sitdown Gentlemens Barber" : "Sitdown Gentlemens Barber"}. {lang === "de" ? "Alle Rechte vorbehalten." : "All rights reserved."}
+            </p>
+            <p className="text-center text-muted-foreground/50 text-[11px] mt-2 pb-2">
+              {lang === "de" ? "Erstellt von:" : "Created by:"}{" "}
+              <a
+                href="https://creationation.app"
+                target="_blank"
+                rel="noreferrer"
+                className="text-copper/80 hover:text-copper transition-colors underline-offset-2 hover:underline"
+              >
+                Creationation Vienna
+              </a>
+            </p>
+          </footer>
         </>
       )}
     <div className="h-24" />
