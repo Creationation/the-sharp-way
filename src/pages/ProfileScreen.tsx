@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, ChevronRight, Calendar, Clock, LogOut, Shield, XCircle, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ChevronRight, Calendar, Clock, LogOut, Shield, XCircle, AlertTriangle, Download, Trash2 } from "lucide-react";
 import { DE, GB } from "country-flag-icons/react/3x2";
 import { useNavigate } from "react-router-dom";
 import {
@@ -39,6 +39,9 @@ const ProfileScreen = () => {
   const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null);
   const [confirmCancelDate, setConfirmCancelDate] = useState<string>("");
   const [confirmCancelTime, setConfirmCancelTime] = useState<string>("");
+  const [exporting, setExporting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -70,6 +73,57 @@ const ProfileScreen = () => {
       console.error("[Profile] fetchBookings exception", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // GDPR Art. 20 — data portability
+  const exportData = async () => {
+    if (!user) return;
+    setExporting(true);
+    try {
+      const [profileRes, bookingsRes, loyaltyRes] = await Promise.all([
+        supabase.from("profiles").select("*").eq("user_id", user.id),
+        supabase.from("bookings").select("*").eq("user_id", user.id),
+        supabase.from("user_loyalty").select("*").eq("user_id", user.id),
+      ]);
+      const payload = {
+        exported_at: new Date().toISOString(),
+        account: { id: user.id, email: user.email, created_at: user.created_at },
+        profile: profileRes.data ?? [],
+        bookings: bookingsRes.data ?? [],
+        loyalty: loyaltyRes.data ?? [],
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `sitdown-vienna-daten-${format(new Date(), "yyyy-MM-dd")}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success(lang === "de" ? "Daten heruntergeladen" : "Data downloaded");
+    } catch (err) {
+      console.error("[Profile] exportData", err);
+      toast.error(lang === "de" ? "Export fehlgeschlagen" : "Export failed");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  // GDPR Art. 17 — right to erasure
+  const deleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke("delete-account");
+      if (error) throw error;
+      toast.success(lang === "de" ? "Konto gelöscht" : "Account deleted");
+      await signOut();
+      navigate("/");
+    } catch (err) {
+      console.error("[Profile] deleteAccount", err);
+      toast.error(lang === "de" ? "Konto konnte nicht gelöscht werden" : "Could not delete account");
+    } finally {
+      setDeleting(false);
+      setConfirmDelete(false);
     }
   };
 
@@ -266,7 +320,56 @@ const ProfileScreen = () => {
             <ChevronRight size={16} className="text-muted-foreground" />
           </button>
         ))}
+
+        {/* GDPR: data export & account deletion */}
+        <button
+          onClick={exportData}
+          disabled={exporting}
+          className="w-full card-app p-4 flex items-center justify-between disabled:opacity-50"
+        >
+          <span className="text-foreground text-sm flex items-center gap-2">
+            <Download size={16} className="text-muted-foreground" />
+            {lang === "de" ? "Meine Daten exportieren" : "Export my data"}
+          </span>
+          <ChevronRight size={16} className="text-muted-foreground" />
+        </button>
+        <button
+          onClick={() => setConfirmDelete(true)}
+          disabled={deleting}
+          className="w-full card-app p-4 flex items-center justify-between border-destructive/30 disabled:opacity-50"
+        >
+          <span className="text-destructive text-sm flex items-center gap-2">
+            <Trash2 size={16} />
+            {lang === "de" ? "Konto endgültig löschen" : "Delete account permanently"}
+          </span>
+          <ChevronRight size={16} className="text-destructive" />
+        </button>
       </div>
+
+      {/* Delete account dialog */}
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent className="bg-surface border-border">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-foreground">
+              <AlertTriangle size={18} className="text-destructive" />
+              {lang === "de" ? "Konto löschen?" : "Delete account?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              {lang === "de"
+                ? "Alle deine Daten · Profil, Buchungen und Treuepunkte · werden unwiderruflich gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+                : "All your data · profile, bookings and loyalty points · will be permanently deleted. This action cannot be undone."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-surface border-border text-foreground">
+              {t.common.cancelBtn}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={deleteAccount} className="bg-destructive text-destructive-foreground">
+              {lang === "de" ? "Endgültig löschen" : "Delete permanently"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Cancel confirmation dialog */}
       <AlertDialog open={!!confirmCancelId} onOpenChange={(open) => { if (!open) setConfirmCancelId(null); }}>

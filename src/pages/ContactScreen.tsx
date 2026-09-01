@@ -174,10 +174,28 @@ const ContactScreen = () => {
       </div>
 
       {/* Footer */}
-      <div className="px-5 text-center">
-        <img src="/sitdown-logo.png" alt="Sitdown Wien" className="h-24 mx-auto" />
-        <p className="text-muted-foreground text-xs mt-1">{t.contact.copyright}</p>
-      </div>
+      <footer className="px-5 text-center">
+        <img src="/sitdown-logo.png" alt="Sitdown Wien · Gentlemens Barber Logo" className="h-24 mx-auto" />
+        <nav className="flex items-center justify-center gap-2 flex-wrap mt-3" aria-label={lang === "de" ? "Rechtliches" : "Legal"}>
+          {[
+            { tab: "impressum", label: lang === "de" ? "Impressum" : "Legal Notice" },
+            { tab: "datenschutz", label: lang === "de" ? "Datenschutz" : "Privacy" },
+            { tab: "agb", label: lang === "de" ? "AGB" : "Terms" },
+          ].map((l, i) => (
+            <span key={l.tab} className="flex items-center gap-2">
+              {i > 0 && <span className="text-muted-foreground text-xs" aria-hidden="true">·</span>}
+              <button
+                onClick={() => navigate(`/legal?tab=${l.tab}`)}
+                className="text-muted-foreground text-xs underline underline-offset-2 hover:text-copper transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-copper"
+              >
+                {l.label}
+              </button>
+            </span>
+          ))}
+        </nav>
+        <p className="text-muted-foreground text-xs mt-2">{t.contact.copyright}</p>
+      </footer>
+
     </div>
   );
 };

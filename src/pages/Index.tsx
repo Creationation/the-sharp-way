@@ -10,7 +10,6 @@ import AboutSection from "@/components/AboutSection";
 import ContactFooter from "@/components/ContactFooter";
 import PromoBanner from "@/components/PromoBanner";
 import FloatingButtons from "@/components/FloatingButtons";
-import CookieConsent from "@/components/CookieConsent";
 import LoadingScreen from "@/components/LoadingScreen";
 
 const Index = () => {
@@ -30,7 +29,6 @@ const Index = () => {
         <ContactFooter />
       </main>
       <FloatingButtons />
-      <CookieConsent />
     </>
   );
 };

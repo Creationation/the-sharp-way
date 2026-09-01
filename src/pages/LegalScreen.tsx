@@ -214,6 +214,15 @@ const Datenschutz = ({ lang }: { lang: "de" | "en" }) => {
           (Benachrichtigungen an das Salon-Team, nur Termindaten).
         </P>
 
+        <H>4a. Übermittlung in Drittländer</H>
+        <P>
+          Beim E-Mail-Versand über Google Workspace sowie bei Telegram-Benachrichtigungen kann eine
+          Verarbeitung in den USA stattfinden. Diese Übermittlung erfolgt auf Basis der
+          EU-Standardvertragsklauseln (Art. 46 Abs. 2 lit. c DSGVO) bzw. des EU-US Data Privacy
+          Framework. Schriftarten werden lokal von unserem Server ausgeliefert — es erfolgt keine
+          Verbindung zu Google Fonts oder anderen externen CDNs.
+        </P>
+
         <H>5. Speicherdauer</H>
         <P>
           Termindaten: bis zu 3 Jahre nach dem letzten Termin. Buchhaltungsrelevante Daten: 7 Jahre
@@ -226,12 +235,30 @@ const Datenschutz = ({ lang }: { lang: "de" | "en" }) => {
           barkeit und Widerspruch. Anfragen an: hello@sitdownvienna.app. Sie können sich zudem bei
           der österreichischen Datenschutzbehörde beschweren (www.dsb.gv.at).
         </P>
-
-        <H>7. Cookies</H>
         <P>
-          Wir verwenden ausschließlich technisch notwendige Speicher (Login-Session, Sprach­
-          einstellung). Es werden keine Tracking- oder Werbe-Cookies gesetzt.
+          Im Bereich „Profil" können Sie jederzeit selbst Ihre Daten als Datei exportieren
+          (Datenübertragbarkeit, Art. 20 DSGVO) und Ihr Konto samt aller personenbezogenen Daten
+          endgültig löschen (Recht auf Löschung, Art. 17 DSGVO).
         </P>
+
+        <H>7. Cookies & lokale Speicherung</H>
+        <P>
+          Wir verwenden ausschließlich technisch notwendige Speicher — keine Tracking-, Analyse-
+          oder Werbe-Cookies, keine externen Schriftarten, keine Social-Media-Pixel:
+        </P>
+        <P>
+          · <strong className="text-copper">sb-…-auth-token</strong> (Local Storage) — Login-Sitzung,
+          gültig bis zum Abmelden.<br />
+          · <strong className="text-copper">lang</strong> (Local Storage) — gewählte Sprache,
+          dauerhaft bis zum Löschen der App-Daten.<br />
+          · <strong className="text-copper">sitdown_visited</strong> (Local Storage) — Erkennung des
+          Erststarts für den Intro-Bildschirm, dauerhaft.
+        </P>
+        <P>
+          Da keine nicht notwendigen Cookies gesetzt werden, ist kein Cookie-Einwilligungsbanner
+          erforderlich (§ 165 Abs. 3 TKG 2021).
+        </P>
+
       </div>
     );
   }
@@ -259,6 +286,13 @@ const Datenschutz = ({ lang }: { lang: "de" | "en" }) => {
         Payments Europe Ltd (payments, IE), Google Workspace (email delivery via
         hello@sitdownvienna.app), Telegram (staff notifications, appointment data only).
       </P>
+      <H>4a. Transfers to third countries</H>
+      <P>
+        Email delivery via Google Workspace and Telegram notifications may involve processing in the
+        USA. Such transfers are based on the EU Standard Contractual Clauses (Art. 46 (2)(c) GDPR)
+        and/or the EU-US Data Privacy Framework. Fonts are served locally from our own server — no
+        connection is made to Google Fonts or any other external CDN.
+      </P>
       <H>5. Retention</H>
       <P>
         Appointment data: up to 3 years after the last visit. Accounting data: 7 years (Austrian
@@ -270,11 +304,29 @@ const Datenschutz = ({ lang }: { lang: "de" | "en" }) => {
         objection. Requests: hello@sitdownvienna.app. You may also lodge a complaint with the
         Austrian Data Protection Authority (www.dsb.gv.at).
       </P>
-      <H>7. Cookies</H>
       <P>
-        We use strictly necessary storage only (login session, language preference). No tracking or
-        advertising cookies are set.
+        In the "Profile" section you can export your data as a file at any time (portability, Art.
+        20 GDPR) and permanently delete your account including all personal data (erasure, Art. 17
+        GDPR).
       </P>
+      <H>7. Cookies & local storage</H>
+      <P>
+        We use strictly necessary storage only — no tracking, analytics or advertising cookies, no
+        external fonts, no social media pixels:
+      </P>
+      <P>
+        · <strong className="text-copper">sb-…-auth-token</strong> (local storage) — login session,
+        valid until sign-out.<br />
+        · <strong className="text-copper">lang</strong> (local storage) — selected language, stored
+        permanently.<br />
+        · <strong className="text-copper">sitdown_visited</strong> (local storage) — first-launch
+        detection for the intro screen, stored permanently.
+      </P>
+      <P>
+        As no non-essential cookies are set, no cookie consent banner is required (§ 165 (3)
+        Austrian Telecommunications Act 2021).
+      </P>
+
     </div>
   );
 };
@@ -325,12 +377,20 @@ const AGB = ({ lang }: { lang: "de" | "en" }) => {
           mitgebrachten Wertgegenständen wird keine Haftung übernommen.
         </P>
 
-        <H>7. Anwendbares Recht & Gerichtsstand</H>
+        <H>7. Rücktrittsrecht</H>
+        <P>
+          Bei Dienstleistungen im Bereich der Freizeitgestaltung, die für einen spezifischen Termin
+          vorgesehen sind, besteht gemäß § 18 Abs. 1 Z 10 FAGG kein gesetzliches Rücktrittsrecht.
+          Es gilt ausschließlich die in Punkt 3 geregelte Stornofrist von 24 Stunden.
+        </P>
+
+        <H>8. Anwendbares Recht & Gerichtsstand</H>
         <P>
           Es gilt österreichisches Recht unter Ausschluss des UN-Kaufrechts. Gerichtsstand ist Wien,
           sofern der Kunde Unternehmer ist; für Verbraucher gelten die gesetzlichen
           Gerichtsstände.
         </P>
+
       </div>
     );
   }
@@ -368,11 +428,18 @@ const AGB = ({ lang }: { lang: "de" | "en" }) => {
         The Salon is liable only within the limits of statutory provisions. No liability is assumed
         for valuables brought along by customers.
       </P>
-      <H>7. Applicable law & venue</H>
+      <H>7. Right of withdrawal</H>
+      <P>
+        For services relating to leisure activities provided on a specific date, there is no
+        statutory right of withdrawal under § 18 (1) no. 10 of the Austrian Distance and Off-Premises
+        Transactions Act (FAGG). Only the 24-hour cancellation rule set out in clause 3 applies.
+      </P>
+      <H>8. Applicable law & venue</H>
       <P>
         Austrian law applies, excluding the UN Sales Convention. Place of jurisdiction is Vienna
         where the customer is a business; for consumers, statutory venues apply.
       </P>
+
     </div>
   );
 };

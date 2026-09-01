@@ -1012,6 +1012,18 @@ const BookingFlow = () => {
         <p className="text-center text-muted-foreground text-[10px] mt-1">
           {lang === "de" ? "Sichere Zahlung über Stripe 🔒 · Kostenlose Stornierung bis 24h vorher" : "Secure payment via Stripe 🔒 · Free cancellation up to 24h before"}
         </p>
+        <p className="text-center text-muted-foreground text-[10px] mt-1 leading-relaxed">
+          {lang === "de" ? "Mit der Buchung akzeptierst du die " : "By booking you accept our "}
+          <a href="/legal?tab=agb" className="text-copper underline underline-offset-2">
+            {lang === "de" ? "AGB" : "Terms"}
+          </a>
+          {lang === "de" ? " inkl. Stornobedingungen (5 € bei Absage unter 24 h) und die " : " incl. the cancellation policy (€5 for cancellations under 24h) and our "}
+          <a href="/legal?tab=datenschutz" className="text-copper underline underline-offset-2">
+            {lang === "de" ? "Datenschutzerklärung" : "Privacy Policy"}
+          </a>
+          .
+        </p>
+
       </div>
     </div>
   );
