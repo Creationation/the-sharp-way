@@ -377,12 +377,20 @@ const AGB = ({ lang }: { lang: "de" | "en" }) => {
           mitgebrachten Wertgegenständen wird keine Haftung übernommen.
         </P>
 
-        <H>7. Anwendbares Recht & Gerichtsstand</H>
+        <H>7. Rücktrittsrecht</H>
+        <P>
+          Bei Dienstleistungen im Bereich der Freizeitgestaltung, die für einen spezifischen Termin
+          vorgesehen sind, besteht gemäß § 18 Abs. 1 Z 10 FAGG kein gesetzliches Rücktrittsrecht.
+          Es gilt ausschließlich die in Punkt 3 geregelte Stornofrist von 24 Stunden.
+        </P>
+
+        <H>8. Anwendbares Recht & Gerichtsstand</H>
         <P>
           Es gilt österreichisches Recht unter Ausschluss des UN-Kaufrechts. Gerichtsstand ist Wien,
           sofern der Kunde Unternehmer ist; für Verbraucher gelten die gesetzlichen
           Gerichtsstände.
         </P>
+
       </div>
     );
   }
