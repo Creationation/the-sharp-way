@@ -214,6 +214,15 @@ const Datenschutz = ({ lang }: { lang: "de" | "en" }) => {
           (Benachrichtigungen an das Salon-Team, nur Termindaten).
         </P>
 
+        <H>4a. Übermittlung in Drittländer</H>
+        <P>
+          Beim E-Mail-Versand über Google Workspace sowie bei Telegram-Benachrichtigungen kann eine
+          Verarbeitung in den USA stattfinden. Diese Übermittlung erfolgt auf Basis der
+          EU-Standardvertragsklauseln (Art. 46 Abs. 2 lit. c DSGVO) bzw. des EU-US Data Privacy
+          Framework. Schriftarten werden lokal von unserem Server ausgeliefert — es erfolgt keine
+          Verbindung zu Google Fonts oder anderen externen CDNs.
+        </P>
+
         <H>5. Speicherdauer</H>
         <P>
           Termindaten: bis zu 3 Jahre nach dem letzten Termin. Buchhaltungsrelevante Daten: 7 Jahre
@@ -226,12 +235,30 @@ const Datenschutz = ({ lang }: { lang: "de" | "en" }) => {
           barkeit und Widerspruch. Anfragen an: hello@sitdownvienna.app. Sie können sich zudem bei
           der österreichischen Datenschutzbehörde beschweren (www.dsb.gv.at).
         </P>
-
-        <H>7. Cookies</H>
         <P>
-          Wir verwenden ausschließlich technisch notwendige Speicher (Login-Session, Sprach­
-          einstellung). Es werden keine Tracking- oder Werbe-Cookies gesetzt.
+          Im Bereich „Profil" können Sie jederzeit selbst Ihre Daten als Datei exportieren
+          (Datenübertragbarkeit, Art. 20 DSGVO) und Ihr Konto samt aller personenbezogenen Daten
+          endgültig löschen (Recht auf Löschung, Art. 17 DSGVO).
         </P>
+
+        <H>7. Cookies & lokale Speicherung</H>
+        <P>
+          Wir verwenden ausschließlich technisch notwendige Speicher — keine Tracking-, Analyse-
+          oder Werbe-Cookies, keine externen Schriftarten, keine Social-Media-Pixel:
+        </P>
+        <P>
+          · <strong className="text-copper">sb-…-auth-token</strong> (Local Storage) — Login-Sitzung,
+          gültig bis zum Abmelden.<br />
+          · <strong className="text-copper">lang</strong> (Local Storage) — gewählte Sprache,
+          dauerhaft bis zum Löschen der App-Daten.<br />
+          · <strong className="text-copper">sitdown_visited</strong> (Local Storage) — Erkennung des
+          Erststarts für den Intro-Bildschirm, dauerhaft.
+        </P>
+        <P>
+          Da keine nicht notwendigen Cookies gesetzt werden, ist kein Cookie-Einwilligungsbanner
+          erforderlich (§ 165 Abs. 3 TKG 2021).
+        </P>
+
       </div>
     );
   }
