@@ -286,6 +286,13 @@ const Datenschutz = ({ lang }: { lang: "de" | "en" }) => {
         Payments Europe Ltd (payments, IE), Google Workspace (email delivery via
         hello@sitdownvienna.app), Telegram (staff notifications, appointment data only).
       </P>
+      <H>4a. Transfers to third countries</H>
+      <P>
+        Email delivery via Google Workspace and Telegram notifications may involve processing in the
+        USA. Such transfers are based on the EU Standard Contractual Clauses (Art. 46 (2)(c) GDPR)
+        and/or the EU-US Data Privacy Framework. Fonts are served locally from our own server — no
+        connection is made to Google Fonts or any other external CDN.
+      </P>
       <H>5. Retention</H>
       <P>
         Appointment data: up to 3 years after the last visit. Accounting data: 7 years (Austrian
@@ -297,11 +304,29 @@ const Datenschutz = ({ lang }: { lang: "de" | "en" }) => {
         objection. Requests: hello@sitdownvienna.app. You may also lodge a complaint with the
         Austrian Data Protection Authority (www.dsb.gv.at).
       </P>
-      <H>7. Cookies</H>
       <P>
-        We use strictly necessary storage only (login session, language preference). No tracking or
-        advertising cookies are set.
+        In the "Profile" section you can export your data as a file at any time (portability, Art.
+        20 GDPR) and permanently delete your account including all personal data (erasure, Art. 17
+        GDPR).
       </P>
+      <H>7. Cookies & local storage</H>
+      <P>
+        We use strictly necessary storage only — no tracking, analytics or advertising cookies, no
+        external fonts, no social media pixels:
+      </P>
+      <P>
+        · <strong className="text-copper">sb-…-auth-token</strong> (local storage) — login session,
+        valid until sign-out.<br />
+        · <strong className="text-copper">lang</strong> (local storage) — selected language, stored
+        permanently.<br />
+        · <strong className="text-copper">sitdown_visited</strong> (local storage) — first-launch
+        detection for the intro screen, stored permanently.
+      </P>
+      <P>
+        As no non-essential cookies are set, no cookie consent banner is required (§ 165 (3)
+        Austrian Telecommunications Act 2021).
+      </P>
+
     </div>
   );
 };
