@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 const AuthScreen = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -90,6 +90,8 @@ const AuthScreen = () => {
               <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 name="fullName"
+                aria-label={t.auth.fullName}
+                autoComplete="name"
                 value={form.fullName}
                 onChange={handleChange}
                 required
@@ -107,6 +109,7 @@ const AuthScreen = () => {
                 type="tel"
                 inputMode="tel"
                 autoComplete="tel"
+                aria-label={t.auth.phone}
                 value={form.phone}
                 onChange={handleChange}
                 required
@@ -122,6 +125,8 @@ const AuthScreen = () => {
             <input
               name="email"
               type="email"
+              aria-label={t.auth.email}
+              autoComplete="email"
               value={form.email}
               onChange={handleChange}
               required
@@ -136,6 +141,8 @@ const AuthScreen = () => {
               <input
                 name="password"
                 type={showPassword ? "text" : "password"}
+                aria-label={t.auth.password}
+                autoComplete={mode === "signup" ? "new-password" : "current-password"}
                 value={form.password}
                 onChange={handleChange}
                 required
@@ -146,6 +153,7 @@ const AuthScreen = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? (lang === "de" ? "Passwort verbergen" : "Hide password") : (lang === "de" ? "Passwort anzeigen" : "Show password")}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
