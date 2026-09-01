@@ -186,7 +186,22 @@ const AuthScreen = () => {
                   ? t.auth.createAccount
                   : t.auth.sendResetLink}
           </button>
+
+          {mode === "signup" && (
+            <p className="text-muted-foreground text-xs text-center leading-relaxed">
+              {lang === "de" ? "Mit der Registrierung akzeptierst du die " : "By registering you accept our "}
+              <a href="/legal?tab=agb" className="text-copper underline underline-offset-2">
+                {lang === "de" ? "AGB" : "Terms"}
+              </a>
+              {lang === "de" ? " und die " : " and "}
+              <a href="/legal?tab=datenschutz" className="text-copper underline underline-offset-2">
+                {lang === "de" ? "Datenschutzerklärung" : "Privacy Policy"}
+              </a>
+              .
+            </p>
+          )}
         </form>
+
 
         {mode === "forgot" ? (
           <p className="text-center text-muted-foreground text-sm mt-6">
