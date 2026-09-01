@@ -420,11 +420,18 @@ const AGB = ({ lang }: { lang: "de" | "en" }) => {
         The Salon is liable only within the limits of statutory provisions. No liability is assumed
         for valuables brought along by customers.
       </P>
-      <H>7. Applicable law & venue</H>
+      <H>7. Right of withdrawal</H>
+      <P>
+        For services relating to leisure activities provided on a specific date, there is no
+        statutory right of withdrawal under § 18 (1) no. 10 of the Austrian Distance and Off-Premises
+        Transactions Act (FAGG). Only the 24-hour cancellation rule set out in clause 3 applies.
+      </P>
+      <H>8. Applicable law & venue</H>
       <P>
         Austrian law applies, excluding the UN Sales Convention. Place of jurisdiction is Vienna
         where the customer is a business; for consumers, statutory venues apply.
       </P>
+
     </div>
   );
 };
