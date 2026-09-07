@@ -42,6 +42,45 @@ const ProfileScreen = () => {
   const [exporting, setExporting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [pwOpen, setPwOpen] = useState(false);
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwShow, setPwShow] = useState(false);
+  const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
+
+  const changePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pwForm.next !== pwForm.confirm) {
+      toast.error(lang === "de" ? "Passwörter stimmen nicht überein" : "Passwords do not match");
+      return;
+    }
+    setPwSaving(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("change-password", {
+        body: { currentPassword: pwForm.current, newPassword: pwForm.next, lang },
+      });
+      const errMsg = (error as any)?.context?.error || (data as any)?.error;
+      if (error && !errMsg) throw error;
+      if (errMsg) {
+        toast.error(errMsg);
+        return;
+      }
+      toast.success(
+        lang === "de"
+          ? "Passwort geändert · Bestätigung per E-Mail gesendet"
+          : "Password changed · confirmation email sent"
+      );
+      setPwForm({ current: "", next: "", confirm: "" });
+      setPwOpen(false);
+    } catch (err: any) {
+      console.error("[Profile] changePassword", err);
+      toast.error(
+        err?.message || (lang === "de" ? "Passwort konnte nicht geändert werden" : "Could not change password")
+      );
+    } finally {
+      setPwSaving(false);
+    }
+  };
+
 
   useEffect(() => {
     if (authLoading) return;
