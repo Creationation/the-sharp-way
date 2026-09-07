@@ -14,19 +14,52 @@ const ResetPassword = () => {
   const [form, setForm] = useState({ password: "", confirm: "" });
 
   useEffect(() => {
-    // Supabase places a recovery session in the URL hash; the client picks it up automatically.
-    const hash = window.location.hash;
-    const isRecovery = hash.includes("type=recovery") || hash.includes("access_token");
+    let cancelled = false;
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setValidSession(!!session && isRecovery ? true : !!session);
-    });
+    const init = async () => {
+      const raw = window.location.hash.startsWith("#")
+        ? window.location.hash.slice(1)
+        : window.location.hash;
+      const params = new URLSearchParams(raw);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") setValidSession(true);
+      // Expired / already used link
+      if (params.get("error")) {
+        if (!cancelled) setValidSession(false);
+        return;
+      }
+
+      const accessToken = params.get("access_token");
+      const refreshToken = params.get("refresh_token");
+
+      if (accessToken && refreshToken) {
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+        // clean the tokens out of the address bar
+        window.history.replaceState({}, "", window.location.pathname);
+        if (!cancelled) setValidSession(!error);
+        return;
+      }
+
+      // PKCE style link (?code=...) — the client exchanges it automatically
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!cancelled) setValidSession(!!session);
+    };
+
+    init();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
+        setValidSession(true);
+      }
     });
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
