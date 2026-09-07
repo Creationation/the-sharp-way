@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, ChevronRight, Calendar, Clock, LogOut, Shield, XCircle, AlertTriangle, Download, Trash2 } from "lucide-react";
+import { ArrowLeft, ChevronRight, ChevronDown, Calendar, Clock, LogOut, Shield, XCircle, AlertTriangle, Download, Trash2, KeyRound, Eye, EyeOff } from "lucide-react";
 import { DE, GB } from "country-flag-icons/react/3x2";
 import { useNavigate } from "react-router-dom";
 import {
@@ -42,6 +42,54 @@ const ProfileScreen = () => {
   const [exporting, setExporting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [pwOpen, setPwOpen] = useState(false);
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwShow, setPwShow] = useState(false);
+  const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
+
+  const changePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pwForm.next !== pwForm.confirm) {
+      toast.error(lang === "de" ? "Passwörter stimmen nicht überein" : "Passwords do not match");
+      return;
+    }
+    setPwSaving(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("change-password", {
+        body: { currentPassword: pwForm.current, newPassword: pwForm.next, lang },
+      });
+      let errMsg: string | null = (data as any)?.error ?? null;
+      if (error) {
+        try {
+          const ctx = (error as any).context;
+          const parsed = ctx && typeof ctx.json === "function" ? await ctx.json() : null;
+          errMsg = parsed?.error || error.message;
+        } catch {
+          errMsg = error.message;
+        }
+      }
+      if (errMsg) {
+        toast.error(errMsg);
+        return;
+      }
+
+      toast.success(
+        lang === "de"
+          ? "Passwort geändert · Bestätigung per E-Mail gesendet"
+          : "Password changed · confirmation email sent"
+      );
+      setPwForm({ current: "", next: "", confirm: "" });
+      setPwOpen(false);
+    } catch (err: any) {
+      console.error("[Profile] changePassword", err);
+      toast.error(
+        err?.message || (lang === "de" ? "Passwort konnte nicht geändert werden" : "Could not change password")
+      );
+    } finally {
+      setPwSaving(false);
+    }
+  };
+
 
   useEffect(() => {
     if (authLoading) return;
@@ -321,7 +369,87 @@ const ProfileScreen = () => {
           </button>
         ))}
 
+        {/* Change password */}
+        <div className="card-app overflow-hidden">
+          <button
+            onClick={() => setPwOpen(!pwOpen)}
+            className="w-full p-4 flex items-center justify-between"
+          >
+            <span className="text-foreground text-sm flex items-center gap-2">
+              <KeyRound size={16} className="text-copper" />
+              {lang === "de" ? "Passwort ändern" : "Change password"}
+            </span>
+            {pwOpen ? (
+              <ChevronDown size={16} className="text-muted-foreground" />
+            ) : (
+              <ChevronRight size={16} className="text-muted-foreground" />
+            )}
+          </button>
+
+          {pwOpen && (
+            <form onSubmit={changePassword} className="px-4 pb-4 space-y-3">
+              <input
+                type="password"
+                autoComplete="current-password"
+                required
+                value={pwForm.current}
+                onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })}
+                placeholder={lang === "de" ? "Aktuelles Passwort" : "Current password"}
+                aria-label={lang === "de" ? "Aktuelles Passwort" : "Current password"}
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper"
+              />
+              <div className="relative">
+                <input
+                  type={pwShow ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
+                  value={pwForm.next}
+                  onChange={(e) => setPwForm({ ...pwForm, next: e.target.value })}
+                  placeholder={lang === "de" ? "Neues Passwort (min. 8 Zeichen)" : "New password (min. 8 characters)"}
+                  aria-label={lang === "de" ? "Neues Passwort" : "New password"}
+                  className="w-full bg-background border border-border rounded-xl px-4 pr-12 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper"
+                />
+                <button
+                  type="button"
+                  onClick={() => setPwShow(!pwShow)}
+                  aria-label={pwShow ? (lang === "de" ? "Passwort verbergen" : "Hide password") : (lang === "de" ? "Passwort anzeigen" : "Show password")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                >
+                  {pwShow ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              <input
+                type={pwShow ? "text" : "password"}
+                autoComplete="new-password"
+                required
+                minLength={8}
+                value={pwForm.confirm}
+                onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })}
+                placeholder={lang === "de" ? "Neues Passwort bestätigen" : "Confirm new password"}
+                aria-label={lang === "de" ? "Neues Passwort bestätigen" : "Confirm new password"}
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper"
+              />
+              <button
+                type="submit"
+                disabled={pwSaving}
+                className="w-full gradient-copper text-primary-foreground font-semibold text-sm py-3 rounded-full shadow-copper disabled:opacity-50"
+              >
+                {pwSaving
+                  ? (lang === "de" ? "Wird gespeichert…" : "Saving…")
+                  : (lang === "de" ? "Passwort aktualisieren" : "Update password")}
+              </button>
+              <p className="text-muted-foreground text-[11px] leading-relaxed">
+                {lang === "de"
+                  ? "Nach der Änderung erhältst du eine Bestätigungs-E-Mail. Jede Änderung wird protokolliert."
+                  : "You will receive a confirmation email after the change. Every change is logged."}
+              </p>
+            </form>
+          )}
+        </div>
+
         {/* GDPR: data export & account deletion */}
+
         <button
           onClick={exportData}
           disabled={exporting}
