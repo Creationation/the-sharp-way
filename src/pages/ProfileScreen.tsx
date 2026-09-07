@@ -369,7 +369,87 @@ const ProfileScreen = () => {
           </button>
         ))}
 
+        {/* Change password */}
+        <div className="card-app overflow-hidden">
+          <button
+            onClick={() => setPwOpen(!pwOpen)}
+            className="w-full p-4 flex items-center justify-between"
+          >
+            <span className="text-foreground text-sm flex items-center gap-2">
+              <KeyRound size={16} className="text-copper" />
+              {lang === "de" ? "Passwort ändern" : "Change password"}
+            </span>
+            {pwOpen ? (
+              <ChevronDown size={16} className="text-muted-foreground" />
+            ) : (
+              <ChevronRight size={16} className="text-muted-foreground" />
+            )}
+          </button>
+
+          {pwOpen && (
+            <form onSubmit={changePassword} className="px-4 pb-4 space-y-3">
+              <input
+                type="password"
+                autoComplete="current-password"
+                required
+                value={pwForm.current}
+                onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })}
+                placeholder={lang === "de" ? "Aktuelles Passwort" : "Current password"}
+                aria-label={lang === "de" ? "Aktuelles Passwort" : "Current password"}
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper"
+              />
+              <div className="relative">
+                <input
+                  type={pwShow ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
+                  value={pwForm.next}
+                  onChange={(e) => setPwForm({ ...pwForm, next: e.target.value })}
+                  placeholder={lang === "de" ? "Neues Passwort (min. 8 Zeichen)" : "New password (min. 8 characters)"}
+                  aria-label={lang === "de" ? "Neues Passwort" : "New password"}
+                  className="w-full bg-background border border-border rounded-xl px-4 pr-12 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper"
+                />
+                <button
+                  type="button"
+                  onClick={() => setPwShow(!pwShow)}
+                  aria-label={pwShow ? (lang === "de" ? "Passwort verbergen" : "Hide password") : (lang === "de" ? "Passwort anzeigen" : "Show password")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                >
+                  {pwShow ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              <input
+                type={pwShow ? "text" : "password"}
+                autoComplete="new-password"
+                required
+                minLength={8}
+                value={pwForm.confirm}
+                onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })}
+                placeholder={lang === "de" ? "Neues Passwort bestätigen" : "Confirm new password"}
+                aria-label={lang === "de" ? "Neues Passwort bestätigen" : "Confirm new password"}
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-copper"
+              />
+              <button
+                type="submit"
+                disabled={pwSaving}
+                className="w-full gradient-copper text-primary-foreground font-semibold text-sm py-3 rounded-full shadow-copper disabled:opacity-50"
+              >
+                {pwSaving
+                  ? (lang === "de" ? "Wird gespeichert…" : "Saving…")
+                  : (lang === "de" ? "Passwort aktualisieren" : "Update password")}
+              </button>
+              <p className="text-muted-foreground text-[11px] leading-relaxed">
+                {lang === "de"
+                  ? "Nach der Änderung erhältst du eine Bestätigungs-E-Mail. Jede Änderung wird protokolliert."
+                  : "You will receive a confirmation email after the change. Every change is logged."}
+              </p>
+            </form>
+          )}
+        </div>
+
         {/* GDPR: data export & account deletion */}
+
         <button
           onClick={exportData}
           disabled={exporting}
