@@ -122,6 +122,7 @@ serve(async (req) => {
       });
     }
 
+    console.log("DEBUG_LINK:", data.properties.action_link);
     const html = buildEmail(data.properties.action_link, isDE);
     const subject = isDE ? "Sitdown Wien · Passwort zurücksetzen" : "Sitdown Wien · Reset your password";
 
