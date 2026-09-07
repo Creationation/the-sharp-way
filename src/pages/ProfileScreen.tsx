@@ -58,12 +58,21 @@ const ProfileScreen = () => {
       const { data, error } = await supabase.functions.invoke("change-password", {
         body: { currentPassword: pwForm.current, newPassword: pwForm.next, lang },
       });
-      const errMsg = (error as any)?.context?.error || (data as any)?.error;
-      if (error && !errMsg) throw error;
+      let errMsg: string | null = (data as any)?.error ?? null;
+      if (error) {
+        try {
+          const ctx = (error as any).context;
+          const parsed = ctx && typeof ctx.json === "function" ? await ctx.json() : null;
+          errMsg = parsed?.error || error.message;
+        } catch {
+          errMsg = error.message;
+        }
+      }
       if (errMsg) {
         toast.error(errMsg);
         return;
       }
+
       toast.success(
         lang === "de"
           ? "Passwort geändert · Bestätigung per E-Mail gesendet"
