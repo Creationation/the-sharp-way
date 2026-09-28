@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CreditCard, RefreshCw, Wallet, Clock, TrendingUp, Undo2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { ResponsiveContainer, AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { format } from "date-fns";
 
 interface Charge {
@@ -152,16 +152,71 @@ const StripeTab = () => {
             })}
           </div>
 
-          <div className="space-y-2">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide">{de ? "Auszahlungen" : "Payouts"}</p>
-            {data.payouts.length === 0 && <div className="text-sm text-muted-foreground">{de ? "Keine Auszahlungen" : "No payouts"}</div>}
-            {data.payouts.map(p => (
-              <div key={p.id} className="bg-card border border-border rounded-2xl p-3 flex items-center justify-between">
-                <div className="text-xs text-muted-foreground">{format(new Date(p.arrival_date * 1000), "dd.MM.yyyy")} · {p.status}</div>
-                <div className="text-sm font-semibold">{eur(p.amount)}</div>
+          {(() => {
+            const upcoming = data.payouts.filter(p => p.status === "pending" || p.status === "in_transit")
+              .sort((a, b) => a.arrival_date - b.arrival_date)[0];
+            const paid = data.payouts.filter(p => p.status === "paid");
+            const last = paid[0];
+            const totalPaid = paid.reduce((s, p) => s + p.amount, 0);
+            const nextMonday = new Date();
+            nextMonday.setDate(nextMonday.getDate() + (((8 - nextMonday.getDay()) % 7) || 7));
+            const pStatus = (s: string) => ({
+              paid: de ? "Überwiesen" : "Paid",
+              pending: de ? "Geplant" : "Scheduled",
+              in_transit: de ? "Unterwegs" : "In transit",
+              failed: de ? "Fehlgeschlagen" : "Failed",
+              canceled: de ? "Storniert" : "Canceled",
+            } as Record<string, string>)[s] || s;
+            const chart = [...paid].reverse().map(p => ({
+              day: format(new Date(p.arrival_date * 1000), "dd.MM"), amount: p.amount / 100,
+            }));
+            return (
+              <div className="space-y-3">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                  {de ? "Wöchentliche Auszahlungen aufs Bankkonto (jeden Montag)" : "Weekly bank payouts (every Monday)"}
+                </p>
+                <div className="bg-card border border-mint/40 rounded-2xl p-3">
+                  <div className="text-[11px] text-muted-foreground mb-1">{de ? "Nächste Auszahlung" : "Next payout"}</div>
+                  <div className="text-lg font-bold text-mint">
+                    {eur(upcoming ? upcoming.amount : data.balance.available + data.balance.pending)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {upcoming
+                      ? `${format(new Date(upcoming.arrival_date * 1000), "dd.MM.yyyy")} · ${pStatus(upcoming.status)}`
+                      : `${de ? "Voraussichtlich" : "Estimated"} ${format(nextMonday, "dd.MM.yyyy")}`}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <Metric icon={Wallet} label={de ? "Letzte Auszahlung" : "Last payout"}
+                    value={last ? `${eur(last.amount)} · ${format(new Date(last.arrival_date * 1000), "dd.MM")}` : "·"} />
+                  <Metric icon={TrendingUp} label={de ? `Summe (${paid.length} Überw.)` : `Total (${paid.length} payouts)`} value={eur(totalPaid)} />
+                </div>
+                {chart.length > 0 && (
+                  <div className="bg-card border border-border rounded-2xl p-3 h-44">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={chart}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis dataKey="day" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                        <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} width={35} />
+                        <Tooltip
+                          contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12 }}
+                          formatter={(v: number) => [`${v.toFixed(2)} €`, de ? "Auszahlung" : "Payout"]}
+                        />
+                        <Bar dataKey="amount" fill="hsl(var(--mint, 160 100% 45%))" radius={[6, 6, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+                {data.payouts.length === 0 && <div className="text-sm text-muted-foreground">{de ? "Keine Auszahlungen" : "No payouts"}</div>}
+                {data.payouts.map(p => (
+                  <div key={p.id} className="bg-card border border-border rounded-2xl p-3 flex items-center justify-between">
+                    <div className="text-xs text-muted-foreground">{format(new Date(p.arrival_date * 1000), "EEE dd.MM.yyyy")} · {pStatus(p.status)}</div>
+                    <div className="text-sm font-semibold">{eur(p.amount)}</div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            );
+          })()}
         </>
       )}
     </div>
