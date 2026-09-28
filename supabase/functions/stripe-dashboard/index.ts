@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
     const [balance, charges, payouts, refunds] = await Promise.all([
       stripe.balance.retrieve(),
       stripe.charges.list({ limit: 100, created: { gte: since } }),
-      stripe.payouts.list({ limit: 10 }),
+      stripe.payouts.list({ limit: 20 }),
       stripe.refunds.list({ limit: 100, created: { gte: since } }),
     ]);
 
@@ -58,6 +58,7 @@ Deno.serve(async (req) => {
       })),
       payouts: payouts.data.map((p) => ({
         id: p.id, amount: p.amount, currency: p.currency, status: p.status, arrival_date: p.arrival_date,
+        created: p.created, automatic: p.automatic,
       })),
       refunds_total: refunds.data.filter((r) => r.status === "succeeded").reduce((s, r) => s + r.amount, 0),
     });
