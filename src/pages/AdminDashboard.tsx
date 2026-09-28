@@ -3,7 +3,7 @@ import {
   ArrowLeft, Calendar as CalendarIcon, Clock, User, Trash2, XCircle,
   CheckCircle, ChevronLeft, ChevronRight, ToggleLeft, ToggleRight, Save,
   Menu, X, Tag, Scissors, Bell, LayoutGrid, BarChart3, Mail, Shield,
-  Search, Download, RotateCcw, BookOpen, Plus,
+  Search, Download, RotateCcw, BookOpen, Plus, CreditCard,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
@@ -26,6 +26,7 @@ import ServicesTab from "@/components/admin/ServicesTab";
 import GalleryTab from "@/components/admin/GalleryTab";
 import EmailsTab from "@/components/admin/EmailsTab";
 import AdminsTab from "@/components/admin/AdminsTab";
+import StripeTab from "@/components/admin/StripeTab";
 import ManualTab from "@/components/admin/ManualTab";
 import ShopHoursTab from "@/components/admin/ShopHoursTab";
 import AdminBookingCreateSheet from "@/components/admin/AdminBookingCreateSheet";
@@ -73,7 +74,7 @@ const AdminDashboard = () => {
   const { lang } = useLanguage();
   const t = translations[lang];
   const dateLocale = lang === "de" ? deLocale : enUS;
-  type TabId = "manual" | "bookings" | "schedule" | "stats" | "availability" | "shophours" | "users" | "promotions" | "barbers" | "services" | "gallery" | "codes" | "notifications" | "emails" | "admins";
+  type TabId = "manual" | "bookings" | "schedule" | "stats" | "availability" | "shophours" | "users" | "promotions" | "barbers" | "services" | "gallery" | "codes" | "notifications" | "emails" | "admins" | "stripe";
   const [tab, setTab] = useState<TabId>("bookings");
   const [menuOpen, setMenuOpen] = useState(false);
   const { barbers: dbBarbers } = useBarbers();
@@ -94,6 +95,7 @@ const AdminDashboard = () => {
     { id: "codes",         label: t.admin.promoCodesTab.title,                      Icon: Tag       },
     { id: "notifications", label: t.admin.notificationsTab.title,                   Icon: Bell      },
     { id: "emails",        label: "Emails",                                         Icon: Mail      },
+    { id: "stripe",        label: "Stripe",                                         Icon: CreditCard },
     { id: "admins",        label: lang === "de" ? "Admins" : "Admins",              Icon: Shield    },
   ];
 
@@ -863,6 +865,7 @@ const AdminDashboard = () => {
 
       {/* ═══════════════════ ADMINS TAB ═══════════════════ */}
       {tab === "admins" && <AdminsTab />}
+      {tab === "stripe" && <StripeTab />}
 
       {/* ═══════════════════ MANUAL TAB ═══════════════════ */}
       {tab === "manual" && <ManualTab />}
