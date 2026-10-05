@@ -10,19 +10,14 @@ import gallery2 from "@/assets/gallery-2.jpg";
 import gallery3 from "@/assets/gallery-3.jpg";
 
 
-const services = [
-  { name: "Classic Haircut", price: "€25" },
-  { name: "Fade & Taper", price: "€30" },
-  { name: "Beard Trim", price: "€15" },
-  { name: "Combo", price: "€40" },
-  { name: "Hot Towel", price: "€35" },
-];
+import { useServices, formatServicePrice } from "@/hooks/useServices";
 
 const BarberProfile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { t, lang } = useLanguage();
   const { barbers, loading } = useBarbers();
+  const { services } = useServices();
   const fallbackWork = [gallery1, gallery2, gallery3];
 
   const barber = barbers.find(b => b.id === id) || barbers[0];
@@ -175,9 +170,9 @@ const BarberProfile = () => {
         <div className="overflow-x-auto scrollbar-hide">
           <div className="flex gap-2" style={{ width: "max-content" }}>
             {services.map(s => (
-              <div key={s.name} className="card-app px-4 py-2.5 flex-shrink-0">
-                <p className="text-foreground text-sm font-medium">{s.name}</p>
-                <p className="text-copper text-xs font-semibold">{s.price}</p>
+              <div key={s.id} className="card-app px-4 py-2.5 flex-shrink-0">
+                <p className="text-foreground text-sm font-medium">{de ? s.name : s.name_en}</p>
+                <p className="text-copper text-xs font-semibold">{formatServicePrice(s, de ? "de" : "en")}</p>
               </div>
             ))}
           </div>
