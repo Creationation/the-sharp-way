@@ -31,6 +31,10 @@ export interface BookingDetail {
   booking_date: string;
   booking_time: string;
   status: string;
+  service_price?: string | null;
+  created_at?: string | null;
+  notes?: string | null;
+  payment_status?: string | null;
 }
 
 interface Barber {
@@ -253,6 +257,35 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
             ) : (
               <p className="text-sm text-muted-foreground">{t.noProfile}</p>
             )}
+          </div>
+        </section>
+
+        {/* Booking info */}
+        <section className="mb-5">
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
+            {lang === "de" ? "Termin-Infos" : "Booking info"}
+          </p>
+          <div className="card-app p-3 space-y-1.5 text-sm">
+            {[
+              [lang === "de" ? "Mitarbeiter" : "Barber", booking.barber_name],
+              [lang === "de" ? "Leistung" : "Service", booking.service_name],
+              [lang === "de" ? "Preis" : "Price", booking.service_price],
+              [t.duration, booking.service_duration],
+              [lang === "de" ? "Status" : "Status", booking.status],
+              [lang === "de" ? "Zahlung" : "Payment", booking.payment_status],
+              [
+                lang === "de" ? "Gebucht am" : "Booked on",
+                booking.created_at ? format(parseISO(booking.created_at), "dd.MM.yyyy · HH:mm", { locale: dateLocale }) : null,
+              ],
+              [lang === "de" ? "Notiz" : "Note", booking.notes],
+            ]
+              .filter(([, v]) => v)
+              .map(([k, v]) => (
+                <div key={k as string} className="flex justify-between gap-3">
+                  <span className="text-muted-foreground">{k}</span>
+                  <span className="text-foreground text-right break-words">{v}</span>
+                </div>
+              ))}
           </div>
         </section>
 

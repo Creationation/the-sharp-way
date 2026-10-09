@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import ExcelJS from "exceljs";
 import BookingDetailSheet, { BookingDetail } from "./BookingDetailSheet";
 import AdminBookingCreateSheet from "./AdminBookingCreateSheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 
 interface Barber {
@@ -27,6 +28,10 @@ interface Booking {
   service_duration: string;
   booking_date: string;
   status: string;
+  service_price?: string | null;
+  created_at?: string | null;
+  notes?: string | null;
+  payment_status?: string | null;
 }
 
 interface Props {
@@ -78,6 +83,8 @@ const ScheduleTab = ({ t, barbers }: Props) => {
   const [selectedBooking, setSelectedBooking] = useState<BookingDetail | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [names, setNames] = useState<Record<string, string>>({});
+  const [slotList, setSlotList] = useState<{ hour: string; barber: Barber; items: Booking[] } | null>(null);
 
 
   const fetchBookings = useCallback(async () => {
@@ -85,9 +92,18 @@ const ScheduleTab = ({ t, barbers }: Props) => {
     const dateStr = format(date, "yyyy-MM-dd");
     const { data } = await supabase
       .from("bookings")
-      .select("id, user_id, barber_name, booking_time, service_name, service_duration, booking_date, status")
-      .eq("booking_date", dateStr);
-    setBookings((data as Booking[]) || []);
+      .select("id, user_id, barber_name, booking_time, service_name, service_duration, booking_date, status, service_price, created_at, notes, payment_status")
+      .eq("booking_date", dateStr)
+      .order("booking_time");
+    const list = (data as Booking[]) || [];
+    setBookings(list);
+    const ids = [...new Set(list.map(b => b.user_id))];
+    if (ids.length) {
+      const { data: profs } = await supabase.from("profiles").select("user_id, full_name").in("user_id", ids);
+      const m: Record<string, string> = {};
+      (profs || []).forEach(p => { if (p.full_name) m[p.user_id] = p.full_name; });
+      setNames(m);
+    }
     setLoading(false);
   }, [date]);
 
@@ -98,12 +114,15 @@ const ScheduleTab = ({ t, barbers }: Props) => {
 
   // Map: hour -> barber_name -> booking
   const grid = useMemo(() => {
-    const map: Record<string, Record<string, Booking>> = {};
+    const map: Record<string, Record<string, Booking[]>> = {};
     for (const h of HOURS) map[h] = {};
     for (const b of bookings) {
       const hourKey = b.booking_time.substring(0, 2) + ":00";
-      if (map[hourKey]) map[hourKey][b.barber_name] = b;
+      if (map[hourKey]) (map[hourKey][b.barber_name] ||= []).push(b);
     }
+    // Active bookings first, then by time
+    for (const h of HOURS) for (const k in map[h]) map[h][k].sort((a, c) =>
+      (a.status === "cancelled" ? 1 : 0) - (c.status === "cancelled" ? 1 : 0) || a.booking_time.localeCompare(c.booking_time));
     return map;
   }, [bookings]);
 
@@ -173,16 +192,16 @@ const ScheduleTab = ({ t, barbers }: Props) => {
     for (const h of HOURS) {
       const rowValues: string[] = [h];
       for (const b of barbers) {
-        const booking = grid[h]?.[b.name];
-        if (!booking) {
-          rowValues.push("");
-        } else {
+        const items = grid[h]?.[b.name] || [];
+        rowValues.push(items.map(booking => {
           const statusLabel = STATUS_LABELS[booking.status]?.[lang] || booking.status;
-          rowValues.push(`${booking.service_name} · ${booking.booking_time} · ${statusLabel}`);
-        }
+          const who = names[booking.user_id] ? `${names[booking.user_id]} · ` : "";
+          return `${who}${booking.service_name} · ${booking.booking_time} · ${statusLabel}`;
+        }).join("\n"));
       }
       const row = ws.addRow(rowValues);
-      row.height = 32;
+      const maxItems = Math.max(1, ...barbers.map(b => (grid[h]?.[b.name] || []).length));
+      row.height = 32 * maxItems;
       row.eachCell((cell, colNumber) => {
         cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
         cell.border = {
@@ -196,7 +215,7 @@ const ScheduleTab = ({ t, barbers }: Props) => {
           cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF8F8F8" } };
         } else {
           const barber = barbers[colNumber - 2];
-          const booking = grid[h]?.[barber.name];
+          const booking = grid[h]?.[barber.name]?.length;
           if (booking) {
             cell.font = { name: "Inter", bold: true, size: 10, color: { argb: hexToArgb(barber.color) } };
             cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: hexToLightArgb(barber.color) } };
@@ -332,7 +351,9 @@ const ScheduleTab = ({ t, barbers }: Props) => {
                 <tr key={hour} className="border-b border-border/50 last:border-0">
                   <td className="py-2.5 px-3 text-muted-foreground font-mono">{hour}</td>
                   {barbers.map(b => {
-                    const booking = grid[hour]?.[b.name];
+                    const items = grid[hour]?.[b.name] || [];
+                    const booking = items[0];
+                    const extra = items.length - 1;
                     const statusStyle = booking ? getStatusStyle(booking.status) : null;
                     return (
                       <td key={b.id} className="py-2.5 px-2 text-center">
@@ -340,20 +361,29 @@ const ScheduleTab = ({ t, barbers }: Props) => {
                           <button
                             type="button"
                             onClick={() => {
-                              setSelectedBooking(booking as BookingDetail);
-                              setSheetOpen(true);
+                              if (items.length > 1) {
+                                setSlotList({ hour, barber: b, items });
+                              } else {
+                                setSelectedBooking(booking as BookingDetail);
+                                setSheetOpen(true);
+                              }
                             }}
-                            className={`w-full rounded-lg px-2 py-1.5 text-[10px] font-medium leading-tight border ${statusStyle!.border} active:scale-[0.97] transition-transform`}
-                            style={{
-                              backgroundColor: b.color + "18",
-                            }}
+                            className={`relative w-full rounded-lg px-2 py-1.5 text-[10px] font-medium leading-tight border ${statusStyle!.border} active:scale-[0.97] transition-transform`}
+                            style={{ backgroundColor: b.color + "18" }}
                           >
-                            <span style={{ color: b.color }}>{booking.service_name}</span>
+                            {extra > 0 && (
+                              <span className="absolute -top-2 -right-2 min-w-[22px] h-[22px] px-1 rounded-full gradient-copper text-primary-foreground text-[10px] font-bold flex items-center justify-center shadow-copper animate-scale-in">
+                                +{extra}
+                              </span>
+                            )}
+                            <span style={{ color: b.color }}>{names[booking.user_id] || booking.service_name}</span>
                             <br />
                             <span className="opacity-70" style={{ color: b.color }}>{booking.booking_time}</span>
                             <br />
                             <span className={`text-[9px] font-semibold ${statusStyle!.text}`}>
-                              {STATUS_LABELS[booking.status]?.[lang] || booking.status}
+                              {extra > 0
+                                ? (lang === "de" ? `${items.length} Termine` : `${items.length} bookings`)
+                                : (STATUS_LABELS[booking.status]?.[lang] || booking.status)}
                             </span>
                           </button>
                         ) : (
@@ -368,6 +398,49 @@ const ScheduleTab = ({ t, barbers }: Props) => {
           </table>
         </div>
       )}
+
+      <Dialog open={!!slotList} onOpenChange={(o) => !o && setSlotList(null)}>
+        <DialogContent className="bg-card border-border max-w-[92vw] sm:max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-foreground flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: slotList?.barber.color }} />
+              {slotList?.barber.name} · {slotList?.hour}
+            </DialogTitle>
+            <p className="text-xs text-muted-foreground text-left">
+              {slotList?.items.length} {lang === "de" ? "Termine in dieser Stunde" : "bookings in this hour"}
+            </p>
+          </DialogHeader>
+          <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+            {slotList?.items.map(item => {
+              const st = getStatusStyle(item.status);
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedBooking(item as BookingDetail);
+                    setSlotList(null);
+                    setSheetOpen(true);
+                  }}
+                  className={`w-full text-left card-app p-3 flex items-center gap-3 border ${st.border} hover:bg-copper/5 active:scale-[0.98] transition-all`}
+                >
+                  <div className="font-mono text-sm font-bold text-copper w-12 shrink-0">{item.booking_time.substring(0, 5)}</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">
+                      {names[item.user_id] || (lang === "de" ? "Unbekannter Kunde" : "Unknown customer")}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">{item.service_name}</p>
+                  </div>
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${st.bg} ${st.text}`}>
+                    {STATUS_LABELS[item.status]?.[lang] || item.status}
+                  </span>
+                  <ChevronRight size={16} className="text-muted-foreground shrink-0" />
+                </button>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <BookingDetailSheet
         booking={selectedBooking}
