@@ -544,7 +544,15 @@ const BookingFlow = () => {
         .limit(1),
     ]);
 
-    const bookedTimes = (bookingsRes.data ?? []).map((r: { booking_time: string }) => r.booking_time);
+    const rawBooked = (bookingsRes.data ?? []).map((r: { booking_time: string }) => r.booking_time.substring(0, 5));
+    // Hourly capacity: Cansu (women) 1 per hour, everyone else 2 per hour
+    const hourCap = selectedBarber.name.toLowerCase().includes("cansu") ? 1 : 2;
+    const perHour: Record<string, number> = {};
+    rawBooked.forEach(t => { const h = t.substring(0, 2); perHour[h] = (perHour[h] || 0) + 1; });
+    const bookedTimes = [...rawBooked];
+    Object.entries(perHour).forEach(([h, n]) => {
+      if (n >= hourCap) bookedTimes.push(`${h}:00`, `${h}:30`);
+    });
     const blocked = availRes.data?.blocked_slots ?? [];
     const isAbsent = (absencesRes.data ?? []).length > 0;
     const hours = hoursRes.data;
