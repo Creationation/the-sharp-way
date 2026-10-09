@@ -1,3 +1,4 @@
+import { parseWalkin } from "@/lib/walkin";
 import { useEffect, useState } from "react";
 import { Phone, Mail, User, Calendar as CalIcon, Clock, UserCog, XCircle, Loader2, Save } from "lucide-react";
 import { format, parseISO } from "date-fns";
