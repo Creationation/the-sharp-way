@@ -155,6 +155,10 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
   for (let i = HOUR_OPTIONS.indexOf(start); i >= 0 && i < HOUR_OPTIONS.length && blocked.includes(HOUR_OPTIONS[i]); i++) myBlock.push(HOUR_OPTIONS[i]);
   const myBlockEnd = myBlock.length ? END_OPTIONS[HOUR_OPTIONS.indexOf(myBlock[myBlock.length - 1])] : null;
   const untilValue = blockUntil || myBlockEnd || END_OPTIONS.find(o => o > start) || "";
+  const durMin = parseInt(booking.service_duration) || 30;
+  const endAt = new Date(`${booking.booking_date}T${start}:00`);
+  endAt.setMinutes(endAt.getMinutes() + durMin);
+  const isOver = booking.status === "completed" || endAt.getTime() < Date.now();
 
   const saveBlocked = async (slots: string[]) => {
     const { error } = await supabase.from("barber_availability").upsert(
@@ -470,7 +474,7 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
         </section>
 
         {/* Block time for this booking */}
-        {booking.status !== "cancelled" && (
+        {booking.status !== "cancelled" && !isOver && (
           <section className="mb-5 card-app p-3 space-y-3">
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-2 text-sm font-medium text-foreground">
