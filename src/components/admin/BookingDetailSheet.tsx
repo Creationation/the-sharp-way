@@ -95,7 +95,8 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
         .eq("user_id", booking.user_id)
         .maybeSingle();
       if (!cancel) {
-        setProfile(data || null);
+        const w = parseWalkin(booking.notes);
+        setProfile(w ? { full_name: w.name, phone: w.phone } : data || null);
         setLoadingProfile(false);
       }
     })();

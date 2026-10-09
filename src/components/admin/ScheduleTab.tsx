@@ -1,3 +1,4 @@
+import { parseWalkin } from "@/lib/walkin";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Download, CalendarIcon, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
