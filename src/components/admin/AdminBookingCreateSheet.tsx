@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Calendar as CalIcon, Clock, UserCog, Loader2, Save, Search, UserPlus } from "lucide-react";
+import { Calendar as CalIcon, Clock, UserCog, Loader2, Save, Search, UserPlus, Ban, Minus, Plus, Users } from "lucide-react";
 import { format } from "date-fns";
 import { de as deLocale, enUS } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+
+const END_OPTIONS = [...HOUR_OPTIONS_BASE().slice(1), "21:00"];
+function HOUR_OPTIONS_BASE() {
+  return Array.from({ length: 24 }, (_, i) => `${String(Math.floor(i / 2) + 9).padStart(2, "0")}:${i % 2 ? "30" : "00"}`);
+}
 
 interface Props {
   open: boolean;
@@ -56,6 +61,9 @@ const AdminBookingCreateSheet = ({
   const [time, setTime] = useState("10:00");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [extraPersons, setExtraPersons] = useState(0);
+  const [blockOn, setBlockOn] = useState(false);
+  const [blockUntil, setBlockUntil] = useState("");
 
   // Walk-in
   const [walkinName, setWalkinName] = useState("");
@@ -74,6 +82,9 @@ const AdminBookingCreateSheet = ({
     setDate(defaultDate || new Date());
     setTime(defaultTime || "10:00");
     setNotes("");
+    setExtraPersons(0);
+    setBlockOn(false);
+    setBlockUntil("");
     setMode("walkin");
     setWalkinName("");
     setWalkinPhone("");
@@ -153,7 +164,13 @@ const AdminBookingCreateSheet = ({
       noteParts.push(`${lang === "de" ? "Laufkundschaft" : "Walk-in"}: ${walkinName.trim()}`);
       if (walkinPhone.trim()) noteParts.push(`Tel: ${walkinPhone.trim()}`);
     }
+    if (extraPersons > 0) noteParts.push(lang === "de" ? `+${extraPersons} Person${extraPersons > 1 ? "en" : ""}` : `+${extraPersons} person${extraPersons > 1 ? "s" : ""}`);
     if (notes.trim()) noteParts.push(notes.trim());
+    const until = blockUntil || END_OPTIONS.find(o => o > time) || time;
+    if (blockOn && until <= time) {
+      toast({ title: lang === "de" ? "Ende der Blockierung muss nach dem Beginn liegen" : "Block end must be after start", variant: "destructive" });
+      return;
+    }
 
     setSaving(true);
     // Admins may book up to 10 appointments per hour per barber (clients stay limited in the booking flow)
@@ -188,7 +205,27 @@ const AdminBookingCreateSheet = ({
       toast({ title: t.error, description: error.message, variant: "destructive" });
       return;
     }
-    toast({ title: t.created });
+    if (blockOn) {
+      const dateStr = format(date, "yyyy-MM-dd");
+      const range = HOUR_OPTIONS.filter(o => o >= time && o < until);
+      const { data: av } = await supabase
+        .from("barber_availability")
+        .select("blocked_slots, day_off")
+        .eq("barber_name", barberName)
+        .eq("date", dateStr)
+        .maybeSingle();
+      const { error: bErr } = await supabase.from("barber_availability").upsert(
+        {
+          barber_name: barberName,
+          date: dateStr,
+          blocked_slots: [...new Set([...(av?.blocked_slots ?? []), ...range])].sort(),
+          day_off: av?.day_off ?? false,
+        },
+        { onConflict: "barber_name,date" }
+      );
+      if (bErr) toast({ title: lang === "de" ? "Termin erstellt, aber Blockierung fehlgeschlagen" : "Booking created, but blocking failed", variant: "destructive" });
+      else toast({ title: lang === "de" ? `Termin erstellt · ${barberName} blockiert ${time}–${until}` : `Booking created · ${barberName} blocked ${time}–${until}` });
+    } else toast({ title: t.created });
     onCreated?.();
     onOpenChange(false);
   };
@@ -366,6 +403,54 @@ const AdminBookingCreateSheet = ({
               </SelectContent>
             </Select>
           </div>
+        </section>
+
+        {/* Extra persons */}
+        <section className="mb-3">
+          <label className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-1.5">
+            <Users size={12} /> {lang === "de" ? "Zusätzliche Personen" : "Additional people"}
+          </label>
+          <div className="flex items-center justify-between bg-surface border border-border rounded-md px-2 py-1.5">
+            <button type="button" aria-label="-" onClick={() => setExtraPersons(n => Math.max(0, n - 1))} disabled={extraPersons === 0}
+              className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground active:scale-95 disabled:opacity-40">
+              <Minus size={14} />
+            </button>
+            <span className="text-sm font-semibold text-foreground">
+              {extraPersons === 0 ? (lang === "de" ? "Keine" : "None") : `+${extraPersons}`}
+            </span>
+            <button type="button" aria-label="+" onClick={() => setExtraPersons(n => Math.min(9, n + 1))} disabled={extraPersons === 9}
+              className="w-8 h-8 rounded-full border border-copper text-copper flex items-center justify-center active:scale-95 disabled:opacity-40">
+              <Plus size={14} />
+            </button>
+          </div>
+        </section>
+
+        {/* Block time for this barber */}
+        <section className="mb-3 card-app p-3">
+          <button type="button" onClick={() => setBlockOn(v => !v)} className="w-full flex items-center justify-between">
+            <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <Ban size={14} className="text-copper" />
+              {lang === "de" ? `Zeit für ${barberName || "Barbier"} blockieren` : `Block time for ${barberName || "barber"}`}
+            </span>
+            <span className={`w-10 h-6 rounded-full p-0.5 transition ${blockOn ? "bg-copper" : "bg-muted"}`}>
+              <span className={`block w-5 h-5 rounded-full bg-background transition-transform ${blockOn ? "translate-x-4" : ""}`} />
+            </span>
+          </button>
+          {blockOn && (
+            <div className="mt-3 animate-fade-in">
+              <p className="text-xs text-muted-foreground mb-2">
+                {lang === "de"
+                  ? `Ab ${time} keine weiteren Buchungen für ${barberName} bis:`
+                  : `From ${time}, no more bookings for ${barberName} until:`}
+              </p>
+              <Select value={blockUntil || END_OPTIONS.find(o => o > time) || ""} onValueChange={setBlockUntil}>
+                <SelectTrigger className="bg-surface border-border text-foreground"><SelectValue /></SelectTrigger>
+                <SelectContent className="bg-surface border-border z-[100] max-h-64">
+                  {END_OPTIONS.filter(o => o > time).map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </section>
 
         {/* Notes */}
