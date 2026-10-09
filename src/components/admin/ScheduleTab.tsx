@@ -127,6 +127,8 @@ const ScheduleTab = ({ t, barbers }: Props) => {
     return map;
   }, [bookings]);
 
+  const clientName = (b: Booking) => parseWalkin(b.notes)?.name || names[b.user_id] || "";
+
   const barberColorMap = useMemo(() => {
     const map: Record<string, string> = {};
     barbers.forEach(b => { map[b.name] = b.color; });
@@ -196,7 +198,7 @@ const ScheduleTab = ({ t, barbers }: Props) => {
         const items = grid[h]?.[b.name] || [];
         rowValues.push(items.map(booking => {
           const statusLabel = STATUS_LABELS[booking.status]?.[lang] || booking.status;
-          const who = names[booking.user_id] ? `${names[booking.user_id]} · ` : "";
+          const who = clientName(booking) ? `${clientName(booking)} · ` : "";
           return `${who}${booking.service_name} · ${booking.booking_time} · ${statusLabel}`;
         }).join("\n"));
       }
@@ -377,7 +379,7 @@ const ScheduleTab = ({ t, barbers }: Props) => {
                                 +{extra}
                               </span>
                             )}
-                            <span style={{ color: b.color }}>{names[booking.user_id] || booking.service_name}</span>
+                            <span style={{ color: b.color }}>{clientName(booking) || booking.service_name}</span>
                             <br />
                             <span className="opacity-70" style={{ color: b.color }}>{booking.booking_time}</span>
                             <br />
@@ -428,7 +430,7 @@ const ScheduleTab = ({ t, barbers }: Props) => {
                   <div className="font-mono text-sm font-bold text-copper w-12 shrink-0">{item.booking_time.substring(0, 5)}</div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-foreground truncate">
-                      {names[item.user_id] || (lang === "de" ? "Unbekannter Kunde" : "Unknown customer")}
+                      {clientName(item) || (lang === "de" ? "Unbekannter Kunde" : "Unknown customer")}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">{item.service_name}</p>
                   </div>
