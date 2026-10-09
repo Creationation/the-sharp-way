@@ -156,6 +156,22 @@ const AdminBookingCreateSheet = ({
     if (notes.trim()) noteParts.push(notes.trim());
 
     setSaving(true);
+    // Admins may book up to 10 appointments per hour per barber (clients stay limited in the booking flow)
+    const { data: sameHour } = await supabase
+      .from("bookings")
+      .select("id")
+      .eq("barber_name", barberName)
+      .eq("booking_date", format(date, "yyyy-MM-dd"))
+      .like("booking_time", `${time.substring(0, 2)}:%`)
+      .neq("status", "cancelled");
+    if ((sameHour?.length || 0) >= 10) {
+      setSaving(false);
+      toast({
+        title: lang === "de" ? "Diese Stunde ist voll (max. 10 Termine)" : "This hour is full (max. 10 bookings)",
+        variant: "destructive",
+      });
+      return;
+    }
     const { error } = await supabase.from("bookings").insert({
       user_id,
       barber_name: barberName,
