@@ -1,6 +1,6 @@
 import { parseWalkin } from "@/lib/walkin";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { ChevronLeft, ChevronRight, Download, CalendarIcon, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, CalendarIcon, Plus, Ban } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, addDays, subDays } from "date-fns";
 import { de as deLocale, enUS } from "date-fns/locale";
@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import ExcelJS from "exceljs";
 import BookingDetailSheet, { BookingDetail } from "./BookingDetailSheet";
 import AdminBookingCreateSheet from "./AdminBookingCreateSheet";
+import BlockTimeDialog from "./BlockTimeDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 
@@ -84,6 +85,7 @@ const ScheduleTab = ({ t, barbers }: Props) => {
   const [selectedBooking, setSelectedBooking] = useState<BookingDetail | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [blockOpen, setBlockOpen] = useState(false);
   const [names, setNames] = useState<Record<string, string>>({});
   const [slotList, setSlotList] = useState<{ hour: string; barber: Barber; items: Booking[] } | null>(null);
 
@@ -321,6 +323,14 @@ const ScheduleTab = ({ t, barbers }: Props) => {
       </div>
 
 
+      <button
+        onClick={() => setBlockOpen(true)}
+        className="w-full card-app p-3 mb-4 flex items-center justify-center gap-2 text-foreground font-semibold text-sm hover:bg-copper/5 active:scale-[0.98] transition-all"
+      >
+        <Ban size={16} className="text-copper" />
+        {lang === "de" ? "Zeit blockieren" : "Block time"}
+      </button>
+
       {/* Legend */}
       <div className="flex flex-wrap gap-3 mb-4">
         {barbers.map(b => (
@@ -452,6 +462,8 @@ const ScheduleTab = ({ t, barbers }: Props) => {
         onOpenChange={setSheetOpen}
         onChanged={fetchBookings}
       />
+
+      <BlockTimeDialog open={blockOpen} onOpenChange={setBlockOpen} date={date} barbers={barbers} onChanged={fetchBookings} />
 
       <AdminBookingCreateSheet
         open={createOpen}
