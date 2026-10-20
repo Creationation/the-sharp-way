@@ -387,7 +387,7 @@ const AdminBookingCreateSheet = ({
           </div>
         </section>
         <AppointmentTimes start={time} end={end} onStart={setTime} onEnd={setEnd} />
-        <AppointmentRecurrence value={recurrence} onChange={setRecurrence} />
+        <AppointmentRecurrence value={recurrence} onChange={setRecurrence} date={date} />
 
         {/* Extra persons */}
         <section className="mb-3">
