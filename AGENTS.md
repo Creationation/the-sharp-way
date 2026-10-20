@@ -1,4 +1,4 @@
 # Architecture
-- Admin recurring appointments are materialized as ordinary bookings by an admin-only atomic RPC, with a series UUID for deduplication; existing calendar and reminder flows must see each occurrence.
+- Admin recurring appointments store an RFC 5545 RRULE string on each booking of a series (series UUID) and are materialized as ordinary bookings up to a 1-year horizon by an admin-only atomic RPC, topped up on admin dashboard load; calendar, reminder and capacity flows must see each occurrence.
 - Admin start/end times are converted to the existing service_duration in minutes; public booking slot rules stay unchanged.
 - Use the shared recurrence controls and rrule date generator for both admin appointment forms.
