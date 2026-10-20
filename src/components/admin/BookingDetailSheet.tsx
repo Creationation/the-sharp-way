@@ -1,5 +1,5 @@
-import { AppointmentTimes, AppointmentRecurrence } from "./AppointmentTiming";
-import { defaultRecurrence, durationBetween, endTime, occurrenceDates, slotOverlaps } from "@/lib/admin-appointments";
+import { AppointmentTimes, AppointmentRecurrence, SeriesScopeDialog, type EditScope } from "./AppointmentTiming";
+import { defaultRepeat, parseRRule, buildRRule, rruleDates, truncateRRule, ruleStart, addDays, durationBetween, endTime, slotOverlaps, localYmd } from "@/lib/admin-appointments";
 import { Button } from "@/components/ui/button";
 import { parseWalkin } from "@/lib/walkin";
 import { useEffect, useState } from "react";
@@ -88,7 +88,9 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
   const [dayOff, setDayOff] = useState(false);
   const [blockUntil, setBlockUntil] = useState("");
   const [end, setEnd] = useState("09:30");
-  const [recurrence, setRecurrence] = useState(defaultRecurrence);
+  const [recurrence, setRecurrence] = useState(defaultRepeat);
+  const [series, setSeries] = useState<{ id: string | null; rrule: string | null }>({ id: null, rrule: null });
+  const [scopeOpen, setScopeOpen] = useState(false);
 
   useEffect(() => {
     if (!booking) return;
@@ -96,7 +98,13 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
     setDate(parseISO(booking.booking_date));
     setTime(booking.booking_time.substring(0, 5));
     setEnd(endTime(booking.booking_time, parseDuration(booking.service_duration)));
-    setRecurrence(defaultRecurrence());
+    setRecurrence(defaultRepeat());
+    setSeries({ id: null, rrule: null });
+    supabase.from("bookings").select("recurrence_series_id, recurrence_rrule").eq("id", booking.id).maybeSingle().then(({ data }) => {
+      if (cancel || !data) return;
+      setSeries({ id: data.recurrence_series_id, rrule: data.recurrence_rrule });
+      setRecurrence(parseRRule(data.recurrence_rrule));
+    });
 
     let cancel = false;
     setExtraPersons(parseInt(booking.notes?.match(PERSONS_RE)?.[1] || "0", 10));
@@ -206,13 +214,35 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
     }
   };
 
-  const handleSave = async () => {
-    let dates: string[];
-    let duration: number;
-    try { dates = occurrenceDates(date, recurrence); duration = durationBetween(time, end); }
-    catch { toast({ title: de ? "Bitte Beginn, Ende und Wiederholung prüfen" : "Please check start, end and repetition", variant: "destructive" }); return; }
-    setSaving(true);
+  const handleSave = () => {
+    if (series.id && series.rrule) setScopeOpen(true);
+    else save("following");
+  };
+
+  const save = async (scope: EditScope) => {
+    setScopeOpen(false);
     const newDate = format(date, "yyyy-MM-dd");
+    let dates: string[] = [newDate];
+    let rrule: string | null = null;
+    let prevRule: string | null = null;
+    let duration: number;
+    try {
+      duration = durationBetween(time, end);
+      if (scope !== "this") {
+        if (scope === "all" && series.rrule) {
+          // keep the series start, shifted by however far this appointment moved
+          const shift = Math.round((new Date(newDate).getTime() - new Date(booking.booking_date).getTime()) / 86400000);
+          rrule = buildRRule(addDays(ruleStart(series.rrule), shift), recurrence);
+        } else rrule = buildRRule(newDate, recurrence);
+        if (rrule) {
+          const today = localYmd(new Date());
+          const from = scope === "all" ? today : newDate;
+          dates = [newDate, ...rruleDates(rrule, from).filter(d => d !== newDate)];
+        }
+        if (scope === "following" && series.rrule) prevRule = truncateRRule(series.rrule, booking.booking_date);
+      }
+    } catch { toast({ title: de ? "Bitte Beginn, Ende und Wiederholung prüfen" : "Please check start, end and repetition", variant: "destructive" }); return; }
+    setSaving(true);
     const newTime = time;
     const newDuration = `${duration} min`;
     const changes = {
@@ -222,7 +252,7 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
       duration: newDuration !== booking.service_duration,
     };
 
-    const { error } = await supabase.rpc("admin_save_appointments", { _source_id: booking.id, _dates: dates, _recurrence: recurrence.enabled ? recurrence : null, _booking: {
+    const { error } = await supabase.rpc("admin_save_series", { _source_id: booking.id, _dates: dates, _rrule: rrule, _scope: scope, _prev_rrule: prevRule, _booking: {
         barber_name: barberName,
         booking_date: newDate,
         booking_time: newTime,
@@ -424,6 +454,7 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
         </section>
         <AppointmentTimes start={time} end={end} onStart={setTime} onEnd={setEnd} />
         <AppointmentRecurrence value={recurrence} onChange={setRecurrence} date={date} disabled={booking.status === "cancelled" || isOver} />
+        <SeriesScopeDialog open={scopeOpen} onClose={() => setScopeOpen(false)} onPick={save} />
 
         {/* Extra persons */}
         <section className="mb-4">
