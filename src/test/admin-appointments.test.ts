@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { durationBetween, slotOverlaps, defaultRepeat, buildRRule, rruleDates, truncateRRule, parseRRule, type Repeat } from "@/lib/admin-appointments";
+import { durationBetween, slotOverlaps, defaultRepeat, buildRRule, rruleDates, truncateRRule, parseRRule, repeatSummary, type Repeat } from "@/lib/admin-appointments";
 
 const rep = (p: Partial<Repeat>): Repeat => ({ ...defaultRepeat(), ...p });
 const TODAY = "2026-10-20"; // Tuesday
@@ -26,7 +26,7 @@ describe("RRULE repetition", () => {
     expect(d[d.length - 1] <= "2027-10-20").toBe(true);
   });
   it("custom weekly on Tue + Thu", () => expect(rruleDates(buildRRule(TODAY, rep({ preset: "custom", frequency: "weekly", weekdays: [1, 3], end: { type: "count", until: "", count: 4 } }))!, TODAY, TODAY)).toEqual(["2026-10-20", "2026-10-22", "2026-10-27", "2026-10-29"]));
-  it("skips months without day 31", () => expect(rruleDates(buildRRule("2026-01-31", rep({ preset: "monthly", end: { type: "count", until: "", count: 3 } }))!, "2026-01-31", "2026-01-31")).toEqual(["2026-01-31", "2026-03-31", "2026-05-31"]));
+  it.skip("old: skips months without day 31", () => expect(rruleDates(buildRRule("2026-01-31", rep({ preset: "monthly", end: { type: "count", until: "", count: 3 } }))!, "2026-01-31", "2026-01-31")).toEqual(["2026-01-31", "2026-03-31", "2026-05-31"]));
   it("dieser und folgende: old rule ends the day before", () => {
     const r = buildRRule(TODAY, rep({ preset: "weekly" }))!;
     expect(rruleDates(truncateRRule(r, "2026-11-03"), TODAY, TODAY)).toEqual(["2026-10-20", "2026-10-27"]);
@@ -35,4 +35,11 @@ describe("RRULE repetition", () => {
     expect(parseRRule(buildRRule(TODAY, rep({ preset: "biweekly" })))).toMatchObject({ preset: "biweekly", end: { type: "forever" } });
     expect(parseRRule(buildRRule(TODAY, rep({ preset: "monthly", end: { type: "count", until: "", count: 5 } })))).toMatchObject({ preset: "monthly", end: { type: "count", count: 5 } });
   });
+});
+
+describe("month-end fallback and summary", () => {
+  it("day 31 falls back to the last day of shorter months", () => expect(rruleDates(buildRRule("2026-01-31", rep({ preset: "monthly", end: { type: "count", until: "", count: 4 } }))!, "2026-01-31", "2026-01-31")).toEqual(["2026-01-31", "2026-02-28", "2026-03-31", "2026-04-30"]));
+  it("day 30 uses Feb 28", () => expect(rruleDates(buildRRule("2026-01-30", rep({ preset: "monthly", end: { type: "count", until: "", count: 2 } }))!, "2026-01-30", "2026-01-30")).toEqual(["2026-01-30", "2026-02-28"]));
+  it("monthly day 31 is read back as the monthly preset", () => expect(parseRRule(buildRRule("2026-01-31", rep({ preset: "monthly" }))).preset).toBe("monthly"));
+  it("summary: Jeden Dienstag, für immer", () => expect(repeatSummary(TODAY, rep({ preset: "weekly" }), true)).toBe("Jeden Dienstag, für immer"));
 });
