@@ -46,7 +46,7 @@ export function useNextAvailability(barbers: { id: string; name: string }[]) {
 
       const [hoursRes, bookingsRes, availRes, absencesRes] = await Promise.all([
         supabase.from("barber_working_hours").select("barber_id, weekday, active, start_time, end_time").in("barber_id", ids),
-        supabase.from("bookings").select("barber_name, booking_date, booking_time").in("barber_name", names).gte("booking_date", from).lte("booking_date", to).eq("status", "confirmed"),
+        supabase.rpc("get_taken_slots", { _barbers: names, _from: from, _to: to }),
         supabase.from("barber_availability").select("barber_name, date, blocked_slots, day_off").in("barber_name", names).gte("date", from).lte("date", to),
         supabase.from("barber_absences").select("barber_id, start_date, end_date").in("barber_id", ids).gte("end_date", from).lte("start_date", to),
       ]);
