@@ -8,6 +8,13 @@
       "when": 1792481920221,
       "tag": "0000_admin_recurring_appointments",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792484248689,
+      "tag": "0001_rrule_series",
+      "breakpoints": true
     }
   ]
 }
