@@ -1,6 +1,7 @@
 // Daily job: keeps copies of repeating admin appointments materialized up to 1 year ahead.
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { RRule } from "npm:rrule@2.8.1";
+import rrulePkg from "npm:rrule@2.8.1";
+const { RRule } = rrulePkg as unknown as typeof import("npm:rrule@2.8.1");
 
 const HORIZON_DAYS = 365;
 const noonUTC = (ymd: string) => { const [y, m, d] = ymd.split("-").map(Number); return new Date(Date.UTC(y, m - 1, d, 12)); };
