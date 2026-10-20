@@ -1,0 +1,3 @@
+- [ ] Add optional admin recurrence to appointment creation and editing in DE/EN.
+- [ ] Replace duration presets with explicit start/end times in both forms.
+- [ ] Verify rules and authenticated create/edit/readback; remove verification data.
