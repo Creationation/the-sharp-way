@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { AppointmentTimes, AppointmentRecurrence } from "./AppointmentTiming";
-import { defaultRecurrence, durationBetween, endTime, occurrenceDates, slotOverlaps } from "@/lib/admin-appointments";
+import { defaultRepeat, buildRRule, rruleDates, durationBetween, endTime, slotOverlaps } from "@/lib/admin-appointments";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalIcon, Clock, UserCog, Loader2, Save, Search, UserPlus, Ban, Minus, Plus, Users } from "lucide-react";
 import { format } from "date-fns";
@@ -63,7 +63,7 @@ const AdminBookingCreateSheet = ({
   const [date, setDate] = useState<Date>(new Date());
   const [time, setTime] = useState("10:00");
   const [end, setEnd] = useState("10:30");
-  const [recurrence, setRecurrence] = useState(defaultRecurrence);
+  const [recurrence, setRecurrence] = useState(defaultRepeat);
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
   const [extraPersons, setExtraPersons] = useState(0);
@@ -87,7 +87,7 @@ const AdminBookingCreateSheet = ({
     setDate(defaultDate || new Date());
     setTime(defaultTime || "10:00");
     setEnd(endTime(defaultTime || "10:00", 30));
-    setRecurrence(defaultRecurrence());
+    setRecurrence(defaultRepeat());
     setNotes("");
     setExtraPersons(0);
     setBlockOn(false);
@@ -156,7 +156,14 @@ const AdminBookingCreateSheet = ({
     }
     let dates: string[];
     let duration: number;
-    try { dates = occurrenceDates(date, recurrence); duration = durationBetween(time, end); }
+    let rrule: string | null;
+    try {
+      const start = format(date, "yyyy-MM-dd");
+      rrule = buildRRule(start, recurrence);
+      dates = rrule ? rruleDates(rrule, start) : [start];
+      if (!dates.length) throw new Error("no_dates");
+      duration = durationBetween(time, end);
+    }
     catch { toast({ title: lang === "de" ? "Bitte Beginn, Ende und Wiederholung prüfen" : "Please check start, end and repetition", variant: "destructive" }); return; }
     let user_id = user.id;
     let noteParts: string[] = [];
@@ -184,7 +191,7 @@ const AdminBookingCreateSheet = ({
     }
 
     setSaving(true);
-    const { error } = await supabase.rpc("admin_save_appointments", { _booking: {
+    const { error } = await supabase.rpc("admin_save_series", { _booking: {
       user_id,
       barber_name: barberName,
       service_name: lang === "de" ? service.name : service.name_en || service.name,
@@ -194,7 +201,7 @@ const AdminBookingCreateSheet = ({
       booking_time: time,
       status: "confirmed",
       notes: noteParts.join(" · ") || null,
-    }, _dates: dates, _recurrence: recurrence.enabled ? recurrence : null });
+    }, _dates: dates, _rrule: rrule });
     if (error) {
       setSaving(false);
       toast({ title: t.error, description: error.message.includes("Hour full") ? (lang === "de" ? "Eine Stunde ist voll (max. 10 Termine). Es wurde nichts gespeichert." : "An hour is full (max. 10 appointments). Nothing was saved.") : error.message, variant: "destructive" });
