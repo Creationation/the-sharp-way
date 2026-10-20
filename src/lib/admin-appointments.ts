@@ -15,9 +15,13 @@ export function endTime(start: string, duration: number) {
   const minutes = Math.min(1439, Number(start.slice(0, 2)) * 60 + Number(start.slice(3, 5)) + duration);
   return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
 }
+export function slotOverlaps(slot: string, start: string, end: string) {
+  const minutes = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+  return minutes(slot) < minutes(end) && minutes(slot) + 30 > minutes(start);
+}
 export function occurrenceDates(date: Date, rule: Recurrence): string[] {
   if (!rule.enabled) return [format(date, "yyyy-MM-dd")];
-  if (!Number.isInteger(rule.interval) || rule.interval < 1 || !Number.isInteger(rule.count) || rule.count < 2 || rule.count > 366) throw new Error("invalid_recurrence");
+  if (!Number.isInteger(rule.interval) || rule.interval < 1 || rule.interval > 100 || !Number.isInteger(rule.count) || rule.count < 2 || rule.count > 366) throw new Error("invalid_recurrence");
   const frequencies = { daily: RRule.DAILY, weekly: RRule.WEEKLY, monthly: RRule.MONTHLY, yearly: RRule.YEARLY };
   const dates = new RRule({ freq: frequencies[rule.frequency], interval: rule.interval, count: rule.count, dtstart: new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 12)) }).all();
   return dates.map(d => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`);

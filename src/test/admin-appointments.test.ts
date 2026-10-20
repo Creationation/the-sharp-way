@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { durationBetween, occurrenceDates, defaultRecurrence } from "@/lib/admin-appointments";
+import { durationBetween, occurrenceDates, defaultRecurrence, slotOverlaps } from "@/lib/admin-appointments";
 describe("admin appointment times and optional recurrence", () => {
+  it("blocks half-hour slots overlapping an arbitrary start and end", () => expect(["10:00", "10:30", "11:00"].filter(s => slotOverlaps(s, "10:15", "10:45"))).toEqual(["10:00", "10:30"]));
   it("accepts explicit 10:15 to 10:45", () => expect(durationBetween("10:15", "10:45")).toBe(30));
   it("accepts 13:00 to 15:00 without presets", () => expect(durationBetween("13:00", "15:00")).toBe(120));
   it("rejects end before start", () => expect(() => durationBetween("15:00", "13:00")).toThrow());

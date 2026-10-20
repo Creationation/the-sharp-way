@@ -1,5 +1,5 @@
 import { AppointmentTimes, AppointmentRecurrence } from "./AppointmentTiming";
-import { defaultRecurrence, durationBetween, endTime, occurrenceDates } from "@/lib/admin-appointments";
+import { defaultRecurrence, durationBetween, endTime, occurrenceDates, slotOverlaps } from "@/lib/admin-appointments";
 import { Button } from "@/components/ui/button";
 import { parseWalkin } from "@/lib/walkin";
 import { useEffect, useState } from "react";
@@ -156,7 +156,7 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
   const start = booking.booking_time.substring(0, 5);
   // Continuous blocked range starting at this booking's time
   const myBlock: string[] = [];
-  for (let i = HOUR_OPTIONS.indexOf(start); i >= 0 && i < HOUR_OPTIONS.length && blocked.includes(HOUR_OPTIONS[i]); i++) myBlock.push(HOUR_OPTIONS[i]);
+  for (let i = HOUR_OPTIONS.findIndex(slot => slotOverlaps(slot, start, endTime(start, 1))); i >= 0 && i < HOUR_OPTIONS.length && blocked.includes(HOUR_OPTIONS[i]); i++) myBlock.push(HOUR_OPTIONS[i]);
   const myBlockEnd = myBlock.length ? END_OPTIONS[HOUR_OPTIONS.indexOf(myBlock[myBlock.length - 1])] : null;
   const untilValue = blockUntil || myBlockEnd || END_OPTIONS.find(o => o > start) || "";
   const durMin = parseInt(booking.service_duration) || 30;
@@ -177,7 +177,7 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
 
   const handleBlock = async () => {
     setSaving(true);
-    const range = HOUR_OPTIONS.filter(o => o >= start && o < untilValue);
+    const range = HOUR_OPTIONS.filter(o => slotOverlaps(o, start, untilValue));
     const ok = await saveBlocked([...new Set([...blocked.filter(s => !myBlock.includes(s)), ...range])].sort());
     setSaving(false);
     if (ok) toast({ title: de ? `${booking.barber_name} blockiert ${start}–${untilValue}` : `${booking.barber_name} blocked ${start}–${untilValue}` });

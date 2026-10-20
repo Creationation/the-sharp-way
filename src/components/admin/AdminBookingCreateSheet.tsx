@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { AppointmentTimes, AppointmentRecurrence } from "./AppointmentTiming";
-import { defaultRecurrence, durationBetween, endTime, occurrenceDates } from "@/lib/admin-appointments";
+import { defaultRecurrence, durationBetween, endTime, occurrenceDates, slotOverlaps } from "@/lib/admin-appointments";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalIcon, Clock, UserCog, Loader2, Save, Search, UserPlus, Ban, Minus, Plus, Users } from "lucide-react";
 import { format } from "date-fns";
@@ -177,7 +177,7 @@ const AdminBookingCreateSheet = ({
     }
     if (extraPersons > 0) noteParts.push(lang === "de" ? `+${extraPersons} Person${extraPersons > 1 ? "en" : ""}` : `+${extraPersons} person${extraPersons > 1 ? "s" : ""}`);
     if (notes.trim()) noteParts.push(notes.trim());
-    const until = blockUntil || END_OPTIONS.find(o => o > time) || time;
+    const until = blockUntil || end;
     if (blockOn && until <= time) {
       toast({ title: lang === "de" ? "Ende der Blockierung muss nach dem Beginn liegen" : "Block end must be after start", variant: "destructive" });
       return;
@@ -195,14 +195,14 @@ const AdminBookingCreateSheet = ({
       status: "confirmed",
       notes: noteParts.join(" · ") || null,
     }, _dates: dates, _recurrence: recurrence.enabled ? recurrence : null });
-    setSaving(false);
     if (error) {
+      setSaving(false);
       toast({ title: t.error, description: error.message.includes("Hour full") ? (lang === "de" ? "Eine Stunde ist voll (max. 10 Termine). Es wurde nichts gespeichert." : "An hour is full (max. 10 appointments). Nothing was saved.") : error.message, variant: "destructive" });
       return;
     }
     if (blockOn) {
       for (const dateStr of dates) {
-      const range = HOUR_OPTIONS.filter(o => o >= time && o < until);
+      const range = HOUR_OPTIONS.filter(o => slotOverlaps(o, time, until));
       const { data: av } = await supabase
         .from("barber_availability")
         .select("blocked_slots, day_off")
@@ -222,6 +222,7 @@ const AdminBookingCreateSheet = ({
       else toast({ title: lang === "de" ? `Termin erstellt · ${barberName} blockiert ${time}–${until}` : `Booking created · ${barberName} blocked ${time}–${until}` });
       }
     } else toast({ title: dates.length > 1 ? (lang === "de" ? `${dates.length} Termine erstellt` : `${dates.length} appointments created`) : t.created });
+    setSaving(false);
     onCreated?.();
     onOpenChange(false);
   };
@@ -346,7 +347,7 @@ const AdminBookingCreateSheet = ({
           <label className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5 block">
             {t.service}
           </label>
-          <Select value={serviceId} onValueChange={setServiceId}>
+          <Select value={serviceId} onValueChange={id => { setServiceId(id); setEnd(endTime(time, services.find(s => s.id === id)?.duration_min || 30)); }}>
             <SelectTrigger className="bg-surface border-border text-foreground">
               <SelectValue placeholder={t.service} />
             </SelectTrigger>
@@ -426,7 +427,7 @@ const AdminBookingCreateSheet = ({
                   ? `Ab ${time} keine weiteren Buchungen für ${barberName} bis:`
                   : `From ${time}, no more bookings for ${barberName} until:`}
               </p>
-              <Select value={blockUntil || END_OPTIONS.find(o => o > time) || ""} onValueChange={setBlockUntil}>
+              <Select value={blockUntil || end} onValueChange={setBlockUntil}>
                 <SelectTrigger className="bg-surface border-border text-foreground"><SelectValue /></SelectTrigger>
                 <SelectContent className="bg-surface border-border z-[100] max-h-64">
                   {END_OPTIONS.filter(o => o > time).map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
