@@ -1,10 +1,12 @@
 import { useId } from "react";
-import { Clock, Repeat, Minus, Plus } from "lucide-react";
+import { format } from "date-fns";
+import { de as deLocale, enUS } from "date-fns/locale";
+import { Clock, Repeat as RepeatIcon, Minus, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLanguage } from "@/contexts/LanguageContext";
-import type { Recurrence } from "@/lib/admin-appointments";
+import type { Repeat, RepeatPreset } from "@/lib/admin-appointments";
 import { cn } from "@/lib/utils";
 
 export function AppointmentTimes({ start, end, onStart, onEnd }: { start: string; end: string; onStart: (s: string) => void; onEnd: (s: string) => void }) {
@@ -20,17 +22,23 @@ export function AppointmentTimes({ start, end, onStart, onEnd }: { start: string
 
 const WEEKDAYS_DE = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 const WEEKDAYS_EN = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-const COUNT_OPTIONS = [4, 8, 12, 24, 52];
 
-export function AppointmentRecurrence({ value, onChange, date, disabled = false }: { value: Recurrence; onChange: (r: Recurrence) => void; date: Date; disabled?: boolean }) {
+export function AppointmentRecurrence({ value, onChange, date, disabled = false }: { value: Repeat; onChange: (r: Repeat) => void; date: Date; disabled?: boolean }) {
   const { lang } = useLanguage();
   const de = lang === "de";
-  const id = useId();
-
-  const defaultWeekday = (date.getDay() + 6) % 7; // 0 = Monday
+  const locale = de ? deLocale : enUS;
+  const dayName = format(date, "EEEE", { locale });
+  const defaultWeekday = (date.getDay() + 6) % 7;
   const selectedWeekdays = value.weekdays.length > 0 ? value.weekdays : [defaultWeekday];
   const selectedMonthDay = value.monthDay >= 1 ? value.monthDay : date.getDate();
 
+  const presets: [RepeatPreset, string][] = [
+    ["none", de ? "Nicht wiederholen" : "Does not repeat"],
+    ["weekly", de ? `Jede Woche am ${dayName}` : `Every week on ${dayName}`],
+    ["biweekly", de ? `Alle 2 Wochen am ${dayName}` : `Every 2 weeks on ${dayName}`],
+    ["monthly", de ? `Jeden Monat am ${date.getDate()}.` : `Every month on day ${date.getDate()}`],
+    ["custom", de ? "Benutzerdefiniert" : "Custom"],
+  ];
   const units = {
     daily: de ? ["Tag", "Tage"] : ["day", "days"],
     weekly: de ? ["Woche", "Wochen"] : ["week", "weeks"],
@@ -40,70 +48,74 @@ export function AppointmentRecurrence({ value, onChange, date, disabled = false 
 
   const toggleWeekday = (day: number) => {
     const has = selectedWeekdays.includes(day);
-    if (has && selectedWeekdays.length === 1) return; // keep at least one day
+    if (has && selectedWeekdays.length === 1) return;
     onChange({ ...value, weekdays: has ? selectedWeekdays.filter(d => d !== day) : [...selectedWeekdays, day].sort((a, b) => a - b) });
   };
-
-  const chip = (active: boolean) => cn(
-    "h-10 rounded-full border text-sm font-medium transition active:scale-95",
-    active ? "bg-copper text-background border-copper" : "bg-surface border-border text-muted-foreground"
+  const chip = (active: boolean) => cn("h-10 rounded-full border text-sm font-medium transition active:scale-95",
+    active ? "bg-copper text-background border-copper" : "bg-surface border-border text-muted-foreground");
+  const stepper = (val: number, set: (n: number) => void, min: number, max: number, label: string) => (
+    <div className="flex items-center gap-2">
+      <button type="button" aria-label={de ? "Weniger" : "Less"} disabled={val <= min} onClick={() => set(Math.max(min, val - 1))} className="h-10 w-10 shrink-0 rounded-full border border-border bg-surface text-foreground flex items-center justify-center active:scale-95 disabled:opacity-40"><Minus size={15} /></button>
+      <div className="flex-1 h-10 rounded-full border border-copper/50 bg-surface flex items-center justify-center text-sm text-foreground">{label}</div>
+      <button type="button" aria-label={de ? "Mehr" : "More"} disabled={val >= max} onClick={() => set(Math.min(max, val + 1))} className="h-10 w-10 shrink-0 rounded-full border border-border bg-surface text-foreground flex items-center justify-center active:scale-95 disabled:opacity-40"><Plus size={15} /></button>
+    </div>
   );
 
   return <section className="mb-5 space-y-4 border-t border-border pt-4">
-    <div className="flex items-center justify-between gap-3">
-      <label htmlFor={id} className="flex items-center gap-2 text-sm text-foreground"><Repeat size={15} className="text-copper" />{de ? "Wiederholung" : "Repeat"}</label>
-      <Switch id={id} checked={value.enabled} disabled={disabled} onCheckedChange={enabled => onChange({ ...value, enabled })} />
-    </div>
-    {value.enabled && <>
-      <Select value={value.frequency} onValueChange={frequency => onChange({ ...value, frequency: frequency as Recurrence["frequency"] })}>
-        <SelectTrigger aria-label={de ? "Wiederholungsrhythmus" : "Repeat frequency"} className="bg-surface border-border"><SelectValue /></SelectTrigger>
-        <SelectContent className="z-[100] bg-surface border-border">{(["daily", "weekly", "monthly", "yearly"] as const).map((f, i) => <SelectItem key={f} value={f}>{(de ? ["Täglich", "Wöchentlich", "Monatlich", "Jährlich"] : ["Daily", "Weekly", "Monthly", "Yearly"])[i]}</SelectItem>)}</SelectContent>
+    <div>
+      <span className="text-sm text-foreground flex items-center gap-2 mb-2"><RepeatIcon size={15} className="text-copper" />{de ? "Wiederholung" : "Repeat"}</span>
+      <Select value={value.preset} disabled={disabled} onValueChange={p => onChange({ ...value, preset: p as RepeatPreset })}>
+        <SelectTrigger aria-label={de ? "Wiederholung" : "Repeat"} className="bg-surface border-border"><SelectValue /></SelectTrigger>
+        <SelectContent className="z-[100] bg-surface border-border">{presets.map(([k, l]) => <SelectItem key={k} value={k}>{l}</SelectItem>)}</SelectContent>
       </Select>
+    </div>
 
-      {/* Interval stepper: "Nach 1 Woche" */}
+    {value.preset === "custom" && <>
+      <div className="grid grid-cols-4 gap-1.5">
+        {(["daily", "weekly", "monthly", "yearly"] as const).map((f, i) => (
+          <button key={f} type="button" onClick={() => onChange({ ...value, frequency: f })} className={cn(chip(value.frequency === f), "text-xs")}>{(de ? ["Täglich", "Wöchentl.", "Monatl.", "Jährlich"] : ["Daily", "Weekly", "Monthly", "Yearly"])[i]}</button>
+        ))}
+      </div>
       <div>
         <span className="block text-xs text-muted-foreground mb-2">{de ? "Wiederholen alle" : "Repeat every"}</span>
-        <div className="flex items-center gap-2">
-          <button type="button" aria-label={de ? "Weniger" : "Less"} disabled={value.interval <= 1} onClick={() => onChange({ ...value, interval: Math.max(1, value.interval - 1) })} className="h-10 w-10 shrink-0 rounded-full border border-border bg-surface text-foreground flex items-center justify-center active:scale-95 transition disabled:opacity-40"><Minus size={15} /></button>
-          <div className="flex-1 h-10 rounded-full border border-copper/50 bg-surface flex items-center justify-center text-sm text-foreground">
-            {value.interval} {value.interval === 1 ? units[0] : units[1]}
-          </div>
-          <button type="button" aria-label={de ? "Mehr" : "More"} disabled={value.interval >= 100} onClick={() => onChange({ ...value, interval: Math.min(100, value.interval + 1) })} className="h-10 w-10 shrink-0 rounded-full border border-border bg-surface text-foreground flex items-center justify-center active:scale-95 transition disabled:opacity-40"><Plus size={15} /></button>
-        </div>
+        {stepper(value.interval, n => onChange({ ...value, interval: n }), 1, 100, `${value.interval} ${value.interval === 1 ? units[0] : units[1]}`)}
       </div>
-
-      {/* Weekly: weekday circles */}
       {value.frequency === "weekly" && <div>
         <span className="block text-xs text-muted-foreground mb-2">{de ? "An welchen Tagen?" : "On which days?"}</span>
         <div className="grid grid-cols-7 gap-1.5">
-          {(de ? WEEKDAYS_DE : WEEKDAYS_EN).map((label, day) => (
-            <button key={day} type="button" onClick={() => toggleWeekday(day)} className={cn(chip(selectedWeekdays.includes(day)), "h-10 w-full text-xs")}>{label}</button>
-          ))}
+          {(de ? WEEKDAYS_DE : WEEKDAYS_EN).map((label, day) => <button key={day} type="button" onClick={() => toggleWeekday(day)} className={cn(chip(selectedWeekdays.includes(day)), "w-full text-xs")}>{label}</button>)}
         </div>
       </div>}
-
-      {/* Monthly: day of month */}
       {value.frequency === "monthly" && <div>
         <span className="block text-xs text-muted-foreground mb-2">{de ? "An welchem Tag im Monat?" : "On which day of the month?"}</span>
         <div className="grid grid-cols-7 gap-1.5">
-          {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
-            <button key={day} type="button" onClick={() => onChange({ ...value, monthDay: day })} className={cn(chip(selectedMonthDay === day), "h-9 w-full text-xs")}>{day}</button>
-          ))}
+          {Array.from({ length: 31 }, (_, i) => i + 1).map(day => <button key={day} type="button" onClick={() => onChange({ ...value, monthDay: day })} className={cn(chip(selectedMonthDay === day), "h-9 w-full text-xs")}>{day}</button>)}
         </div>
       </div>}
-
-      {/* Count: preset buttons instead of a number field */}
-      <div>
-        <span className="block text-xs text-muted-foreground mb-2">{de ? "Wie oft insgesamt?" : "How many times in total?"}</span>
-        <div className="grid grid-cols-5 gap-1.5">
-          {COUNT_OPTIONS.map(count => (
-            <button key={count} type="button" onClick={() => onChange({ ...value, count })} className={cn(chip(value.count === count), "h-10 w-full text-sm")}>{count}×</button>
-          ))}
-        </div>
-        <p className="text-[11px] text-muted-foreground mt-2">
-          {de ? `${value.count} Termine werden erstellt.` : `${value.count} appointments will be created.`}
-        </p>
-      </div>
     </>}
+
+    {value.preset !== "none" && <div className="space-y-2">
+      <span className="block text-xs text-muted-foreground">{de ? "Ende" : "Ends"}</span>
+      <div className="grid grid-cols-3 gap-1.5">
+        {(["forever", "until", "count"] as const).map((k, i) => (
+          <button key={k} type="button" onClick={() => onChange({ ...value, end: { ...value.end, type: k } })} className={cn(chip(value.end.type === k), "text-xs")}>{(de ? ["Für immer", "Bis Datum", "Anzahl"] : ["Forever", "Until date", "Count"])[i]}</button>
+        ))}
+      </div>
+      {value.end.type === "until" && <Input type="date" aria-label={de ? "Bis Datum" : "Until date"} value={value.end.until} min={format(date, "yyyy-MM-dd")} onChange={e => onChange({ ...value, end: { ...value.end, until: e.target.value } })} className="bg-surface border-border text-foreground" />}
+      {value.end.type === "count" && stepper(value.end.count, n => onChange({ ...value, end: { ...value.end, count: n } }), 2, 400, de ? `${value.end.count} Termine` : `${value.end.count} appointments`)}
+    </div>}
   </section>;
+}
+
+export type EditScope = "this" | "following" | "all";
+export function SeriesScopeDialog({ open, onClose, onPick }: { open: boolean; onClose: () => void; onPick: (s: EditScope) => void }) {
+  const { lang } = useLanguage();
+  const de = lang === "de";
+  const opts: [EditScope, string][] = [["this", de ? "Nur dieser Termin" : "This appointment only"], ["following", de ? "Dieser und folgende Termine" : "This and following appointments"], ["all", de ? "Alle Termine" : "All appointments"]];
+  return <Dialog open={open} onOpenChange={o => !o && onClose()}>
+    <DialogContent className="bg-card border-border z-[110] max-w-sm">
+      <DialogHeader><DialogTitle className="text-copper">{de ? "Wiederholten Termin ändern" : "Edit repeating appointment"}</DialogTitle></DialogHeader>
+      <div className="space-y-2">{opts.map(([k, l]) => <button key={k} type="button" onClick={() => onPick(k)} className="w-full text-left rounded-lg border border-border bg-surface px-4 py-3 text-sm text-foreground hover:border-copper active:scale-[0.98] transition">{l}</button>)}</div>
+    </DialogContent>
+  </Dialog>;
 }

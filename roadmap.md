@@ -1,3 +1,3 @@
 - [x] Add optional admin recurrence to appointment creation and editing in DE/EN.
 - [x] Replace duration presets with explicit start/end times in both forms.
-- [x] Verify rules and authenticated create/edit/readback; remove verification data.
+- [x] Verify rules and authenticated create/edit/readback; remove verification data.- [x] Store recurrence as RRULE with copies kept 1 year ahead; preset menu; end Für immer/Bis Datum/Anzahl; edit scope nur dieser/folgende/alle.

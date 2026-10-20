@@ -222,6 +222,7 @@ export type Database = {
           id: string
           notes: string | null
           payment_status: string | null
+          recurrence_rrule: string | null
           recurrence_rule: Json | null
           recurrence_series_id: string | null
           reminder_sent_24h: boolean
@@ -247,6 +248,7 @@ export type Database = {
           id?: string
           notes?: string | null
           payment_status?: string | null
+          recurrence_rrule?: string | null
           recurrence_rule?: Json | null
           recurrence_series_id?: string | null
           reminder_sent_24h?: boolean
@@ -272,6 +274,7 @@ export type Database = {
           id?: string
           notes?: string | null
           payment_status?: string | null
+          recurrence_rrule?: string | null
           recurrence_rule?: Json | null
           recurrence_series_id?: string | null
           reminder_sent_24h?: boolean
@@ -822,6 +825,18 @@ export type Database = {
           _booking: Json
           _dates: string[]
           _recurrence?: Json
+          _source_id?: string
+        }
+        Returns: number
+      }
+      admin_save_series: {
+        Args: {
+          _booking: Json
+          _dates: string[]
+          _prev_rrule?: string
+          _rrule?: string
+          _scope?: string
+          _series_id?: string
           _source_id?: string
         }
         Returns: number
