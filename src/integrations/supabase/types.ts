@@ -820,6 +820,15 @@ export type Database = {
         Args: { _points: number; _stamps: number; _user_id: string }
         Returns: undefined
       }
+      admin_remove_series: {
+        Args: {
+          _mode?: string
+          _prev_rrule?: string
+          _scope: string
+          _source_id: string
+        }
+        Returns: string[]
+      }
       admin_save_appointments: {
         Args: {
           _booking: Json
@@ -841,12 +850,24 @@ export type Database = {
         }
         Returns: number
       }
+      get_taken_slots: {
+        Args: { _barbers: string[]; _from: string; _to: string }
+        Returns: {
+          barber_name: string
+          booking_date: string
+          booking_time: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      service_extend_series: {
+        Args: { _dates: string[]; _series_id: string }
+        Returns: number
       }
       use_promo_code: { Args: { _code: string }; Returns: undefined }
     }

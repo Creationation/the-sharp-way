@@ -15,6 +15,13 @@
       "when": 1792484248689,
       "tag": "0001_rrule_series",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792484859095,
+      "tag": "0002_series_scope_and_taken_slots",
+      "breakpoints": true
     }
   ]
 }

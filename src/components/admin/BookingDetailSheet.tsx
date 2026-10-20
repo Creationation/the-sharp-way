@@ -90,7 +90,7 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
   const [end, setEnd] = useState("09:30");
   const [recurrence, setRecurrence] = useState(defaultRepeat);
   const [series, setSeries] = useState<{ id: string | null; rrule: string | null }>({ id: null, rrule: null });
-  const [scopeOpen, setScopeOpen] = useState(false);
+  const [scopeFor, setScopeFor] = useState<null | "save" | "cancel">(null);
 
   useEffect(() => {
     if (!booking) return;
@@ -215,12 +215,12 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
   };
 
   const handleSave = () => {
-    if (series.id && series.rrule) setScopeOpen(true);
+    if (series.id && series.rrule) setScopeFor("save");
     else save("following");
   };
 
   const save = async (scope: EditScope) => {
-    setScopeOpen(false);
+    setScopeFor(null);
     const newDate = format(date, "yyyy-MM-dd");
     let dates: string[] = [newDate];
     let rrule: string | null = null;
@@ -303,26 +303,29 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
       confirmText: t.cancelBooking,
     });
     if (!ok) return;
+    if (series.id && series.rrule) setScopeFor("cancel");
+    else cancelScope("this");
+  };
+
+  const cancelScope = async (scope: EditScope) => {
+    setScopeFor(null);
     setSaving(true);
-    const { error } = await supabase
-      .from("bookings")
-      .update({ status: "cancelled" })
-      .eq("id", booking.id);
+    const { data: ids, error } = await supabase.rpc("admin_remove_series", {
+      _source_id: booking.id, _scope: scope, _mode: "cancel",
+      _prev_rrule: scope === "following" && series.rrule ? truncateRRule(series.rrule, booking.booking_date) : null,
+    });
     if (error) {
       setSaving(false);
       toast({ title: t.error, description: error.message, variant: "destructive" });
       return;
     }
 
+    // One notification only (for this appointment), not one per copy
+    void ids;
     const results = await Promise.allSettled([
       supabase.functions.invoke("send-booking-update", {
-        body: {
-          booking_id: booking.id,
-          changes: { cancelled: true },
-          new_values: {},
-        },
-      }),
-    ]);
+        body: { booking_id: booking.id, changes: { cancelled: true }, new_values: {} },
+      })]);
     results.forEach((r) => {
       if (r.status === "rejected") console.error("[booking-cancel] notify failed:", r.reason);
     });
@@ -454,7 +457,7 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
         </section>
         <AppointmentTimes start={time} end={end} onStart={setTime} onEnd={setEnd} />
         <AppointmentRecurrence value={recurrence} onChange={setRecurrence} date={date} disabled={booking.status === "cancelled" || isOver} />
-        <SeriesScopeDialog open={scopeOpen} onClose={() => setScopeOpen(false)} onPick={save} />
+        <SeriesScopeDialog open={scopeFor !== null} onClose={() => setScopeFor(null)} onPick={s => scopeFor === "cancel" ? cancelScope(s) : save(s)} title={scopeFor === "cancel" ? (de ? "Wiederholten Termin stornieren" : "Cancel repeating appointment") : undefined} />
 
         {/* Extra persons */}
         <section className="mb-4">

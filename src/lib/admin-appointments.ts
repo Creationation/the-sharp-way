@@ -43,6 +43,9 @@ export const localYmd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() +
 export const addDays = (ymd: string, n: number) => { const d = noonUTC(ymd); d.setUTCDate(d.getUTCDate() + n); return ymdUTC(d); };
 export const weekdayOf = (ymd: string) => (noonUTC(ymd).getUTCDay() + 6) % 7;
 
+/** Day 29–31: falls back to the last day of shorter months (BYSETPOS=-1 over 28..day). */
+const monthDayOpts = (day: number) => day >= 29 ? { bymonthday: Array.from({ length: day - 27 }, (_, i) => 28 + i), bysetpos: -1 } : { bymonthday: day };
+
 /** Builds an RFC 5545 RRULE string (with DTSTART) or null when not repeating. */
 export function buildRRule(start: string, r: Repeat): string | null {
   if (r.preset === "none") return null;
@@ -50,13 +53,13 @@ export function buildRRule(start: string, r: Repeat): string | null {
   const day = Number(start.slice(8, 10));
   const opts: Partial<ConstructorParameters<typeof RRule>[0]> = { dtstart: noonUTC(start), interval: 1 };
   if (r.preset === "weekly" || r.preset === "biweekly") Object.assign(opts, { freq: RRule.WEEKLY, interval: r.preset === "biweekly" ? 2 : 1, byweekday: [RDAYS[wd]] });
-  else if (r.preset === "monthly") Object.assign(opts, { freq: RRule.MONTHLY, bymonthday: day });
+  else if (r.preset === "monthly") Object.assign(opts, { freq: RRule.MONTHLY, ...monthDayOpts(day) });
   else {
     if (!Number.isInteger(r.interval) || r.interval < 1 || r.interval > 100) throw new Error("invalid_recurrence");
     const freq = { daily: RRule.DAILY, weekly: RRule.WEEKLY, monthly: RRule.MONTHLY, yearly: RRule.YEARLY }[r.frequency];
     Object.assign(opts, { freq, interval: r.interval });
     if (r.frequency === "weekly") opts.byweekday = (r.weekdays.length ? r.weekdays : [wd]).map(d => RDAYS[d]);
-    if (r.frequency === "monthly") opts.bymonthday = r.monthDay >= 1 && r.monthDay <= 31 ? r.monthDay : day;
+    if (r.frequency === "monthly") Object.assign(opts, monthDayOpts(r.monthDay >= 1 && r.monthDay <= 31 ? r.monthDay : day));
   }
   if (r.end.type === "count") {
     if (!Number.isInteger(r.end.count) || r.end.count < 2 || r.end.count > 400) throw new Error("invalid_recurrence");
@@ -94,13 +97,36 @@ export function parseRRule(rrule: string | null | undefined): Repeat {
   const interval = o.interval ?? 1;
   const freqName = ({ [Frequency.DAILY]: "daily", [Frequency.WEEKLY]: "weekly", [Frequency.MONTHLY]: "monthly", [Frequency.YEARLY]: "yearly" } as Record<number, Repeat["frequency"]>)[o.freq!] ?? "weekly";
   const start = o.dtstart ? ymdUTC(o.dtstart) : "";
-  r.frequency = freqName; r.interval = interval; r.weekdays = days; r.monthDay = mdays[0] ?? 0;
+  r.frequency = freqName; r.interval = interval; r.weekdays = days; r.monthDay = mdays.length ? Math.max(...mdays) : 0;
   const sameDay = start && days.length === 1 && days[0] === weekdayOf(start);
   if (freqName === "weekly" && sameDay && interval === 1) r.preset = "weekly";
   else if (freqName === "weekly" && sameDay && interval === 2) r.preset = "biweekly";
-  else if (freqName === "monthly" && interval === 1 && start && mdays[0] === Number(start.slice(8, 10))) r.preset = "monthly";
+  else if (freqName === "monthly" && interval === 1 && start && Math.max(...mdays) === Number(start.slice(8, 10))) r.preset = "monthly";
   else r.preset = "custom";
   if (o.count) r.end = { type: "count", until: "", count: o.count };
   else if (o.until) r.end = { type: "until", until: ymdUTC(o.until), count: 10 };
   return r;
+}
+
+/** Short human summary, e.g. "Jeden Dienstag, für immer". */
+export function repeatSummary(start: string, r: Repeat, de: boolean): string {
+  if (r.preset === "none") return "";
+  const DE = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+  const EN = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const names = de ? DE : EN;
+  const wd = weekdayOf(start); const day = Number(start.slice(8, 10));
+  const list = (ds: number[]) => ds.map(d => names[d]).join(de ? ", " : ", ");
+  let what: string;
+  const freq = r.preset === "custom" ? r.frequency : r.preset === "monthly" ? "monthly" : "weekly";
+  const interval = r.preset === "biweekly" ? 2 : r.preset === "custom" ? r.interval : 1;
+  const days = r.preset === "custom" && r.weekdays.length ? r.weekdays : [wd];
+  const mday = r.preset === "custom" && r.monthDay >= 1 ? r.monthDay : day;
+  if (freq === "weekly") what = interval === 1 ? (de ? `Jeden ${list(days)}` : `Every ${list(days)}`) : (de ? `Alle ${interval} Wochen am ${list(days)}` : `Every ${interval} weeks on ${list(days)}`);
+  else if (freq === "monthly") what = interval === 1 ? (de ? `Jeden Monat am ${mday}.` : `Every month on day ${mday}`) : (de ? `Alle ${interval} Monate am ${mday}.` : `Every ${interval} months on day ${mday}`);
+  else if (freq === "daily") what = interval === 1 ? (de ? "Jeden Tag" : "Every day") : (de ? `Alle ${interval} Tage` : `Every ${interval} days`);
+  else what = interval === 1 ? (de ? "Jedes Jahr" : "Every year") : (de ? `Alle ${interval} Jahre` : `Every ${interval} years`);
+  if (freq === "monthly" && mday >= 29) what += de ? " (sonst letzter Tag)" : " (or last day)";
+  const fmt = (ymd: string) => `${ymd.slice(8, 10)}.${ymd.slice(5, 7)}.${ymd.slice(0, 4)}`;
+  const end = r.end.type === "forever" ? (de ? "für immer" : "forever") : r.end.type === "until" ? (de ? `bis ${r.end.until ? fmt(r.end.until) : "…"}` : `until ${r.end.until ? fmt(r.end.until) : "…"}`) : (de ? `${r.end.count} Termine` : `${r.end.count} appointments`);
+  return `${what}, ${end}`;
 }

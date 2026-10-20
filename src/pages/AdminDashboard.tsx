@@ -31,6 +31,8 @@ import ManualTab from "@/components/admin/ManualTab";
 import ShopHoursTab from "@/components/admin/ShopHoursTab";
 import AdminBookingCreateSheet from "@/components/admin/AdminBookingCreateSheet";
 import { extendSeries } from "@/lib/series-extend";
+import { truncateRRule } from "@/lib/admin-appointments";
+import { SeriesScopeDialog, type EditScope } from "@/components/admin/AppointmentTiming";
 import { useBarbers } from "@/hooks/useBarbers";
 import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
 
@@ -264,7 +266,24 @@ const AdminDashboard = () => {
     }
   };
 
+  const [pendingRemove, setPendingRemove] = useState<null | { id: string; mode: "cancel" | "delete" }>(null);
+  const seriesOf = (id: string) => bookings.find(b => b.id === id) as unknown as { booking_date: string; recurrence_series_id?: string | null; recurrence_rrule?: string | null } | undefined;
+  const removeWithScope = async (scope: EditScope) => {
+    if (!pendingRemove) return;
+    const { id, mode } = pendingRemove;
+    setPendingRemove(null);
+    const b = seriesOf(id);
+    const { error } = await supabase.rpc("admin_remove_series", {
+      _source_id: id, _scope: scope, _mode: mode,
+      _prev_rrule: scope === "following" && b?.recurrence_rrule ? truncateRRule(b.recurrence_rrule, b.booking_date) : null,
+    });
+    if (error) { toast.error(mode === "delete" ? t.admin.deleteError : t.admin.updateError); return; }
+    toast.success(mode === "delete" ? t.admin.bookingDeleted : t.admin.bookingCancelled);
+    fetchBookings();
+  };
+
   const updateStatus = async (id: string, status: string) => {
+    if (status === "cancelled" && seriesOf(id)?.recurrence_rrule) { setPendingRemove({ id, mode: "cancel" }); return; }
     const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
     if (error) { toast.error(t.admin.updateError); return; }
     toast.success(status === "cancelled" ? t.admin.bookingCancelled : t.admin.statusUpdated);
@@ -272,6 +291,7 @@ const AdminDashboard = () => {
   };
 
   const deleteBooking = async (id: string) => {
+    if (seriesOf(id)?.recurrence_rrule) { setPendingRemove({ id, mode: "delete" }); return; }
     const { error } = await supabase.from("bookings").delete().eq("id", id);
     if (error) { toast.error(t.admin.deleteError); return; }
     toast.success(t.admin.bookingDeleted);
@@ -879,6 +899,8 @@ const AdminDashboard = () => {
         onOpenChange={setCreateBookingOpen}
         onCreated={fetchBookings}
       />
+      <SeriesScopeDialog open={pendingRemove !== null} onClose={() => setPendingRemove(null)} onPick={removeWithScope}
+        title={pendingRemove?.mode === "delete" ? (lang === "de" ? "Wiederholten Termin löschen" : "Delete repeating appointment") : (lang === "de" ? "Wiederholten Termin stornieren" : "Cancel repeating appointment")} />
     </div>
   );
 };

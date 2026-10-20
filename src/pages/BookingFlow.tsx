@@ -517,12 +517,8 @@ const BookingFlow = () => {
     const dateStr = toDateStr(selectedDate);
 
     const [bookingsRes, availRes, hoursRes, absencesRes] = await Promise.all([
-      supabase
-        .from("bookings")
-        .select("booking_time")
-        .eq("barber_name", selectedBarber.name)
-        .eq("booking_date", dateStr)
-        .eq("status", "confirmed"),
+      // All confirmed bookings of this barber (incl. other clients and repeating admin appointments)
+      supabase.rpc("get_taken_slots", { _barbers: [selectedBarber.name], _from: dateStr, _to: dateStr }),
       supabase
         .from("barber_availability")
         .select("blocked_slots, day_off")
