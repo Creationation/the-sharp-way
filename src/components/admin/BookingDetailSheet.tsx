@@ -320,10 +320,12 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
       return;
     }
 
-    const results = await Promise.allSettled((ids ?? [booking.id]).map(id =>
+    // One notification only (for this appointment), not one per copy
+    void ids;
+    const results = await Promise.allSettled([
       supabase.functions.invoke("send-booking-update", {
-        body: { booking_id: id, changes: { cancelled: true }, new_values: {} },
-      })));
+        body: { booking_id: booking.id, changes: { cancelled: true }, new_values: {} },
+      })]);
     results.forEach((r) => {
       if (r.status === "rejected") console.error("[booking-cancel] notify failed:", r.reason);
     });
