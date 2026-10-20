@@ -133,6 +133,7 @@ const AdminDashboard = () => {
     }
     if (isAdmin) {
       fetchBookings();
+      extendSeries().catch(e => console.error("[series] extend failed", e));
     }
   }, [isAdmin, authLoading, adminChecked]);
 
