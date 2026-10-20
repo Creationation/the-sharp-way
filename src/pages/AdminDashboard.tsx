@@ -30,6 +30,7 @@ import StripeTab from "@/components/admin/StripeTab";
 import ManualTab from "@/components/admin/ManualTab";
 import ShopHoursTab from "@/components/admin/ShopHoursTab";
 import AdminBookingCreateSheet from "@/components/admin/AdminBookingCreateSheet";
+import { extendSeries } from "@/lib/series-extend";
 import { useBarbers } from "@/hooks/useBarbers";
 import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
 
