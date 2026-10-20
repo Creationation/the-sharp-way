@@ -423,7 +423,7 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
           </div>
         </section>
         <AppointmentTimes start={time} end={end} onStart={setTime} onEnd={setEnd} />
-        <AppointmentRecurrence value={recurrence} onChange={setRecurrence} disabled={booking.status === "cancelled" || isOver} />
+        <AppointmentRecurrence value={recurrence} onChange={setRecurrence} date={date} disabled={booking.status === "cancelled" || isOver} />
 
         {/* Extra persons */}
         <section className="mb-4">
