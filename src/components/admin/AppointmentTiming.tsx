@@ -1,4 +1,3 @@
-import { useId } from "react";
 import { format } from "date-fns";
 import { de as deLocale, enUS } from "date-fns/locale";
 import { Clock, Repeat as RepeatIcon, Minus, Plus } from "lucide-react";
@@ -6,16 +5,35 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLanguage } from "@/contexts/LanguageContext";
-import type { Repeat, RepeatPreset } from "@/lib/admin-appointments";
+import { repeatSummary, type Repeat, type RepeatPreset } from "@/lib/admin-appointments";
 import { cn } from "@/lib/utils";
+
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
+const MINUTES = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, "0"));
+
+/** 24-hour time picker (no AM/PM, independent of the phone's settings). */
+function Time24({ value, onChange, label }: { value: string; onChange: (v: string) => void; label: string }) {
+  const [h, m] = [value.slice(0, 2) || "10", value.slice(3, 5) || "00"];
+  const minutes = MINUTES.includes(m) ? MINUTES : [...MINUTES, m].sort();
+  return <div className="flex items-center gap-1">
+    <Select value={h} onValueChange={v => onChange(`${v}:${m}`)}>
+      <SelectTrigger aria-label={`${label} h`} className="bg-surface border-border text-foreground px-2"><SelectValue /></SelectTrigger>
+      <SelectContent className="z-[100] bg-surface border-border max-h-64">{HOURS.map(x => <SelectItem key={x} value={x}>{x}</SelectItem>)}</SelectContent>
+    </Select>
+    <span className="text-muted-foreground">:</span>
+    <Select value={m} onValueChange={v => onChange(`${h}:${v}`)}>
+      <SelectTrigger aria-label={`${label} min`} className="bg-surface border-border text-foreground px-2"><SelectValue /></SelectTrigger>
+      <SelectContent className="z-[100] bg-surface border-border max-h-64">{minutes.map(x => <SelectItem key={x} value={x}>{x}</SelectItem>)}</SelectContent>
+    </Select>
+  </div>;
+}
 
 export function AppointmentTimes({ start, end, onStart, onEnd }: { start: string; end: string; onStart: (s: string) => void; onEnd: (s: string) => void }) {
   const { lang } = useLanguage();
-  const id = useId();
   return <section className="mb-4 grid grid-cols-2 gap-3">
     {[{ value: start, change: onStart, label: lang === "de" ? "Beginn" : "Start", key: "start" }, { value: end, change: onEnd, label: lang === "de" ? "Ende" : "End", key: "end" }].map(field => <div key={field.key} className="min-w-0">
-      <label htmlFor={`${id}-${field.key}`} className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5"><Clock size={12} />{field.label}</label>
-      <Input id={`${id}-${field.key}`} type="time" value={field.value} onChange={e => field.change(e.target.value)} className="bg-surface border-border text-foreground min-w-0" required />
+      <span className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5"><Clock size={12} />{field.label}</span>
+      <Time24 value={field.value} onChange={field.change} label={field.label} />
     </div>)}
   </section>;
 }
@@ -102,8 +120,12 @@ export function AppointmentRecurrence({ value, onChange, date, disabled = false 
         ))}
       </div>
       {value.end.type === "until" && <Input type="date" aria-label={de ? "Bis Datum" : "Until date"} value={value.end.until} min={format(date, "yyyy-MM-dd")} onChange={e => onChange({ ...value, end: { ...value.end, until: e.target.value } })} className="bg-surface border-border text-foreground" />}
-      {value.end.type === "count" && stepper(value.end.count, n => onChange({ ...value, end: { ...value.end, count: n } }), 2, 400, de ? `${value.end.count} Termine` : `${value.end.count} appointments`)}
+      {value.end.type === "count" && <div className="flex items-center gap-2">
+        <Input type="number" inputMode="numeric" min={2} max={400} aria-label={de ? "Anzahl" : "Count"} value={value.end.count || ""} onChange={e => onChange({ ...value, end: { ...value.end, count: Math.min(400, Math.max(0, parseInt(e.target.value, 10) || 0)) } })} className="bg-surface border-border text-foreground w-24" />
+        <span className="text-sm text-muted-foreground">{de ? "Termine" : "appointments"}</span>
+      </div>}
     </div>}
+    {value.preset !== "none" && <p className="text-xs text-copper">{repeatSummary(format(date, "yyyy-MM-dd"), value, de)}</p>}
   </section>;
 }
 
