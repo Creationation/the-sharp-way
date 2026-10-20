@@ -1,3 +1,6 @@
+import { AppointmentTimes, AppointmentRecurrence } from "./AppointmentTiming";
+import { defaultRecurrence, durationBetween, endTime, occurrenceDates, slotOverlaps } from "@/lib/admin-appointments";
+import { Button } from "@/components/ui/button";
 import { parseWalkin } from "@/lib/walkin";
 import { useEffect, useState } from "react";
 import { Phone, Mail, User, Calendar as CalIcon, Clock, UserCog, XCircle, Loader2, Save, Ban, Minus, Plus, Users, CheckCircle2 } from "lucide-react";
@@ -61,7 +64,6 @@ const HOUR_OPTIONS = Array.from({ length: 12 * 2 }, (_, i) => {
 const END_OPTIONS = [...HOUR_OPTIONS.slice(1), "21:00"];
 const PERSONS_RE = /\+(\d+) (?:Person(?:en)?|persons?)/;
 
-const DURATION_OPTIONS = [30, 60, 90, 120, 150, 180];
 
 const parseDuration = (d: string): number => {
   const m = d.match(/\d+/);
@@ -85,14 +87,16 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
   const [blocked, setBlocked] = useState<string[]>([]);
   const [dayOff, setDayOff] = useState(false);
   const [blockUntil, setBlockUntil] = useState("");
-  const [duration, setDuration] = useState(30);
+  const [end, setEnd] = useState("09:30");
+  const [recurrence, setRecurrence] = useState(defaultRecurrence);
 
   useEffect(() => {
     if (!booking) return;
     setBarberName(booking.barber_name);
     setDate(parseISO(booking.booking_date));
     setTime(booking.booking_time.substring(0, 5));
-    setDuration(parseDuration(booking.service_duration));
+    setEnd(endTime(booking.booking_time, parseDuration(booking.service_duration)));
+    setRecurrence(defaultRecurrence());
 
     let cancel = false;
     setExtraPersons(parseInt(booking.notes?.match(PERSONS_RE)?.[1] || "0", 10));
@@ -152,7 +156,7 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
   const start = booking.booking_time.substring(0, 5);
   // Continuous blocked range starting at this booking's time
   const myBlock: string[] = [];
-  for (let i = HOUR_OPTIONS.indexOf(start); i >= 0 && i < HOUR_OPTIONS.length && blocked.includes(HOUR_OPTIONS[i]); i++) myBlock.push(HOUR_OPTIONS[i]);
+  for (let i = HOUR_OPTIONS.findIndex(slot => slotOverlaps(slot, start, endTime(start, 1))); i >= 0 && i < HOUR_OPTIONS.length && blocked.includes(HOUR_OPTIONS[i]); i++) myBlock.push(HOUR_OPTIONS[i]);
   const myBlockEnd = myBlock.length ? END_OPTIONS[HOUR_OPTIONS.indexOf(myBlock[myBlock.length - 1])] : null;
   const untilValue = blockUntil || myBlockEnd || END_OPTIONS.find(o => o > start) || "";
   const durMin = parseInt(booking.service_duration) || 30;
@@ -173,7 +177,7 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
 
   const handleBlock = async () => {
     setSaving(true);
-    const range = HOUR_OPTIONS.filter(o => o >= start && o < untilValue);
+    const range = HOUR_OPTIONS.filter(o => slotOverlaps(o, start, untilValue));
     const ok = await saveBlocked([...new Set([...blocked.filter(s => !myBlock.includes(s)), ...range])].sort());
     setSaving(false);
     if (ok) toast({ title: de ? `${booking.barber_name} blockiert ${start}–${untilValue}` : `${booking.barber_name} blocked ${start}–${untilValue}` });
@@ -203,6 +207,10 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
   };
 
   const handleSave = async () => {
+    let dates: string[];
+    let duration: number;
+    try { dates = occurrenceDates(date, recurrence); duration = durationBetween(time, end); }
+    catch { toast({ title: de ? "Bitte Beginn, Ende und Wiederholung prüfen" : "Please check start, end and repetition", variant: "destructive" }); return; }
     setSaving(true);
     const newDate = format(date, "yyyy-MM-dd");
     const newTime = time;
@@ -214,9 +222,7 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
       duration: newDuration !== booking.service_duration,
     };
 
-    const { error } = await supabase
-      .from("bookings")
-      .update({
+    const { error } = await supabase.rpc("admin_save_appointments", { _source_id: booking.id, _dates: dates, _recurrence: recurrence.enabled ? recurrence : null, _booking: {
         barber_name: barberName,
         booking_date: newDate,
         booking_time: newTime,
@@ -226,11 +232,10 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
           const tag = extraPersons > 0 ? (de ? `+${extraPersons} Person${extraPersons > 1 ? "en" : ""}` : `+${extraPersons} person${extraPersons > 1 ? "s" : ""}`) : "";
           return [tag, base].filter(Boolean).join(" · ") || null;
         })(),
-      })
-      .eq("id", booking.id);
+      } });
     if (error) {
       setSaving(false);
-      toast({ title: t.error, description: error.message, variant: "destructive" });
+      toast({ title: t.error, description: error.message.includes("Hour full") ? (de ? "Eine Stunde ist voll (max. 10 Termine). Es wurde nichts gespeichert." : "An hour is full (max. 10 appointments). Nothing was saved.") : error.message, variant: "destructive" });
       return;
     }
 
@@ -393,7 +398,7 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
         </section>
 
         {/* Date + Time */}
-        <section className="mb-4 grid grid-cols-2 gap-3">
+        <section className="mb-4">
           <div>
             <label className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
               <CalIcon size={12} /> {t.date}
@@ -416,44 +421,9 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
               </PopoverContent>
             </Popover>
           </div>
-          <div>
-            <label className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
-              <Clock size={12} /> {t.time}
-            </label>
-            <Select value={time} onValueChange={setTime}>
-              <SelectTrigger className="bg-surface border-border text-foreground">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-surface border-border z-[100] max-h-64">
-                {HOUR_OPTIONS.map((h) => (
-                  <SelectItem key={h} value={h}>{h}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
         </section>
-
-        {/* Duration */}
-        <section className="mb-5">
-          <label className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
-            <Clock size={12} /> {t.duration}
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {DURATION_OPTIONS.map((d) => (
-              <button
-                key={d}
-                onClick={() => setDuration(d)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition ${
-                  duration === d
-                    ? "bg-copper text-bg-base border-copper"
-                    : "bg-surface text-foreground border-border hover:border-copper/50"
-                }`}
-              >
-                {d} {t.minutes}
-              </button>
-            ))}
-          </div>
-        </section>
+        <AppointmentTimes start={time} end={end} onStart={setTime} onEnd={setEnd} />
+        <AppointmentRecurrence value={recurrence} onChange={setRecurrence} disabled={booking.status === "cancelled" || isOver} />
 
         {/* Extra persons */}
         <section className="mb-4">
@@ -513,14 +483,14 @@ const BookingDetailSheet = ({ booking, barbers, open, onOpenChange, onChanged }:
 
         {/* Actions */}
         <div className="flex flex-col gap-2 pb-4">
-          <button
+          <Button
             onClick={handleSave}
             disabled={saving}
             className="w-full bg-copper text-bg-base font-semibold rounded-lg py-3 text-sm active:scale-[0.98] transition flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             {t.save}
-          </button>
+          </Button>
           {booking.status !== "cancelled" && (
             <button
               onClick={handleCancel}

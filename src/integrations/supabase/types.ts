@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.4"
   }
   public: {
     Tables: {
@@ -222,6 +222,8 @@ export type Database = {
           id: string
           notes: string | null
           payment_status: string | null
+          recurrence_rule: Json | null
+          recurrence_series_id: string | null
           reminder_sent_24h: boolean
           reminder_sent_2h: boolean
           reminder_sent_5h: boolean
@@ -245,6 +247,8 @@ export type Database = {
           id?: string
           notes?: string | null
           payment_status?: string | null
+          recurrence_rule?: Json | null
+          recurrence_series_id?: string | null
           reminder_sent_24h?: boolean
           reminder_sent_2h?: boolean
           reminder_sent_5h?: boolean
@@ -268,6 +272,8 @@ export type Database = {
           id?: string
           notes?: string | null
           payment_status?: string | null
+          recurrence_rule?: Json | null
+          recurrence_series_id?: string | null
           reminder_sent_24h?: boolean
           reminder_sent_2h?: boolean
           reminder_sent_5h?: boolean
@@ -810,6 +816,15 @@ export type Database = {
       admin_adjust_loyalty: {
         Args: { _points: number; _stamps: number; _user_id: string }
         Returns: undefined
+      }
+      admin_save_appointments: {
+        Args: {
+          _booking: Json
+          _dates: string[]
+          _recurrence?: Json
+          _source_id?: string
+        }
+        Returns: number
       }
       has_role: {
         Args: {
