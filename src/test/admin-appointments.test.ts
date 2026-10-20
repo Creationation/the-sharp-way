@@ -26,7 +26,6 @@ describe("RRULE repetition", () => {
     expect(d[d.length - 1] <= "2027-10-20").toBe(true);
   });
   it("custom weekly on Tue + Thu", () => expect(rruleDates(buildRRule(TODAY, rep({ preset: "custom", frequency: "weekly", weekdays: [1, 3], end: { type: "count", until: "", count: 4 } }))!, TODAY, TODAY)).toEqual(["2026-10-20", "2026-10-22", "2026-10-27", "2026-10-29"]));
-  it.skip("old: skips months without day 31", () => expect(rruleDates(buildRRule("2026-01-31", rep({ preset: "monthly", end: { type: "count", until: "", count: 3 } }))!, "2026-01-31", "2026-01-31")).toEqual(["2026-01-31", "2026-03-31", "2026-05-31"]));
   it("dieser und folgende: old rule ends the day before", () => {
     const r = buildRRule(TODAY, rep({ preset: "weekly" }))!;
     expect(rruleDates(truncateRRule(r, "2026-11-03"), TODAY, TODAY)).toEqual(["2026-10-20", "2026-10-27"]);
