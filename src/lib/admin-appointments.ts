@@ -40,7 +40,7 @@ const RDAYS: Weekday[] = [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRul
 const noonUTC = (ymd: string) => { const [y, m, d] = ymd.split("-").map(Number); return new Date(Date.UTC(y, m - 1, d, 12)); };
 const ymdUTC = (d: Date) => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
 export const localYmd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-const addDays = (ymd: string, n: number) => { const d = noonUTC(ymd); d.setUTCDate(d.getUTCDate() + n); return ymdUTC(d); };
+export const addDays = (ymd: string, n: number) => { const d = noonUTC(ymd); d.setUTCDate(d.getUTCDate() + n); return ymdUTC(d); };
 export const weekdayOf = (ymd: string) => (noonUTC(ymd).getUTCDay() + 6) % 7;
 
 /** Builds an RFC 5545 RRULE string (with DTSTART) or null when not repeating. */
