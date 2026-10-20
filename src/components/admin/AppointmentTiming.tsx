@@ -130,13 +130,13 @@ export function AppointmentRecurrence({ value, onChange, date, disabled = false 
 }
 
 export type EditScope = "this" | "following" | "all";
-export function SeriesScopeDialog({ open, onClose, onPick }: { open: boolean; onClose: () => void; onPick: (s: EditScope) => void }) {
+export function SeriesScopeDialog({ open, onClose, onPick, title }: { open: boolean; onClose: () => void; onPick: (s: EditScope) => void; title?: string }) {
   const { lang } = useLanguage();
   const de = lang === "de";
-  const opts: [EditScope, string][] = [["this", de ? "Nur dieser Termin" : "This appointment only"], ["following", de ? "Dieser und folgende Termine" : "This and following appointments"], ["all", de ? "Alle Termine" : "All appointments"]];
+  const opts: [EditScope, string][] = [["this", de ? "Nur dieser Termin" : "This appointment only"], ["following", de ? "Dieser und alle folgenden" : "This and all following"], ["all", de ? "Alle Termine" : "All appointments"]];
   return <Dialog open={open} onOpenChange={o => !o && onClose()}>
     <DialogContent className="bg-card border-border z-[110] max-w-sm">
-      <DialogHeader><DialogTitle className="text-copper">{de ? "Wiederholten Termin ändern" : "Edit repeating appointment"}</DialogTitle></DialogHeader>
+      <DialogHeader><DialogTitle className="text-copper">{title ?? (de ? "Wiederholten Termin ändern" : "Edit repeating appointment")}</DialogTitle></DialogHeader>
       <div className="space-y-2">{opts.map(([k, l]) => <button key={k} type="button" onClick={() => onPick(k)} className="w-full text-left rounded-lg border border-border bg-surface px-4 py-3 text-sm text-foreground hover:border-copper active:scale-[0.98] transition">{l}</button>)}</div>
     </DialogContent>
   </Dialog>;
